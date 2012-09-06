@@ -18,7 +18,7 @@
     };
     
     Klass.prototype.current = function () {
-      return this.someArray.at(this.index);
+      return this.someArray.at_(this.index);
     };
 
     Klass.prototype.current_ = function (replacement) {
@@ -30,7 +30,7 @@
       var origin;
       origin = index.deepCopy();
       index = index.plus_(1);
-      (origin.concat(' to ').concat(index)).print();
+      (origin.concat_(' to ').concat_(index)).print();
       return index;
     };
 
@@ -44,6 +44,6 @@
     _cascade.current().print();
   })();
 
-  [1, 2, 3, 4].inject_into_(0, function (a, lastres) { return lastres.plus(a); });
+  [1, 2, 3, 4].inject_into_(0, function (a, lastres) { return lastres.plus_(a); });
 
 }).call(this);
