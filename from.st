@@ -15,7 +15,7 @@ Class Klass :superClass
   incrementPointer | origin |
     origin <- index deepCopy.
     index <- index + 1.
-    (origin, ' to ', index) print
+    (origin, ' to ', index) print.
     ^ index
 ]
 
