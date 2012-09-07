@@ -19,6 +19,6 @@ Class Klass :superClass
     ^ index
 ]
 
-(Klass new ; incrementPointer ; current: 3 ; current) print.
+(Klass new ; incrementPointer ; current: 3) current print.
 
 #(1 2 3 4) inject: 0 into: [:a :lastres | lastres + a].
