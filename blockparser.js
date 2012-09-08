@@ -77,10 +77,10 @@
       vars = "";
       _this.many(function () {
         _this.colon();
-        vars += _this.variable() + " ";
+        vars += _this.variable() + ", ";
         _this.optional(_this.space);
       });
-      return vars;
+      return vars.slice(0, -2);
     });
   };
 
