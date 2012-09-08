@@ -23,8 +23,8 @@
     }
 
     /*
-     * Cache combinators instead of evaluating them every time.
-     * s = combinator name, fn = the parser returned by the combinator
+     * Cache parsers instead of evaluating them every time.
+     * s = parser name, fn = the parser returned by the parser
      */
     Packrat.prototype.cacheDo = function (s, fn) {
       fn = fn || function () {}; //block
