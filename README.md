@@ -16,7 +16,7 @@ Little Smalltalkの処理系が手に入らなかったので本を見ながら�
   * このときunaryやkeyword1_keyword2はjsでobjのコンストラクタのprototypeに定義することとする。
   * 予約語やメソッド名に使えない記号のときは他の名前に変換できる仕組みを用意する。　(辞書?)
 
-最終目標:
+目標:
 ---------
-最終目標として、from.stをto.jsにコンパイルできるようにする。   
-to.jsはCoffeeScriptが吐き出すコードを真似たい。    
+from.stをto.jsにコンパイルできるようにする。   
+to.jsはCoffeeScriptが吐き出すコードを真似たい。

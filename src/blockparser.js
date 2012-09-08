@@ -1,4 +1,8 @@
 /*
+ * Copyright (c) 2012 Minori Yamashita <ympbyc@gmail.com>
+ * See LICENCE.txt
+ */
+/* 
  * BlockParser
  * convert smalltalk style block to javascript's closure
  */
@@ -21,7 +25,7 @@
   };
 
   try {
-    Packrat = require('packrat');
+    Packrat = require('packratparser').Packrat;
   } catch (err) {
     Packrat = window.Packrat || throw "packrat.js is required";
   }

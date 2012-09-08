@@ -1,5 +1,9 @@
-/* packratparser.js - javascript clone of http://d.hatena.ne.jp/ku-ma-me/20070906/p1
- *
+/*
+ * Copyright (c) 2012 Minori Yamashita <ympbyc@gmail.com>
+ * See LICENCE.txt
+ */
+/* 
+ * packratparser.js - javascript clone of http://d.hatena.ne.jp/ku-ma-me/20070906/p1
  * packratparser.js is part of Little Smallscript.
  */
 
