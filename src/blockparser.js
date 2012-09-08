@@ -38,9 +38,9 @@
   };
   BlockParser.prototype = new Packrat("");
 
-  BlockParser.prototype.expr = function () {
+  BlockParser.prototype.block = function () {
     var _this = this;
-    return this.cacheDo("expr", function () {
+    return this.cacheDo("block", function () {
       var parameters, body;
       _this.blockStart();
       parameters = _this.blockHead();
@@ -82,7 +82,7 @@
       _this.many(function () {
         _this.colon();
         vars += _this.variable() + ", ";
-        _this.optional(_this.space);
+        _this.skipSpace();
       });
       return vars.slice(0, -2);
     });
@@ -112,27 +112,43 @@
     });
   };
 
+  BlockParser.prototype.expression = function () {
+    var _this = this;
+    return this.cacheDo("expression", function () {
+      return _this.try_(
+        _this.block,
+        function () {
+          return _this.regex(/^[^\[\]\.]+/);
+        }
+      );
+    });
+  };
+      
+  BlockParser.prototype.skipSpace = function () {
+    return this.optional(this.space);
+  };
+
   BlockParser.prototype.body = function () {
     var _this = this;
     return this.cacheDo("body", function () {
-      //var ret ="";
-      return _this.many(function () {
+      var ret ="";
+
+      _this.skipSpace();
+      ret += _this.many(function () {
         var a;
-        a = _this.try_(
-          _this.expr,
-          function () {
-            return _this.regex(/^[^\[\]\.]+/);
-          }
-        );
+        a = _this.expression();
       
-        _this.optional(_this.space);
-        _this.optional(function () { return _this.chr(".") });
-        _this.optional(_this.space);
+        _this.skipSpace();
+        _this.chr(".");
+        _this.skipSpace();
         
-        //ret += a;
-        return a;
+        return a + "; ";
       });
-      //return ret;
+      
+      ret += " return " + _this.expression() + ";";
+      _this.skipSpace();
+
+      return ret;
     });
   };
 
@@ -141,9 +157,9 @@
   
   (function () {
     " examples "
-    new BlockParser("[:foo :bar | return bar]").expr(); // function (foo bar ) { return bar }
-    new BlockParser("[block without parameters]").expr(); // function () { block without parameters }
-    new BlockParser("[:a :b :c | return ([return 1])() ]").expr(); //function (a, b, c) {  return (function () { return 1 })()  }
+    new BlockParser("[1]").block(); //"function () {  return 1; }"
+    new BlockParser("[:a| [1] ]").block(); //"function (a) {  return function () {  return 1; }; }"
+    new BlockParser("[:foo :bar| [foo]. bar]").block(); //"function (foo, bar) { function () {  return foo; };  return bar; }"
   })();
 
 }).call(this);
