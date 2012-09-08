@@ -3,7 +3,9 @@
  * convert smalltalk style block to javascript's closure
  */
 (function () {
-  var BlockParser, 
+  'use strict';
+
+  var Packrat, BlockParser, 
   __each = function (obj, fn) {
     for (var key in obj)
       if (obj.hasOwnProperty(key))
@@ -17,6 +19,13 @@
     });
     return dest_str;
   };
+
+  try {
+    Packrat = require('packrat');
+  } catch (err) {
+    Packrat = window.Packrat || throw "packrat.js is required";
+  }
+
 
   function BlockParser (input) {
     this.cache = {};
