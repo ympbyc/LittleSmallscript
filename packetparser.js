@@ -1,22 +1,22 @@
-/* packetparser.js - javascript clone of http://d.hatena.ne.jp/ku-ma-me/20070906/p1
+/* packratparser.js - javascript clone of http://d.hatena.ne.jp/ku-ma-me/20070906/p1
  *
- * packetparser.js is part of Little Smallscript.
+ * packratparser.js is part of Little Smallscript.
  */
 
 (function () {
-  var Packet,
+  var Packrat,
       __toArray = function (a) { return [].slice.call(a); };
 
   /*
-   * Packet Parser is an implementation of PEG
+   * Packrat Parser is an implementation of PEG
    * new this constructor function with input you want to parse
    * to generare parsers.
    */
-  Packet = (function () {
-    var Packet, NoParse;
+  Packrat = (function () {
+    var Packrat, NoParse;
 
     /* constructor */
-    function Packet (input) {
+    function Packrat (input) {
       this.input = input;
       this.index = 0;
       this.cache = {};
@@ -26,7 +26,7 @@
      * Cache combinators instead of evaluating them every time.
      * s = combinator name, fn = the parser returned by the combinator
      */
-    Packet.prototype.cacheDo = function (s, fn) {
+    Packrat.prototype.cacheDo = function (s, fn) {
       fn = fn || function () {}; //block
       var c = {}; // c={fn:,idx:}
       if ((this.cache[s] || {})[this.index]) {
@@ -63,7 +63,7 @@
     /*
      * throw NoParse
      */
-    Packet.prototype.noParse = function () {
+    Packrat.prototype.noParse = function () {
       throw new NoParse;
     };
 
@@ -77,7 +77,7 @@
      * ordered or 
      * a / b / ...
      */
-    Packet.prototype.try_ = function (/* &rest arguments */) {
+    Packrat.prototype.try_ = function (/* &rest arguments */) {
       var i, ret, _this = this;
       i = this.index;
       __toArray(arguments).forEach(function (a) {
@@ -96,7 +96,7 @@
      * match all or none
      * a b ...
      */
-    Packet.prototype.sequence = function (/* &rest arguments */) {
+    Packrat.prototype.sequence = function (/* &rest arguments */) {
       var i, ret, fail, _this = this;
       i = this.index;
       ret = [];
@@ -119,7 +119,7 @@
      * succeeds even when the parser doesn't match
      * a?
      */
-    Packet.prototype.optional = function (fn) {
+    Packrat.prototype.optional = function (fn) {
       var i;
       i = this.index;
       try {
@@ -136,7 +136,7 @@
      * this parser doesn't consume the input
      * &a
      */
-    Packet.prototype.followedBy = function (fn) {
+    Packrat.prototype.followedBy = function (fn) {
       var f = true,
           i = this.index;
       try {
@@ -153,7 +153,7 @@
      * opposite of followedBy
      * !a
      */
-    Packet.prototype.notFollowedBy = function (fn) {
+    Packrat.prototype.notFollowedBy = function (fn) {
       var f = false,
           i = this.index;
       try {
@@ -170,7 +170,7 @@
      * 0 or more ocuurance. returned in an array.
      * a*
      */
-    Packet.prototype.many = function (fn) {
+    Packrat.prototype.many = function (fn) {
       var _this = this;
       return this.try_(
         function () { return _this.many1( function () { return fn.call(_this); } )  },
@@ -182,7 +182,7 @@
      * 1 or more occurance. returned in an array.
      * a+
      */
-    Packet.prototype.many1 = function (fn) {
+    Packrat.prototype.many1 = function (fn) {
       var v, vs, _this = this;
       v = fn.call(this);
       vs = this.many(function () { return fn.call(_this); });
@@ -192,7 +192,7 @@
     /*
      * Matchs and consumes any one character.
      */
-    Packet.prototype.anyChar = function () {
+    Packrat.prototype.anyChar = function () {
       var c;
       c = this.input[this.index];
       this.index += 1;
@@ -202,7 +202,7 @@
     /*
      * Takes predicate block and consumes a character if satisfied.
      */
-    Packet.prototype.satisfyChar = function (fn) {
+    Packrat.prototype.satisfyChar = function (fn) {
       var c;
       c = this.anyChar();
       return fn.call(this, c) ? c : this.noParse();
@@ -211,7 +211,7 @@
     /*
      * Matches the given character.
      */
-    Packet.prototype.chr = function (ch) {
+    Packrat.prototype.chr = function (ch) {
       var c;
       c = this.anyChar();
       return c == ch ? c : this.noParse()
@@ -220,7 +220,7 @@
     /*
      * Matches the given string.
      */
-    Packet.prototype.string = function (str) {
+    Packrat.prototype.string = function (str) {
       var _this = this;
       str.split('').forEach(function (ch) {
         var c;
@@ -230,11 +230,11 @@
       return str;
     }
     
-    return Packet;
+    return Packrat;
     
   })();
 
   if ( ! exports) var exports = window;
-  exports.Packet = Packet;
+  exports.Packrat = Packrat;
 
 }).call(this);
