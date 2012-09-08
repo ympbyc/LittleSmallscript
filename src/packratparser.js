@@ -244,7 +244,7 @@
       var rc, match;
       rc = regex.exec(this.input.substring(this.index));
       if (rc) {
-        match = rc[0]+"";
+        match = new String(rc[0]);
         this.index += match.length;
         return match;
       }

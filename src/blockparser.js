@@ -27,7 +27,7 @@
   try {
     Packrat = require('packratparser').Packrat;
   } catch (err) {
-    Packrat = window.Packrat || throw "packrat.js is required";
+    if ( ! (Packrat = window.Packrat)) throw "packrat.js is required";
   }
 
 
@@ -52,7 +52,7 @@
 
   BlockParser.prototype.space = function () {
     var _this = this;
-    return this.cacheDo("space", function () { return _this.regex(/[\s\n\t]+/); });
+    return this.cacheDo("space", function () { return _this.regex(/^[\s\n\t]+/); });
   };
 
   BlockParser.prototype.blockStart = function () {
@@ -67,7 +67,7 @@
 
   BlockParser.prototype.variable = function () {
     var _this = this;
-    return this.cacheDo("variable", function () {return _this.regex(/[a-zA-Z]+/);});
+    return this.cacheDo("variable", function () {return _this.regex(/^[a-zA-Z]+/);});
   };
 
   BlockParser.prototype.colon = function () {
@@ -115,9 +115,24 @@
   BlockParser.prototype.body = function () {
     var _this = this;
     return this.cacheDo("body", function () {
+      //var ret ="";
       return _this.many(function () {
-        return _this.notFollowedBy(_this.blockEnd) === null ? _this.anyChar() : null;
-      })
+        var a;
+        a = _this.try_(
+          _this.expr,
+          function () {
+            return _this.regex(/^[^\[\]\.]+/);
+          }
+        );
+      
+        _this.optional(_this.space);
+        _this.optional(function () { return _this.chr(".") });
+        _this.optional(_this.space);
+        
+        //ret += a;
+        return a;
+      });
+      //return ret;
     });
   };
 
@@ -128,6 +143,7 @@
     " examples "
     new BlockParser("[:foo :bar | return bar]").expr(); // function (foo bar ) { return bar }
     new BlockParser("[block without parameters]").expr(); // function () { block without parameters }
+    new BlockParser("[:a :b :c | return ([return 1])() ]").expr(); //function (a, b, c) {  return (function () { return 1 })()  }
   })();
 
 }).call(this);
