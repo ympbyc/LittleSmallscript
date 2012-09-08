@@ -4,7 +4,8 @@
  */
 
 (function () {
-  var Packet;
+  var Packet,
+      __toArray = function (a) { return [].slice.call(a); };
 
   /*
    * Packet Parser is an implementation of PEG
@@ -23,7 +24,7 @@
 
     /*
      * Cache combinators instead of evaluating them every time.
-     * s = combinator name, fn = block that the combinator returns
+     * s = combinator name, fn = the parser returned by the combinator
      */
     Packet.prototype.cacheDo = function (s, fn) {
       fn = fn || function () {}; //block
@@ -38,7 +39,7 @@
       }
       try {
         c.idx = this.index;
-        c.fn = fn();
+        c.fn = fn.call(this);
         this.cache[s][c.idx] = {fn:c.fn, idx:this.index};
         return c.fn;
       } catch (err) {
@@ -67,6 +68,10 @@
     };
 
     /*--- Definition of basic combinators ---*/
+    /* available pegs
+     * a b, a / b, a?, a*, a+, &a, !a,  (a)
+     */
+
 
     /* 
      * ordered or 
@@ -75,7 +80,7 @@
     Packet.prototype.try_ = function (/* &rest arguments */) {
       var i, ret, _this = this;
       i = this.index;
-      [].slice.call(arguments).forEach(function (a) {
+      __toArray(arguments).forEach(function (a) {
         if (ret) return;
         try {
           ret = a.call(_this);
@@ -88,29 +93,71 @@
     };
 
     /*
-     * not sure what the intended use of this is
+     * match all or none
+     * a b ...
+     */
+    Packet.prototype.sequence = function (/* &rest arguments */) {
+      var i, ret, fail, _this = this;
+      i = this.index;
+      ret = [];
+      fail = false;
+      __toArray(arguments).forEach(function (a) {
+        if (fail) return;
+        try {
+          ret.push(a.call(_this));
+        } catch (err) {
+          if ( ! err instanceof NoParse) throw err;
+          _this.index = i;
+          fail = true;
+          _this.noParse();
+        }
+      });
+      return ret ? ret : this.noParse();
+    };
+
+    /*
+     * succeeds even when the parser doesn't match
+     * a?
+     */
+    Packet.prototype.optional = function (fn) {
+      var i;
+      i = this.index;
+      try {
+        return fn.call(this);
+      } catch (err) {
+        if ( ! err instanceof NoParse) throw err;
+        this.index = i; //backtraq
+        return null;
+      }
+    };
+
+    /*
+     * succeeds if the given parser matches.
+     * this parser doesn't consume the input
+     * &a
      */
     Packet.prototype.followedBy = function (fn) {
       var f = true,
           i = this.index;
       try {
-        fn();
+        fn.call(this);
         f = false;
       } catch (err) {
         if ( ! err instanceof NoParse) throw err;
       }
-      this.index = i;
+      this.index = i; //backtraq
       return f ? this.noParse() : null;
     };
 
     /*
-     * not sure what the intended use of this is
+     * opposite of followedBy
+     * !a
      */
     Packet.prototype.notFollowedBy = function (fn) {
       var f = false,
           i = this.index;
       try {
-        fn();
+        fn.call(this);
         f = true;
       } catch (err) {
         if ( ! err instanceof NoParse) throw err;
@@ -126,7 +173,7 @@
     Packet.prototype.many = function (fn) {
       var _this = this;
       return this.try_(
-        function () { return _this.many1( function () { return fn(); } )  },
+        function () { return _this.many1( function () { return fn.call(_this); } )  },
         function () { return [] }
       );
     };
@@ -136,9 +183,9 @@
      * a+
      */
     Packet.prototype.many1 = function (fn) {
-      var v, vs;
-      v = fn();
-      vs = this.many(function () { return fn(); });
+      var v, vs, _this = this;
+      v = fn.call(this);
+      vs = this.many(function () { return fn.call(_this); });
       return v.concat(vs);
     };
 
@@ -158,7 +205,7 @@
     Packet.prototype.satisfyChar = function (fn) {
       var c;
       c = this.anyChar();
-      return fn(c) ? c : this.noParse();
+      return fn.call(this, c) ? c : this.noParse();
     };
     
     /*
