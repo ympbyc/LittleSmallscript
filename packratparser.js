@@ -4,6 +4,8 @@
  */
 
 (function () {
+  'use strict';
+
   var Packrat,
       __toArray = function (a) { return [].slice.call(a); },
       __valid = function (vari) { return vari !== null && vari !== undefined;  };
@@ -30,7 +32,7 @@
     Packrat.prototype.cacheDo = function (s, fn) {
       fn = fn || function () {}; //block
       var c = {}; // c={fn:,idx:}
-      if ((this.cache[s] || {})[this.index]) {
+      if ((this.cache[s] || (this.cache[s] = {}))[this.index]) {
         c = this.cache[s][this.index];
         if (c.idx) {
           this.index = c.idx;
@@ -45,7 +47,7 @@
         return c.fn;
       } catch (err) {
         this.cache[s][c.idx] = null;
-        throw e;
+        throw err;
       }
     };
 
