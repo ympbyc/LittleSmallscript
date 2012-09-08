@@ -170,7 +170,7 @@
     };
     
     /*
-     * 0 or more ocuurance. returned in an array.
+     * 0 or more ocuurance. 
      * a*
      */
     Packrat.prototype.many = function (fn) {
@@ -182,7 +182,7 @@
     };
 
     /*
-     * 1 or more occurance. returned in an array.
+     * 1 or more occurance. 
      * a+
      */
     Packrat.prototype.many1 = function (fn) {
