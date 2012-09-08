@@ -8,7 +8,7 @@
 
   var Packrat,
       __toArray = function (a) { return [].slice.call(a); },
-      __valid = function (vari) { return vari !== null && vari !== undefined;  };
+      __valid = function (vari) { return /*vari !== null &&*/ vari !== undefined;  };
 
   /*
    * Packrat Parser is an implementation of PEG
@@ -208,7 +208,7 @@
     Packrat.prototype.satisfyChar = function (fn) {
       var c;
       c = this.anyChar();
-      return __valid(fn.call(this, c)) ? c : this.noParse();
+      return fn.call(this, c) ? c : this.noParse();
     };
     
     /*
@@ -231,6 +231,20 @@
         if (c !== ch) _this.noParse();
       });
       return str;
+    }
+
+    /*
+     * Reular expression
+     */
+    Packrat.prototype.regex = function (regex) {
+      var rc, match;
+      rc = regex.exec(this.input.substring(this.index));
+      if (rc) {
+        match = rc[0]+"";
+        this.index += match.length;
+        return match;
+      }
+      this.noParse();
     }
     
     return Packrat;
