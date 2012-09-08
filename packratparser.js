@@ -5,7 +5,8 @@
 
 (function () {
   var Packrat,
-      __toArray = function (a) { return [].slice.call(a); };
+      __toArray = function (a) { return [].slice.call(a); },
+      __valid = function (vari) { return vari !== null && vari !== undefined;  };
 
   /*
    * Packrat Parser is an implementation of PEG
@@ -89,7 +90,7 @@
           _this.index = i;
         }
       });
-      return ret ? ret : this.noParse();
+      return __valid(ret) ? ret : this.noParse();
     };
 
     /*
@@ -99,12 +100,12 @@
     Packrat.prototype.sequence = function (/* &rest arguments */) {
       var i, ret, fail, _this = this;
       i = this.index;
-      ret = [];
+      ret = "";
       fail = false;
       __toArray(arguments).forEach(function (a) {
         if (fail) return;
         try {
-          ret.push(a.call(_this));
+          ret += a.call(_this);
         } catch (err) {
           if ( ! err instanceof NoParse) throw err;
           _this.index = i;
@@ -112,7 +113,7 @@
           _this.noParse();
         }
       });
-      return ret ? ret : this.noParse();
+      return __valid(ret) ? ret : this.noParse();
     };
 
     /*
@@ -173,8 +174,8 @@
     Packrat.prototype.many = function (fn) {
       var _this = this;
       return this.try_(
-        function () { return _this.many1( function () { return fn.call(_this); } )  },
-        function () { return [] }
+        function () { return _this.many1( function () { return fn.call(_this); } );  },
+        function () { return ""; }
       );
     };
 
@@ -186,7 +187,7 @@
       var v, vs, _this = this;
       v = fn.call(this);
       vs = this.many(function () { return fn.call(_this); });
-      return v.concat(vs);
+      return v += vs;
     };
 
     /*
@@ -196,7 +197,7 @@
       var c;
       c = this.input[this.index];
       this.index += 1;
-      return c ? c : this.noParse();
+      return __valid(c) ? c : this.noParse();
     };
 
     /*
@@ -205,7 +206,7 @@
     Packrat.prototype.satisfyChar = function (fn) {
       var c;
       c = this.anyChar();
-      return fn.call(this, c) ? c : this.noParse();
+      return __valid(fn.call(this, c)) ? c : this.noParse();
     };
     
     /*
