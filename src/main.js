@@ -1,8 +1,7 @@
 (function () {
-  var LittleSmallscript, ExpressionParser, BlockParser, readline, rl;
+  var LittleSmallscript, readline, rl;
   
   ExpressionParser = require("./expressionparser").ExpressionParser;
-  BlockParser = require("./blockparser").BlockParser;
 
   readline = require('readline'),
   rl = readline.createInterface(process.stdin, process.stdout);
@@ -11,13 +10,8 @@
   rl.prompt();
 
   rl.on("line", function(input) {
-    if (input === "Littlesmalltalk exit") {
-      rl.close();
-      process.stdin.destroy();
-      return;
-    }
-    
     console.log(new ExpressionParser(input).expression());
+    return;
   });
 
 }).call(this);

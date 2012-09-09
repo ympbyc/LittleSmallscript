@@ -9,7 +9,7 @@
 (function () {
   'use strict';
 
-  var LittleSmallscript, ExpressionParser, BlockParser, 
+  var LittleParsers, ExpressionParser, 
   __each = function (obj, fn) {
     for (var key in obj)
       if (obj.hasOwnProperty(key))
@@ -25,11 +25,9 @@
   };
 
   try {
-    LittleSmallscript = require('./littlesmallscript').LittleSmallscript;
-    BlockParser = require('./blockparser').BlockParser;
+    LittleParsers = require('./littleparsers').LittleParsers;
   } catch (err) {
-    if ( ! (LittleSmallscript = window.LittleSmallscript)) throw "littlesmallscript.js is required";
-    if ( ! (BlockParser = window.BlockParser)) throw "blockparser.js is required";
+    if ( ! (LittleParsers = window.LittleParsers)) throw "littleparsers.js is required";
   }
 
   ExpressionParser = (function () {
@@ -39,7 +37,7 @@
       this.cache = {};
       this.input = input;
     };
-    ExpressionParser.prototype = new LittleSmallscript("");
+    ExpressionParser.prototype = new LittleParsers("");
 
     /*                             cascade *
      * variable <-@recur(variable)         */
@@ -165,6 +163,17 @@
       });
     };
 
+
+    ExpressionParser.prototype.continuation = function () {
+      var _this = this;
+      return this.cacheDo("continuation", function () {
+        return _this.try_(
+          _this.keywordMessage,
+          _this.unaryMessage
+        );
+      });
+    };
+
     /*
      * variable, literal, block, primitive, (cascade)
      */
@@ -183,16 +192,6 @@
             _this.chr(")");
             return ret;
           }
-        );
-      });
-    };
-
-    ExpressionParser.prototype.continuation = function () {
-      var _this = this;
-      return this.cacheDo("continuation", function () {
-        return _this.try_(
-          _this.keywordMessage,
-          _this.unaryMessage
         );
       });
     };

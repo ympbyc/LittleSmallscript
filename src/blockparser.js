@@ -9,7 +9,7 @@
 (function () {
   'use strict';
 
-  var LittleSmallscript, BlockParser, 
+  var LittleParsers, BlockParser, 
   __each = function (obj, fn) {
     for (var key in obj)
       if (obj.hasOwnProperty(key))
@@ -25,9 +25,9 @@
   };
 
   try {
-    LittleSmallscript = require('./littlesmallscript').LittleSmallscript;
+    LittleParsers = require('./littleparsers').LittleParsers;
   } catch (err) {
-    if ( ! (LittleSmallscript = window.LittleSmallscript)) throw "littlesmallscript.js is required";
+    if ( ! (LittleParsers = window.LittleParsers)) throw "littleparsers.js is required";
   }
 
   BlockParser = (function () {
@@ -38,7 +38,7 @@
       this.input = input;
       this.destinationTemplate = "function (%parameters%) { %body% }";
     };
-    BlockParser.prototype = new LittleSmallscript("");
+    BlockParser.prototype = new LittleParsers("");
 
     /* [             blockStatement ] *
      *   parameters                   */
@@ -59,7 +59,7 @@
     BlockParser.prototype.blockParameters = function () {
       var _this = this;
       return this.cacheDo("blockParameters", function () {
-        vars = "";
+        var vars = "";
         _this.many(function () {
           _this.colon();
           vars += _this.variable() + ", ";
@@ -76,24 +76,11 @@
       return this.cacheDo("blockHead", function () {
         return _this.optional(function () {
           var params;
+          _this.skipSpace();
           params = _this.blockParameters();
           _this.verticalBar();
           return params;
         });
-      });
-    };
-
-    /*                             cascade *
-     * variable <-@recur(variable)         */
-    BlockParser.prototype.expression = function () {
-      var _this = this;
-      return this.cacheDo("expression", function () {
-        return _this.try_(
-          _this.block,
-          function () {
-            return _this.regex(/^[^\[\]\.]+/);
-          }
-        );
       });
     };
 
