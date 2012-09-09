@@ -105,8 +105,8 @@
      */
     Packrat.prototype.sequence = function (/* &rest arguments */) {
       var i, ret, fail, _this = this;
-      i = this.index;
       ret = "";
+      i = this.index;
       fail = false;
       __toArray(arguments).forEach(function (a) {
         if (fail) return;
@@ -197,6 +197,25 @@
     };
 
     /*
+     * between
+     */
+    Packrat.prototype.between = function (start, inbetween, end) {
+      var ret, 
+          _this = this;
+      this.sequence(
+        start,
+        function () { 
+          ret = _this.many(
+            function () {return _this.notFollowedBy(end)===null ? inbetween.call(_this) : null}
+          );
+          return ret;
+        },
+        end
+      );
+      return ret;
+    };
+
+    /*
      * Matchs and consumes any one character.
      */
     Packrat.prototype.anyChar = function () {
@@ -244,7 +263,7 @@
       var rc, match;
       rc = regex.exec(this.input.substring(this.index));
       if (rc) {
-        match = new String(rc[0]);
+        match = rc[0]+"";
         this.index += match.length;
         return match;
       }
@@ -255,7 +274,11 @@
     
   })();
 
-  if ( ! exports) var exports = window;
-  exports.Packrat = Packrat;
+  try {
+    exports.Packrat = Packrat;
+  } catch (err) {}
+  try {
+    window.Packrat = Packrat;
+  } catch (err) {}
 
 }).call(this);

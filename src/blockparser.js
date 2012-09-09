@@ -9,7 +9,7 @@
 (function () {
   'use strict';
 
-  var Packrat, BlockParser, 
+  var LittleSmallscript, BlockParser, 
   __each = function (obj, fn) {
     for (var key in obj)
       if (obj.hasOwnProperty(key))
@@ -25,137 +25,118 @@
   };
 
   try {
-    Packrat = require('packratparser').Packrat;
+    LittleSmallscript = require('./littlesmallscript').LittleSmallscript;
   } catch (err) {
-    if ( ! (Packrat = window.Packrat)) throw "packrat.js is required";
+    if ( ! (LittleSmallscript = window.LittleSmallscript)) throw "littlesmallscript.js is required";
   }
 
+  BlockParser = (function () {
+    var BlockParser;
 
-  function BlockParser (input) {
-    this.cache = {};
-    this.input = input;
-    this.destinationTemplate = "function (%parameters%) { %body% }";
-  };
-  BlockParser.prototype = new Packrat("");
+    BlockParser = function (input) {
+      this.cache = {};
+      this.input = input;
+      this.destinationTemplate = "function (%parameters%) { %body% }";
+    };
+    BlockParser.prototype = new LittleSmallscript("");
 
-  BlockParser.prototype.block = function () {
-    var _this = this;
-    return this.cacheDo("block", function () {
-      var parameters, body;
-      _this.blockStart();
-      parameters = _this.blockHead();
-      body = _this.body();
-      _this.blockEnd();
-      return __template(this.destinationTemplate, {parameters:parameters, body:body});
-    });
-  };
-
-  BlockParser.prototype.space = function () {
-    var _this = this;
-    return this.cacheDo("space", function () { return _this.regex(/^[\s\n\t]+/); });
-  };
-
-  BlockParser.prototype.blockStart = function () {
-    var _this = this;
-    return this.cacheDo("blockStart", function () {return _this.chr("[");});
-  };
-
-  BlockParser.prototype.blockEnd = function () {
-    var _this = this;
-    return this.cacheDo("blockEnd", function () {return _this.chr("]");});
-  };
-
-  BlockParser.prototype.variable = function () {
-    var _this = this;
-    return this.cacheDo("variable", function () {return _this.regex(/^[a-zA-Z]+/);});
-  };
-
-  BlockParser.prototype.colon = function () {
-    var _this = this;
-    return this.cacheDo("colon", function () {return _this.chr(":");});
-  };
-
-  BlockParser.prototype.variables = function () {
-    var _this = this;
-    return this.cacheDo("variables", function () {
-      vars = "";
-      _this.many(function () {
-        _this.colon();
-        vars += _this.variable() + ", ";
-        _this.skipSpace();
+    /* [             blockStatement ] *
+     *   parameters                   */
+    BlockParser.prototype.block = function () {
+      var _this = this;
+      return this.cacheDo("block", function () {
+        var parameters, body;
+        _this.blockStart();
+        parameters = _this.blockHead();
+        body = _this.blockStatement();
+        _this.blockEnd();
+        return __template(this.destinationTemplate, {parameters:parameters, body:body});
       });
-      return vars.slice(0, -2);
-    });
-  };
+    };
 
-  BlockParser.prototype.colonVariable = function () {
-    var _this = this;
-    return this.cacheDo("colonVariable", function () {
-      return _this.sequence(_this.colon, _this.variable);
-    });
-  };
-
-  BlockParser.prototype.verticalBar = function () {
-    var _this = this;
-    return this.cacheDo("verticalBar", function () {return _this.chr("|");});
-  };
-
-  BlockParser.prototype.blockHead = function () {
-    var _this = this;
-    return this.cacheDo("blockHead", function () {
-      return _this.optional(function () {
-        var params;
-        params = _this.variables();
-        _this.verticalBar();
-        return params;
+    /* space-separated sequence of parameters
+     * ":foo :bar" -> "foo, bar" */
+    BlockParser.prototype.blockParameters = function () {
+      var _this = this;
+      return this.cacheDo("blockParameters", function () {
+        vars = "";
+        _this.many(function () {
+          _this.colon();
+          vars += _this.variable() + ", ";
+          _this.skipSpace();
+        });
+        return vars.slice(0, -2);
       });
-    });
-  };
+    };
 
-  BlockParser.prototype.expression = function () {
-    var _this = this;
-    return this.cacheDo("expression", function () {
-      return _this.try_(
-        _this.block,
-        function () {
-          return _this.regex(/^[^\[\]\.]+/);
-        }
-      );
-    });
-  };
-      
-  BlockParser.prototype.skipSpace = function () {
-    return this.optional(this.space);
-  };
+    /* consume parameter sequence and return js style parameters
+     * ":foo :bar|" -> blockParameters */
+    BlockParser.prototype.blockHead = function () {
+      var _this = this;
+      return this.cacheDo("blockHead", function () {
+        return _this.optional(function () {
+          var params;
+          params = _this.blockParameters();
+          _this.verticalBar();
+          return params;
+        });
+      });
+    };
 
-  BlockParser.prototype.body = function () {
-    var _this = this;
-    return this.cacheDo("body", function () {
-      var ret ="";
+    /*                             cascade *
+     * variable <-@recur(variable)         */
+    BlockParser.prototype.expression = function () {
+      var _this = this;
+      return this.cacheDo("expression", function () {
+        return _this.try_(
+          _this.block,
+          function () {
+            return _this.regex(/^[^\[\]\.]+/);
+          }
+        );
+      });
+    };
 
-      _this.skipSpace();
-      ret += _this.many(function () {
-        var a;
-        a = _this.expression();
-      
+    /*    expression                     *
+     *  ^                                *
+     *               .@recur(expression) */
+    BlockParser.prototype.blockStatement = function () {
+      var _this = this;
+      return this.cacheDo("blockStatement", function () {
+        var ret ="";
+
         _this.skipSpace();
-        _this.chr(".");
-        _this.skipSpace();
+        ret += _this.many(function () {
+          var a;
+          a = _this.expression();
+          
+          _this.skipSpace();
+          _this.chr(".");
+          _this.skipSpace();
+          
+          return a + "; ";
+        });
         
-        return a + "; ";
+        _this.optional(_this.explicitReturn);
+        ret += " return " + _this.expression() + ";";
+        _this.skipSpace();
+
+        return ret;
       });
-      
-      ret += " return " + _this.expression() + ";";
-      _this.skipSpace();
+    };
 
-      return ret;
-    });
-  };
+    return BlockParser;
+  })();
 
-  if ( ! exports) var exports = window;
-  exports.BlockParser = BlockParser;
+  try {
+    exports.BlockParser = BlockParser;
+  } catch (err) {}
+  try{
+    window.BlockParser = BlockParser;
+  } catch (err) {}
   
   (function () {
+    return;
     " examples "
     new BlockParser("[1]").block(); //"function () {  return 1; }"
     new BlockParser("[:a| [1] ]").block(); //"function (a) {  return function () {  return 1; }; }"
