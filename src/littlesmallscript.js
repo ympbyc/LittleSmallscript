@@ -151,6 +151,9 @@
       });
     };
     
+    // foo
+    Smallscript.prototype.unarySelector = Smallscript.prototype.variable;
+    
     // ignore whitespaces
     Smallscript.prototype.skipSpace = function () {
       return this.optional(this.space);

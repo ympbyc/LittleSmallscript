@@ -4,7 +4,7 @@
  */
 /* 
  * ExpressionParser
- * convert smalltalk style block to javascript's closure
+ * Little Smalltalk expression to Javascript expression
  */
 (function () {
   'use strict';
@@ -80,13 +80,15 @@
       return this.cacheDo("cascade", function () {
         var se, conti;
         se = _this.simpleExpression(); // obj mes / obj sel arg / obj kw: arg kw2: arg
-        if (_this.notFollowedBy(_this.semicolon) === null) return se;
+        try {
+          if (_this.notFollowedBy(_this.semicolon) === null) return se;
+        } catch (e) {}
         conti = _this.optional(function () {
           return _this.many(function () {
             _this.skipSpace();
             _this.semicolon();
             _this.skipSpace();
-            return "receiver" + _this.continuation() + ";";
+            return "receiver" + "." + _this.continuation() + ";";
           })
         });
         return __template(tmpl, {simpleExpression:se, body:conti});
@@ -102,21 +104,32 @@
       var _this = this;
       return this.cacheDo("simpleExpression", function () {
         return _this.try_(
-          _this.keywordMessage,
-          _this.unaryMessage
+          _this.keywordExpression,
+          _this.unaryExpression
         );
       });
     };
 
     // from | receiver keyword1: aaa keyword2: bbb
     // to   | receiver.keyword1_keyword2_(aaa, bbb)
+    ExpressionParser.prototype.keywordExpression = function () {
+      var _this = this;
+      return this.cacheDo("keywordExpression", function () {
+        var receiver,
+            methodCall;
+        receiver = _this.primary();
+        methodCall = _this.keywordMessage();
+        return receiver + "." + methodCall;
+      });
+    };
+
+    // from | sel1: arg1 sel2: arg2
+    // to   | sel1_sel2_(arg1, arg2)
     ExpressionParser.prototype.keywordMessage = function () {
       var _this = this;
       return this.cacheDo("keywordMessage", function () {
-        var receiver,
-        methodName = "",
+        var methodName = "",
         args = "";
-        receiver = _this.primary();
         _this.many1(function () {
           _this.skipSpace();
           methodName += _this.keywordSelector().replace(':', '_');
@@ -124,24 +137,34 @@
           args += _this.primary() + ", ";
           _this.skipSpace();
         });
-        return receiver + "." + methodName + "(" + args.slice(0,-2) + ")";
-      });
-    };
+        return methodName + "(" + args.slice(0,-2) + ")";
+      });  
+    }
 
-    // receiver selector
-    ExpressionParser.prototype.unaryMessage = function () {
+    // from | receiver selector
+    // to   | receiver.selector()
+    ExpressionParser.prototype.unaryExpression = function () {
       var _this = this;
-      return this.cacheDo("unaryMessage", function () {
+      return this.cacheDo("unaryExpression", function () {
         var a = "";
         a += _this.primary();
         _this.skipSpace();
         a += ".";
         _this.skipSpace();
-        a += _this.variable() + "()";
+        a += _this.unaryMessage();
         return a;
       });
     };
-    
+
+    // from | selector
+    // to   | selector()
+    ExpressionParser.prototype.unaryMessage = function () {
+      var _this = this;
+      return this.cacheDo("unaryMessage", function () {
+        return _this.unarySelector() + "()";
+      });
+    };
+
     /*
      * variable, literal, block, primitive, (cascade)
      */
@@ -167,7 +190,7 @@
     ExpressionParser.prototype.continuation = function () {
       var _this = this;
       return this.cacheDo("continuation", function () {
-        return _this.try(
+        return _this.try_(
           _this.keywordMessage,
           _this.unaryMessage
         );
