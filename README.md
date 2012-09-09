@@ -51,12 +51,12 @@ from:
 
 ```smalltalk
 [
-  Parser <- [ :input | 
+  Klass <- [ :input | 
     this at: 'input' put: input
   ]. 
-  p <- Parser new: 'hoge'. 
-  console log: (p at: 'input'). 
-  p
+  k <- Klass new: 'hoge'. 
+  console log: (k at: 'input'). 
+  k
 ] value
 ```
 
@@ -64,12 +64,12 @@ to:
 
 ```javascript
 (function () { 
-  Parser =  function (input) {
+  Klass =  function (input) {
     return  (this).atPut("input", input);    
   }; 
-  p =  (Parser).new("hoge");  
-  (console).log((p).at("input"));  
-  return  p; 
+  k =  (Klass).new("hoge");  
+  (console).log((k).at("input"));  
+  return  k; 
 }).value()
 ```
 
