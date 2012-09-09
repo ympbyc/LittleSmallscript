@@ -75,7 +75,7 @@ to:
     }); 
     return _receiver;  
   })(); 
-  p =  (Person).new("hoge");  
+  p =  (Person).new("Yendor");  
   (p).show();  
   return  p; 
 }).value()
