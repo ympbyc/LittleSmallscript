@@ -74,7 +74,7 @@
      */
     ExpressionParser.prototype.cascade = function () {
       var _this = this,
-          tmpl = "(function () { var receiver = %simpleExpression%; %body% return receiver;  })()";
+          tmpl = "(function () { var _receiver = %simpleExpression%; %body% return _receiver;  })()";
       return this.cacheDo("cascade", function () {
         var se, conti;
         se = _this.simpleExpression(); // obj mes / obj sel arg / obj kw: arg kw2: arg
@@ -86,7 +86,7 @@
             _this.skipSpace();
             _this.semicolon();
             _this.skipSpace();
-            return "receiver" + "." + _this.continuation() + ";";
+            return "_receiver" + "." + _this.continuation() + ";";
           })
         });
         return __template(tmpl, {simpleExpression:se, body:conti});
@@ -103,7 +103,8 @@
       return this.cacheDo("simpleExpression", function () {
         return _this.try_(
           _this.keywordExpression,
-          _this.unaryExpression
+          _this.unaryExpression,
+          _this.primary
         );
       });
     };
@@ -117,7 +118,7 @@
             methodCall;
         receiver = _this.primary();
         methodCall = _this.keywordMessage();
-        return receiver + "." + methodCall;
+        return "(" + receiver + ")" + "." + methodCall;
       });
     };
 
@@ -129,8 +130,10 @@
         var methodName = "",
         args = "";
         _this.many1(function () {
+          var tmpMethodName;
           _this.skipSpace();
-          methodName += _this.keywordSelector().replace(':', '_');
+          tmpMethodName = _this.keywordSelector().replace(':', '');
+          methodName += (methodName.length > 0) ? tmpMethodName[0].toUpperCase() + tmpMethodName.substring(1) : tmpMethodName; //eg: injectInto
           _this.skipSpace();
           args += _this.primary() + ", ";
           _this.skipSpace();
@@ -145,7 +148,7 @@
       var _this = this;
       return this.cacheDo("unaryExpression", function () {
         var a = "";
-        a += _this.primary();
+        a += "(" + _this.primary() + ")";
         _this.skipSpace();
         a += ".";
         _this.skipSpace();
@@ -188,7 +191,7 @@
           function () {
             var ret;
             _this.chr("(");
-            ret = _this.cascade;
+            ret = _this.cascade();
             _this.chr(")");
             return ret;
           }

@@ -9,13 +9,23 @@
 (function () {
   'use strict';
   
-  var LittleParsers, BlockParser, ExpressionParser, LittleSmallscript;
+  var Packrat, LittleParsers, BlockParser, ExpressionParser, LittleSmallscript,
+  __extend = function (destination, source) {
+    for (var k in source) {
+      if (source.hasOwnProperty(k)) {
+        destination[k] = source[k];
+      }
+    }
+    return destination;
+  };
   
   try {
+    Packrat = require("./packratparser").Packrat;
     LittleParsers = require('./littleparsers').LittleParsers;
     BlockParser = require('./blockparser').BlockParser;
     ExpressionParser= require('./expressionparser').ExpressionParser;
   } catch (err) {
+    if ( ! (Packrat = window.Packrat)) throw "packratparser.js is required";
     if ( ! (LittleParsers = window.LittleParsers)) throw "littleparsers.js is required";
     if ( ! (BlockParser = window.BlockParser)) throw "blockparser.js is required";
     if ( ! (ExpressionParser = window.ExpressionParser)) throw "expressionparser.js is required";
@@ -28,26 +38,12 @@
       this.cache = {};
       this.input = input;
     };
-    LittleSmallscript.prototype = new LittleParsers("");
+    LittleSmallscript.prototype = new Packrat("");
+    //mixin
+    __extend(LittleSmallscript.prototype, LittleParsers.prototype);
+    __extend(LittleSmallscript.prototype, BlockParser.prototype);
+    __extend(LittleSmallscript.prototype, ExpressionParser.prototype);
     
-    /*                             cascade *
-     * variable <-@recur(variable)         */
-    LittleSmallscript.prototype.expression = function () {
-      var _this = this;
-      return this.cacheDo("expression", function () {
-        return new ExpressionParser(this.input.substring(this.index)).expression();
-      });
-    };
-    
-    /* [                 blockstatement ] *
-     *   blockparameters                  */
-    LittleSmallscript.prototype.block = function () {
-      var _this = this;
-      return this.cacheDo("block", function () {
-        return new BlockParser(this.input.substring(this.index)).block();
-      });
-    };
-
     return LittleSmallscript;
   })()
   

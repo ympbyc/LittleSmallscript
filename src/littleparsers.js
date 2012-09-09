@@ -165,7 +165,7 @@
     };
 
     /*                             cascade *
-     * variable <-@recur(variable)         */
+     * variable <-@recur(variable)         
     LittleParsers.prototype.expression = function () {
       var _this = this;
       if (ExpressionParser===null || ExpressionParser===undefined) {
@@ -185,7 +185,7 @@
     };
     
     /* [                 blockstatement ] *
-     *   blockparameters                  */
+     *   blockparameters                  
     LittleParsers.prototype.block = function () {
       var _this = this;
       if (BlockParser===null || BlockParser===undefined) {
@@ -203,7 +203,8 @@
         return ret;
       });
     };
-    
+    */
+
     return LittleParsers;
   })()
   

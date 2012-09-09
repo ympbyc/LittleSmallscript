@@ -36,21 +36,21 @@
     BlockParser = function (input) {
       this.cache = {};
       this.input = input;
-      this.destinationTemplate = "function (%parameters%) { %body% }";
     };
     BlockParser.prototype = new LittleParsers("");
 
     /* [             blockStatement ] *
      *   parameters                   */
     BlockParser.prototype.block = function () {
-      var _this = this;
+      var _this = this,
+          destinationTemplate = "function (%parameters%) { %body% }";
       return this.cacheDo("block", function () {
         var parameters, body;
         _this.blockStart();
         parameters = _this.blockHead();
         body = _this.blockStatement();
         _this.blockEnd();
-        return __template(this.destinationTemplate, {parameters:parameters, body:body});
+        return __template(destinationTemplate, {parameters:parameters, body:body});
       });
     };
 
