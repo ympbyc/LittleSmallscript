@@ -51,25 +51,33 @@ from:
 
 ```smalltalk
 [
-  Klass <- [ :input | 
-    this at: 'input' put: input
+  Person <- [ :name | 
+    this at: 'name' put: name
   ]. 
-  k <- Klass new: 'hoge'. 
-  console log: (k at: 'input'). 
-  k
+  Person at: 'prototype'; at: 'answer' put: [this at: 'name'].
+  p <- Person new: 'Yendor'. 
+  p answer. 
+  p
 ] value
 ```
 
 to:
 
 ```javascript
-(function () { 
-  Klass =  function (input) {
-    return  (this).atPut("input", input);    
-  }; 
-  k =  (Klass).new("hoge");  
-  (console).log((k).at("input"));  
-  return  k; 
+(function () {
+  Person =  function (name) {
+    return  (this).atPut("name", name); 
+  };
+  (function () { 
+    var _receiver = (Person).at("prototype");
+    _receiver.atPut('answer', function () {
+     return  (this).at("name"); 
+    }); 
+    return _receiver;  
+  })(); 
+  p =  (Person).new("hoge");  
+  (p).show();  
+  return  p; 
 }).value()
 ```
 
