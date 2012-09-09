@@ -76,7 +76,7 @@ to:
     return _receiver;  
   })(); 
   p =  (Person).new("Yendor");  
-  (p).show();  
+  (p).answer();  
   return  p; 
 }).value()
 ```
