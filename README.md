@@ -97,10 +97,10 @@ Map method: [:w :h |
     _map addLast: row
   ].
   ^ _map
-] at: 'init'.
+] at: 'widthHeight'.
 Map method: [^ _map] at: 'show'.
 
-(Map new; init) show
+(Map new; width: 10 height: 5) show
 ```
 ").toJS();
 
@@ -122,13 +122,13 @@ Map method: [^ _map] at: 'show'.
       return  _map.addLast(row); 
     });  
     return  _map; 
-  }, "init");  
+  }, "widthHeight");  
   Map.methodAt(function () { 
     return  _map; 
   }, "show"); 
   return (function () { 
     var _receiver = Map.new();
-    _receiver.init(); 
+    _receiver.widthHeight(10, 5); 
     return _receiver;  
   })().show(); 
 }).call(this);

@@ -8,7 +8,7 @@ Map method: [:w :h | \
     _map addLast: row \
   ]. \
   ^ _map \
-] at: 'init'. \
+] at: 'widthHeight'. \
 Map method: [^ _map] at: 'show'. \
  \
-(Map new: init) show \
+(Map new; width: 10 height: 5) show \
