@@ -78,7 +78,7 @@
           var params;
           _this.skipSpace();
           params = _this.blockParameters();
-          _this.verticalBar();
+          if (params && params.length) _this.verticalBar();
           return params;
         });
       });

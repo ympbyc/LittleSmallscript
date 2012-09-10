@@ -50,6 +50,7 @@
         });
         
         _this.optional(_this.explicitReturn);
+        _this.skipSpace();
         ret += " return " + _this.expression() + ";";
         _this.skipSpace();
         _this.optional(function () { return _this.chr("."); });

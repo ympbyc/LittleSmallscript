@@ -164,47 +164,6 @@
       return this.chr("^");
     };
 
-    /*                             cascade *
-     * variable <-@recur(variable)         
-    LittleParsers.prototype.expression = function () {
-      var _this = this;
-      if (ExpressionParser===null || ExpressionParser===undefined) {
-        try {
-          ExpressionParser = require("./expressionparser").ExpressionParser;
-        } catch (e) {
-          ExpressionParser = window.ExpressionParser;
-        }
-      }
-      return this.cacheDo("expression", function () {
-        var ep, ret;
-        ep = new ExpressionParser(this.input.substring(this.index));
-        ret = ep.expression();
-        _this.index += ep.index;
-        return ret;
-      });
-    };
-    
-    /* [                 blockstatement ] *
-     *   blockparameters                  
-    LittleParsers.prototype.block = function () {
-      var _this = this;
-      if (BlockParser===null || BlockParser===undefined) {
-        try {
-          BlockParser = require("./blockparser").BlockParser;
-        } catch (e) {
-          BlockParser = window.BlockParser;
-        }
-      }
-      return this.cacheDo("block", function () {
-        var bp, ret;
-        bp = new BlockParser(this.input.substring(this.index));
-        ret = bp.block();
-        _this.index += bp.index;
-        return ret;
-      });
-    };
-    */
-
     return LittleParsers;
   })()
   
