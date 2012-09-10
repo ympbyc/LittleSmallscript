@@ -204,10 +204,13 @@
           _this = this;
       this.sequence(
         start,
-        function () { 
-          ret = _this.many(
-            function () {return _this.notFollowedBy(end)===null ? inbetween.call(_this) : null}
-          );
+        function () {
+          ret = _this.many(function () {
+            var a;
+            _this.notFollowedBy(end);
+            a = inbetween.call(_this);
+            return a;
+          });
           return ret;
         },
         end

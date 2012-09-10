@@ -187,7 +187,7 @@
           _this.variable,
           _this.literal,
           _this.block,
-          //_this.primitive,
+          _this.primitive,
           function () {
             var ret;
             _this.chr("(");
@@ -198,6 +198,7 @@
         );
       });
     };
+
 
     /*
      * primary used as receiver have following special cases
@@ -215,6 +216,25 @@
             return "(" + _this.block() + ")";
           },
           _this.primary
+        );
+      });
+    };
+
+    /*
+     * <inline.javascript(code)>
+     */
+    ExpressionParser.prototype.primitive = function () {
+      var _this = this;
+      return this.cacheDo("primitive", function () {
+        _this.skipSpace();
+        return _this.between(
+          function () { 
+            var ret = _this.chr("<"); 
+            _this.notFollowedBy(function () { return _this.chr("-"); }); 
+            return ret; 
+          }, 
+          _this.anyChar, 
+          function () { return _this.chr(">"); }
         );
       });
     };
