@@ -25,12 +25,12 @@ greet: yourname
 !
 ```
 
-It uses specialforms and you do not see many specialforms in Smalltalk source code.
-Therefore I think the ideal way to define classes should not need any specialforms.
+It uses specialforms and you do not see many specialforms in Smalltalk source code.  
+Therefore I think the ideal way to define classes should not need any specialforms.  
 
 Solution
 --------
-If we were to define these methods in the language the compiler is targeting (javascript in this case):
+If we were to define the following methods in the language the compiler is targeting (javascript in this case):
 
 ```javascript
 Function.prototype.subclass = function (Constructor) {
@@ -76,11 +76,13 @@ someMethod
   ^ someInstanceVariable
 
 "Proposal"
-Klass method: [^ self at: someInstanceVariable] at: #someMethod
+Klass method: [
+  ^ self at: someInstanceVariable
+] at: #someMethod
 ``` 
 
-You now have to append "self at:" before instance variable names.
-This probably should automaticaly be done in compile time.
+You now have to append "self at:" before instance variable names.  
+This probably should automaticaly be done in compile time.  
 
 
 Conclusion
