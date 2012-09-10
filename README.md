@@ -45,7 +45,7 @@ Make resulting javascript code similar to that of CoffeeScript.
 
 Milestones:
 ----------
-10 Sept 2012
+5am 10 Sep 2012
 
 from:
 
@@ -82,3 +82,50 @@ to:
 ```
 
 !! actual output doesn't have newlines !!
+
+7pm 10 Sep 2012
+
+new LittleSmallscript("
+```smalltalk
+| Map |
+Map <- Object subclass.
+Map method: [self at: _map put: (Array new)] at: 'new'.
+Map method: [:w :h |
+  h timesRepeat: [| row |
+    row <- Array new.
+    w timesRepeat: [row addLast: (MapCell new)].
+    _map addLast: row
+  ].
+  ^ _map
+] at: 'init'.
+Map method: [^ _map] at: 'show'.
+
+(Map new: init) show
+```
+").toJS();
+
+//=>
+```javascript
+(function () {
+  var Map;
+  Map =  Object.subclass();  
+  Map.methodAt(function () {  
+    return  self.atPut(_map, Array.new()); 
+  }, "new");  
+  Map.methodAt(function (w, h) {  
+    h.timesRepeat(function () { 
+      var row;
+      row =  Array.new();  
+      w.timesRepeat(function () {  
+        return  row.addLast(MapCell.new()); 
+      });  
+      return  _map.addLast(row); 
+    });  
+    return  _map; 
+  }, "init");  
+  Map.methodAt(function () { 
+    return  _map; 
+  }, "show"); 
+  return  Map.new(init).show(); 
+}).call(this);
+```
