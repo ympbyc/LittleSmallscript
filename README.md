@@ -100,7 +100,7 @@ Map method: [:w :h |
 ] at: 'init'.
 Map method: [^ _map] at: 'show'.
 
-(Map new: init) show
+(Map new; init) show
 ```
 ").toJS();
 
@@ -126,6 +126,10 @@ Map method: [^ _map] at: 'show'.
   Map.methodAt(function () { 
     return  _map; 
   }, "show"); 
-  return  Map.new(init).show(); 
+  return (function () { 
+    var _receiver = Map.new();
+    _receiver.init(); 
+    return _receiver;  
+  })().show(); 
 }).call(this);
 ```
