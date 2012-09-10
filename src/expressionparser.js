@@ -116,9 +116,9 @@
       return this.cacheDo("keywordExpression", function () {
         var receiver,
             methodCall;
-        receiver = _this.primary();
+        receiver = _this.primaryReceiver();
         methodCall = _this.keywordMessage();
-        return "(" + receiver + ")" + "." + methodCall;
+        return receiver + "." + methodCall;
       });
     };
 
@@ -148,7 +148,7 @@
       var _this = this;
       return this.cacheDo("unaryExpression", function () {
         var a = "";
-        a += "(" + _this.primary() + ")";
+        a += _this.primaryReceiver();
         _this.skipSpace();
         a += ".";
         _this.skipSpace();
@@ -195,6 +195,26 @@
             _this.chr(")");
             return ret;
           }
+        );
+      });
+    };
+
+    /*
+     * primary used as receiver have following special cases
+     * invalid: function(){}() valid: (function () {})()
+     * invalid: 1.foo valid: 1 .foo valid: (1).foo
+     */
+    ExpressionParser.prototype.primaryReceiver = function () {
+      var _this = this;
+      return this.cacheDo("primaryReceiver", function () {
+        return _this.try_(
+          function () {
+            return _this.numberLiteral() + " ";
+          },
+          function () {
+            return "(" + _this.block() + ")";
+          },
+          _this.primary
         );
       });
     };

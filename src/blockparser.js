@@ -39,8 +39,8 @@
     };
     BlockParser.prototype = new LittleParsers("");
 
-    /* [             blockStatement ] *
-     *   parameters                   */
+    /* [             statement ] *
+     *   parameters              */
     BlockParser.prototype.block = function () {
       var _this = this,
           destinationTemplate = "function (%parameters%) { %body% }";
@@ -48,7 +48,7 @@
         var parameters, body;
         _this.blockStart();
         parameters = _this.blockHead();
-        body = _this.blockStatement();
+        body = _this.statement();
         _this.blockEnd();
         return __template(destinationTemplate, {parameters:parameters, body:body});
       });
@@ -81,34 +81,6 @@
           _this.verticalBar();
           return params;
         });
-      });
-    };
-
-    /*    expression                     *
-     *  ^                                *
-     *               .@recur(expression) */
-    BlockParser.prototype.blockStatement = function () {
-      var _this = this;
-      return this.cacheDo("blockStatement", function () {
-        var ret ="";
-
-        _this.skipSpace();
-        ret += _this.many(function () {
-          var a;
-          a = _this.expression();
-          
-          _this.skipSpace();
-          _this.chr(".");
-          _this.skipSpace();
-          
-          return a + "; ";
-        });
-        
-        _this.optional(_this.explicitReturn);
-        ret += " return " + _this.expression() + ";";
-        _this.skipSpace();
-
-        return ret;
       });
     };
 

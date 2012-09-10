@@ -161,7 +161,7 @@
     
     // ^ can be prefixed to the last expression in a statement
     LittleParsers.prototype.explicitReturn = function () {
-      return _char("^");
+      return this.chr("^");
     };
 
     /*                             cascade *

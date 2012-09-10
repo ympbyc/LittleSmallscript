@@ -57,7 +57,7 @@ Human method: [ :yourname |
   | myname  |
   myname <- self at: #name.
   console log: ('hello from ' , myname  , ' to ' , yourname)
-] at: #greet
+] at: #greet .
 
 (Human new) greet: 'Master Lich'
 ```
