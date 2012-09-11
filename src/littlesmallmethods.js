@@ -22,7 +22,11 @@
   Function.prototype.subclassWithVariables_ = function (vararr) {
     var Sc = this.subclass();
     Sc.prototype.__init = function () {
-      this.__instanceVariables__ = [];
+      if (Object.defineProperty !== undefined && Object.defineProperty !== null) {
+        Object.defineProperty(newInstance, '__instanceVariables__', {enumerable:false, value:[], writable:false});
+      } else {
+        this.__instanceVariables__ = [];
+      }
       for (var key in vararr) {
         this[vararr[key]] = null;
         this.__instanceVariables__.push(vararr[key]);
@@ -137,9 +141,11 @@
     return this;
   };
   Object.prototype.asArray = function () {
+    this.__updateCollection(); //for safety
     return this.__collection__.concat([]);
   };
   Object.prototype.asString = function () {
+    this.__updateCollection(); //for safety
     return this.__collection__.inject_into_('', function (it, lastres) {
       return lastres + new String(it);
     });
@@ -182,7 +188,10 @@
     });
     return lastres;
   };
-  Object.prototype.isEmpty = function () { return this.__collection__.length === 0; };
+  Object.prototype.isEmpty = function () { 
+    this.__updateCollection(); //for safety
+    return this.__collection__.length === 0; 
+  };
   Object.prototype.occuranceOf_ = function (item) {
     return this.inject_into_(0, function (it, lst) { return (item === it) ? ++lst : lst });
   };
@@ -217,7 +226,10 @@
     });
     return ret;
   };
-  Object.prototype.size = function () { return this.__collection__.length;  };
+  Object.prototype.size = function () { 
+    this.__updateCollection(); //for safety
+    return this.__collection__.length;  
+  };
   Object.prototype.asDictionary = function () {
     var ret = {},
         _this = this;
@@ -265,7 +277,7 @@
     }
   };
   Object.prototype.keys = function () {
-    this.__updateCollection();
+    this.__updateCollection(); //for safety
     return this.__keys__;
   };
   Object.prototype.keysDo_ = function (fn) {
@@ -287,6 +299,7 @@
     }
   };
   Object.prototype.currentKey = function () {
+    this.__updateCollection(); //for safety
     return this.__keys__[this.__generatorIndex__];
   };
 
