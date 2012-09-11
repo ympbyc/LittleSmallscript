@@ -62,13 +62,13 @@
     StatementParser.prototype.variableDeclaration = function () {
       var _this = this;
       return this.cacheDo("variableDeclaration", function () {
-        var ret;
+        var ret = "var ";
         _this.skipSpace();
         _this.verticalBar();
-        ret = _this.many(function () {
+        ret += _this.many(function () {
           _this.skipSpace();
-          return "var " + _this.variable() + ", ";
-        }).replace(/,\s$/, ';');
+          return _this.variable() + ", ";
+        }).replace(/,\s$/, '; ');
         _this.skipSpace();
         _this.verticalBar();
         return ret;
