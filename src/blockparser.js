@@ -94,12 +94,4 @@
     window.BlockParser = BlockParser;
   } catch (err) {}
   
-  (function () {
-    return;
-    " examples "
-    new BlockParser("[1]").block(); //"function () {  return 1; }"
-    new BlockParser("[:a| [1] ]").block(); //"function (a) {  return function () {  return 1; }; }"
-    new BlockParser("[:foo :bar| [foo]. bar]").block(); //"function (foo, bar) { function () {  return foo; };  return bar; }"
-  })();
-
 }).call(this);

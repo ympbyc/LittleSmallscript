@@ -49,9 +49,10 @@
   LittleSmallscript = (function () { 
     var LittleSmallscript;
     
-    LittleSmallscript = function (input) {
+    LittleSmallscript = function (input, compileOptions) {
       this.cache = {};
       this.input = input;
+      this.options = compileOptions;
     };
     LittleSmallscript.prototype = new Packrat("");
     //mixin
@@ -64,7 +65,22 @@
       var _this = this,
           wraptmpl = "(function () { %statement% }).call(this)";
       return this.cacheDo("toJS", function () {
-        return __template(wraptmpl, {statement: _this.statement()});
+        var js;
+        js = __template(wraptmpl, {statement: _this.statement()});
+        if ( ! this.options.prettyprint) return js;
+        var beautifyOption = {
+          indent_size : this.options.indent_size || 2,
+          indent_char : this.options.indent_char || ' ',
+          preserve_newlines : false,
+          jslint_happy : this.options.jslint || true
+        };
+        try {
+          return require('../lib/beautify.js').js_beautify(js, beautifyOption);
+        } catch (err) {
+          try {
+            return window.js_beautify(js, beautifyOption);
+          } catch (err) { throw "beautify.js is needed for pretty print"; }
+        }
       });
     };
     

@@ -1,10 +1,6 @@
 ToDo:
 
-* inline javascript
-  * < inline(js); >
-
-* built-in methods
-  * Bool.ifTrue, Array.atPut etc
+* pretty print
 
 * binary message
   * 1 + 1
