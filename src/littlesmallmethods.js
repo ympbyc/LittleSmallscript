@@ -50,7 +50,12 @@
     return newInstance;
   };
   Function.prototype.method_at_ = function (fn, slot) {
-    return this.prototype[slot] = fn;
+    if (Function.prototype.bind !== null && Function.prototype.bind !== undefined)
+      return this.prototype[slot] = fn.bind(this);
+    var _this = this;
+    return this.prototype[slot] = function (/* &rest argument */) { 
+      fn.apply(_this, argument);
+    }
   };
 
   Object.prototype.asString = Object.prototype.toString;
@@ -239,7 +244,7 @@
     return ret;
   };
   Object.prototype.at_ = function (key) {
-    if (this[key].isNil) throw "slot is nil";
+    if ((! this[key]) || this[key].isNil()) throw "slot is nil";
     return this[key]; 
   };
   Object.prototype.at_ifAbsent_ = function (key, fn) {
