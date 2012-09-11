@@ -54,8 +54,8 @@
       return this.prototype[slot] = fn.bind(this);
     var _this = this;
     return this.prototype[slot] = function (/* &rest argument */) { 
-      fn.apply(_this, argument);
-    }
+      return fn.apply(_this, arguments);
+    };
   };
 
   Object.prototype.asString = Object.prototype.toString;
