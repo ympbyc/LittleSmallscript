@@ -132,8 +132,8 @@
         _this.many1(function () {
           var tmpMethodName;
           _this.skipSpace();
-          tmpMethodName = _this.keywordSelector().replace(':', '');
-          methodName += (methodName.length > 0) ? tmpMethodName[0].toUpperCase() + tmpMethodName.substring(1) : tmpMethodName; //eg: injectInto
+          tmpMethodName = _this.keywordSelector().replace(':', '_'); //eg: inject_into_
+          //methodName += (methodName.length > 0) ? tmpMethodName[0].toUpperCase() + tmpMethodName.substring(1) : tmpMethodName; //eg. injectInto
           _this.skipSpace();
           args += _this.primary() + ", ";
           _this.skipSpace();
