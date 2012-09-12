@@ -34,7 +34,7 @@
     }
     return Sc;
   };
-  Function.prototype.new = Object.prototype.new_ = function () {
+  Function.prototype.new_ = function () {
     var newInstance = new this();
     if (Object.defineProperty !== undefined && Object.defineProperty !== null) {
       Object.defineProperty(newInstance, '__collection__', {enumerable:false, value:[], writable:true});
@@ -45,17 +45,25 @@
       newInstance.__keys__ = [];
       newInstance.__generatorIndex__ = -1; // internal use for generators
     }
-    if (newInstance.__init) newInstance.__init.call(this);
-    if (newInstance.init) newInstance.init.call(this, arguments);
+    if (newInstance.__init) newInstance.__init.call(newInstance);
+    if (newInstance.init) newInstance.init.apply(newInstance, arguments);
     return newInstance;
   };
-  Function.prototype.method_at_ = function (fn, slot) {
+  // method:at:
+  Function.prototype.methodat = function (fn, slot) {
+    return this.prototype[slot] = fn;
+
     if (Function.prototype.bind !== null && Function.prototype.bind !== undefined)
       return this.prototype[slot] = fn.bind(this);
     var _this = this;
     return this.prototype[slot] = function (/* &rest argument */) { 
       return fn.apply(_this, arguments);
     };
+  };
+  // method:withKeywords:
+  Function.prototype.methodwithKeywords = function (fn, arr) {
+    var methName = arr.injectinto('', function (a,b) { return b + a; });
+    return this.methodat(fn, methName);
   };
 
   Object.prototype.asString = Object.prototype.toString;
@@ -68,13 +76,13 @@
     }
     return a;
   };
-  Object.prototype.do_ = Object.prototype.binaryDo_ = function (fn) {
+  Object.prototype.do_ = Object.prototype.binaryDo = function (fn) {
     for (var key in this) {
       if (__hasProp.call(this, key) && new String(key).search(/__/) !== 0) fn(this[key], key);
     }
     return null;
   };
-  Object.prototype.error_ = function (str) { throw str; };
+  Object.prototype.error = function (str) { throw str; };
   Object.prototype.__updateCollection = function () {
     this.__collection__ = [];
     this.__keys__ = [];
@@ -94,46 +102,49 @@
   Object.prototype.next = function () {
     return this.__collection__[this.__generatorIndex__+1] ? this.__collection__[++this.__generatorIndex__] : null;
   };
-  Object.prototype.isKindOf_ = function (Klass) { return this instanceof Klass; };
-  Object.prototype.isMemberOf_ = function (Klass) { return this.class_() === Klass;  }
+  Object.prototype.isKindOf = function (Klass) { return this instanceof Klass; };
+  Object.prototype.isMemberOf = function (Klass) { return this.class_() === Klass;  }
   Object.prototype.isNil = function () { return this === null || this === undefined;  };
   Object.prototype.notNil = function () { return this !== null && this !== undefined;  };
   Object.prototype.print = Object.printString = function () { return JSON ? JSON.stringify(this) : this.toString();  };
-  Object.prototype.respondsTo_ = function (name) { return this[name].notNil() };
+  Object.prototype.respondsTo = function (name) { return this[name].notNil() };
   
-  Boolean.prototype.and_ = function (fn) { return this.valueOf() ? (fn.call(this) ? true : false) : false;  };
-  Boolean.prototype.or_ = function (fn) { return  this.valueOf() ? true : (fn.call(this) ? true : false); };
-  Boolean.prototype.eqv_ = function (bool) {
-    if (typeof bool !== 'boolean' && ! bool instanceof Boolean) throw 'argument must be boolean'; 
+  Boolean.prototype.and = function (fn) { return this.valueOf() ? (fn.call(this) ? true : false) : false;  };
+  Boolean.prototype.or = function (fn) { return  this.valueOf() ? true : (fn.call(this) ? true : false); };
+  Boolean.prototype.eqv = function (bool) {
+    if (typeof bool !== 'boolean' && ! bool instanceof Boolean) throw 'Beelean.eqv expects parameter 1 to be bool.' + bool + 'given.'; 
     return this.valueOf() === bool;
   };
-  Boolean.prototype.xor_ = function (bool) {
-  if (typeof bool !== 'boolean' && ! bool instanceof Boolean) throw 'argument must be boolean';
+  Boolean.prototype.xor = function (bool) {
+  if (typeof bool !== 'boolean' && ! bool instanceof Boolean) throw 'Beelean.xor expects parameter 1 to be bool.' + bool + 'given.'; 
     return this.valueOf() !== bool;
   };
-  Boolean.prototype.ifTrue_ = function (fn) { return this.valueOf() ? fn.call(this) : null;  };
-  Boolean.prototype.ifFalse_ = function (fn) { return this.valueOf() ? null : fn.call(this);  };
-  Boolean.prototype.ifTrue_ifFalse_ = function (t, f) { return this.valueOf() ? t.call(this) : f.call(this); };
-  Boolean.prototype.ifFalse_ifTrue_ = function (f, t) { return this.valueOf() ? t.call(this) : f.call(this); };
+  Boolean.prototype.ifTrue = function (fn) { return this.valueOf() ? fn.call(this) : null;  };
+  Boolean.prototype.ifFalse = function (fn) { return this.valueOf() ? null : fn.call(this);  };
+  // ifTrue:ifFalse
+  Boolean.prototype.ifTrueifFalse = function (t, f) { return this.valueOf() ? t.call(this) : f.call(this); };
+  // ifFalse:ifTrue
+  Boolean.prototype.ifFalseifTrue = function (f, t) { return this.valueOf() ? t.call(this) : f.call(this); };
   Boolean.prototype.not = function () { return ! this.valueOf(); };
   
-  Number.prototype.to_ = function (tonum) { 
+  Number.prototype.to = function (tonum) { 
     var i = this-1, 
     res = []; 
     while (++i < tonum) 
       res.push(i); 
     return res;
   };
-  Number.prototype.to_by_ = function (tonum, bynum) {
+  // to:by:
+  Number.prototype.toby = function (tonum, bynum) {
     var i = this-1;
     res = [];
     while (i+=bynum <= tonum)
       res.push(i);
     return res;
   };
-  Number.prototype.timesRepeat_ = function (fn) {
+  Number.prototype.timesRepeat = function (fn) {
     var _this = this;
-    return (0).to_(this).do_(function (it) { return fn.call(_this, it); }); 
+    return (0).to(this).do_(function (it) { return fn.call(_this, it); }); 
   };
   
   Object.prototype.addAll = function (col) {
@@ -155,7 +166,7 @@
       return lastres + new String(it);
     });
   };
-  Object.prototype.collect_ = function (fn) {
+  Object.prototype.collect = function (fn) {
     var ret = {},
         _this = this;
     this.do_(function (it, key) {
@@ -163,21 +174,22 @@
     });
     return ret;
   };
-  Object.prototype.detect_ = function (fn) {
+  Object.prototype.detect = function (fn) {
     this.do_(function (it, key) {
       if (fn.call(this, it)) return it;
     });
-    throw "not found";
+    throw "Object.detect could not find an item that satisfies "+fn.toString()+".";
     return null;
   };
-  Object.prototype.detect_ifAbsent_ = function (fn1, fn2) {
+  // detect:ifAbsent:
+  Object.prototype.detectifAbsent = function (fn1, fn2) {
     try {
       return this.detect(fn1);
     } catch (err) {
       return fn2.call(this);
     }
   };
-  Object.prototype.includes_ = function (it) {
+  Object.prototype.includes = function (it) {
     try{
       this.detect(function (it2) { return it === it2; });
       return true;
@@ -185,7 +197,8 @@
       return false;
     };
   };
-  Object.prototype.inject_into_ = function (initialValue,fn) {
+  // inject:into:
+  Object.prototype.injectinto = function (initialValue,fn) {
     var lastres = initialValue,
         _this = this;
     this.do_(function (it, key) {
@@ -197,10 +210,10 @@
     this.__updateCollection(); //for safety
     return this.__collection__.length === 0; 
   };
-  Object.prototype.occuranceOf_ = function (item) {
-    return this.inject_into_(0, function (it, lst) { return (item === it) ? ++lst : lst });
+  Object.prototype.occuranceOf = function (item) {
+    return this.injectinto(0, function (it, lst) { return (item === it) ? ++lst : lst });
   };
-  Object.prototype.remove_ = function (item) {
+  Object.prototype.remove = function (item) {
     var found = false,
         _this = this;
     this.do_(function (it, key) {
@@ -208,14 +221,15 @@
     });
     return null;
   };
-  Object.prototype.remove_ifAbsent_ = function (item, fn) {
+  // remove:ifAbsent:
+  Object.prototype.removeifAbsent = function (item, fn) {
     try {
-      return this.remove_(item);
+      return this.remove(item);
     } catch (err) {
       return fn.call(this);
     }
   };
-  Object.prototype.select_ = function (fn) {
+  Object.prototype.select = function (fn) {
     var ret = {},
         _this = this;
     this.do_(function (it, key) {
@@ -223,7 +237,7 @@
     });
     return ret;
   };
-  Object.prototype.reject_ = function (fn) {
+  Object.prototype.reject = function (fn) {
     var ret = {},
         _this = this;
     this.do_(function (it, key) {
@@ -243,40 +257,44 @@
     });
     return ret;
   };
-  Object.prototype.at_ = function (key) {
-    if ((! this[key]) || this[key].isNil()) throw "slot is nil";
+  Object.prototype.at = function (key) {
+    if ((! this[key]) || this[key].isNil()) throw "Object.at: slot "+key+" is nil";
     return this[key]; 
   };
-  Object.prototype.at_ifAbsent_ = function (key, fn) {
+  // at:ifAbsent:
+  Object.prototype.atifAbsent = function (key, fn) {
     try {
       return this.at_(key);
     } catch (err) {
       return fn.call(this);
     }
   };
-  Object.prototype.atAll_put_ = function (keys, item) {
+  // atAll:put:
+  Object.prototype.atAllput = function (keys, item) {
     var _this = this;
     keys.do_(function (key) { return _this[key] = item;  });
     this.__updateCollection();
     return this;
   };
-  Object.prototype.at_put_ = function (key, item) {
+  // at:put:
+  Object.prototype.atput = function (key, item) {
     this[key] = item;
     this.__updateCollection();
     return this;
   };
-  Object.prototype.includesKey_ = function (key) {
+  Object.prototype.includesKey = function (key) {
     return this[key] !== undefined;
   };
-  Object.prototype.indexOf_ = function (item) {
+  Object.prototype.indexOf = function (item) {
     for (var key in this) {
       if (this[key] === item) return key;
     }
-    throw "not found";
+    throw "Object.indexOf: not found";
   }
-  Object.prototype.indexOf_ifAbsent_ = function (item, fn) {
+  // indexOf:ifAbsent:
+  Object.prototype.indexOfifAbsent = function (item, fn) {
     try {
-      return this.indexOf_(item);
+      return this.indexOf(item);
     } catch (err) {
       return fn.call(this);
     }
@@ -285,18 +303,19 @@
     this.__updateCollection(); //for safety
     return this.__keys__;
   };
-  Object.prototype.keysDo_ = function (fn) {
+  Object.prototype.keysDo = function (fn) {
     return this.keys().do_(fn);
   };
-  Object.prototype.keySelect_ = function (fn) {
+  Object.prototype.keySelect = function (fn) {
     return this.keys().select_(fn);
   };
-  Object.prototype.removeKey_ = function (key) {
-    if (this[key].isNil()) throw "slot not found";
+  Object.prototype.removeKey = function (key) {
+    if (this[key].isNil()) throw "Object.removeKey: slot " + key + " not found";
     this.__updateCollection();
     return delete this[key];
   };
-  Object.prototype.removeKey_ifAbsent_ = function (key, fn) {
+  // removeKey:ifAbsent:
+  Object.prototype.removeKeyifAbsent = function (key, fn) {
     try {
       return this.removeKey(key);
     } catch (err) {
@@ -308,9 +327,9 @@
     return this.__keys__[this.__generatorIndex__];
   };
 
-  Array.prototype.addLast_ = function (item) { this.push(item); this.__updateCollection(); return this; };  
-  Array.prototype.do_ = Array.prototype.binaryDo_ = Array.prototype.forEach || Object.prototype.do_;
-  Array.prototype.collect_ = Array.prototype.map || function (fn) {
+  Array.prototype.addLast = function (item) { this.push(item); this.__updateCollection(); return this; };  
+  Array.prototype.do_ = Array.prototype.binaryDo = Array.prototype.forEach || Object.prototype.do_;
+  Array.prototype.collect = Array.prototype.map || function (fn) {
     var ret = [], 
         _this = this;
     this.do_(function (it, key) {
@@ -318,7 +337,7 @@
     });
     return ret;
   };
-  Array.prototype.select_ = Array.prototype.filter || function (fn) {
+  Array.prototype.select = Array.prototype.filter || function (fn) {
     var ret = [],
         _this = this;
     this.do_(function (it, key) {
@@ -334,16 +353,18 @@
     });
     return ret;
   };
-  Array.prototype.copyFrom_to_ = function (from, to) {
+  // copyFrom:to:
+  Array.prototype.copyFromto = function (from, to) {
     return this.slice(from, to);
   };
-  Array.prototype.copyWith_ = function (fn) {
+  Array.prototype.copyWith = function (fn) {
     return this.concat([]).concat(fn.call(this));
   };
-  Array.prototype.copyWithout_ = function (val) {
+  Array.prototype.copyWithout = function (val) {
     return this.reject(function (it) { return it===val;  });
   };
-  Array.prototype.equals_startingAt_ = function (arr, idx) {
+  // equals:startingAt:
+  Array.prototype.equalsstartingAt = function (arr, idx) {
     if (this.length !== arr.slice(idx).length) return false;
     var tgt = arr.slice(idx), 
         _this = this;
@@ -357,9 +378,10 @@
     this.do_(function (it, key) {
       if (fn.call(_this, it)) return key;
     });
-    throw "not found";
+    throw "Array.findFirst: not found";
   };
-  Array.prototype.findFirst_ifAbsent = function (fn1, fn2) {
+  // findFirst:ifAbsent:
+  Array.prototype.findFirstifAbsent = function (fn1, fn2) {
     try {
       return this.findFirst(fn1);
     } catch (err) {
@@ -373,9 +395,10 @@
       if (fn.call(_this, it)) ret = key;
     });
     if (ret) return ret;
-    throw "not found"
+    throw "Array.findLast: not found"
   };
-  Array.prototype.findLast_ifAbsent = function (fn1, fn2) {
+  // findLast:ifAbsent:
+  Array.prototype.findLastifAbsent = function (fn1, fn2) {
     try {
       return this.findLast(fn1);
     } catch (err) {
@@ -385,7 +408,8 @@
   Array.prototype.firstKey = function () { return 0;  };
   Array.prototype.last = function () { return this[this.length-1];  };
   Array.prototype.lastKey = function () { return this.length - 1;  }
-  Array.prototype.replaceFrom_to_with_ = function (from, to, replacement) {
+  // replaceFrom:to:with:
+  Array.prototype.replaceFromtowith = function (from, to, replacement) {
     for (var i = from, j = 0; i < to; ++i) {
       this[i] = replacement[j];
       ++j;
@@ -393,53 +417,50 @@
     this.__updateCollection();
     return this;
   };
-  Array.prototype.startingAt_ = function (idx) { return this.slice(idx);  };
+  Array.prototype.startingAt = function (idx) { return this.slice(idx);  };
   Array.prototype.reversed = function () {
     return this.reverse();
   };
-  Array.prototype.reverseDo_ = function (fn) {
+  Array.prototype.reverseDo = function (fn) {
     return this.reverse().do_(fn);
   };
-  Array.prototype.sort_ = Array.prototype.sort;
-  Array.prototype.with_do_ = function (col, fn) {
-    if (this.length !== col.length) throw "first argument has to be an array that have the same length as the receiver";
+  Array.prototype.sort = Array.prototype.sort;
+  // with:do:
+  Array.prototype.withdo = function (col, fn) {
+    if (this.length !== col.length) throw "Array.withDo: first argument has to be an array that have the same length as the receiver";
   };
 
-  String.prototype.at_ = function (idx) { return this[idx]; };
-  String.prototype.at_put_ = function (idx, item) {
+  String.prototype.at = function (idx) { return this[idx]; };
+  // at:put:
+  String.prototype.atput = function (idx, item) {
     this = this.substring(0,idx-1) + item + this.substring(idx+1);
     return this;
   };
-  String.prototype.copyFrom_length_ = function (from, length) { return this.substring(from, from+length)  };
-  String.prototype.copyFrom_to_ = String.prototype.substring;
-  String.prototype.print = function () { try { console.log(this) } catch (err) { throw "no console found" } };
+  // copyFrom:length:
+  String.prototype.copyFromlength = function (from, length) { return this.substring(from, from+length)  };
+  // copyFrom:to:
+  String.prototype.copyFromto = String.prototype.substring;
+  String.prototype.print = function () { try { console.log(this) } catch (err) { throw "String.print: no console found" } };
   String.prototype.size = function () { return this.length; };
-  String.prototype.sameAs_ = function (str) { return this.toLowerCase() === str.toLowerCase() };
+  String.prototype.sameAs = function (str) { return this.toLowerCase() === str.toLowerCase() };
   
   Function.prototype.value = function () { return this(); };
-  Function.prototype.value_ 
-      = Function.prototype.value_value_ 
-      = Function.prototype.value_value_value_ 
-      = Function.prototype.value_value_value_value_ 
-      = Function.prototype.value_value_value_value_value_ 
+  // value:value:...
+  Function.prototype.valuevalue 
+      = Function.prototype.valuevaluevalue 
+      = Function.prototype.valuevaluevaluevalue 
+      = Function.prototype.valuevaluevaluevaluevalue 
       = function (/* &rest arguments */) { 
         return this.apply(this, arguments);
       };
-  Function.prototype.whileTrue_ = function (fn) {
-    while (this()) fn.call(this);
+  Function.prototype.whileTrue = function (fn) {
+    while (this()) if (fn) fn.call(this);
     return null;
   };
-  Function.prototype.whileTrue = function () {
-    while (this()) ;
+  Function.prototype.whileFalse = function (fn) {
+    while ( ! this()) if (fn) fn.call(this);
     return null;
   };
-  Function.prototype.whileFalse_ = function (fn) {
-    while ( ! this()) fn.call(this);
-    return null;
-  };
-  Function.prototype.whileFalse = function () {
-    while ( ! this()) ;
-    return null;
-  };
+
   
 }).call(this);

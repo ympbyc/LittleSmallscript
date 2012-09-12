@@ -63,11 +63,11 @@
     
     LittleSmallscript.prototype.toJS = function () {
       var _this = this,
-          wraptmpl = "(function () { %statement% }).call(this)";
+          wraptmpl = "(function () { %statement% }).call(this);";
       return this.cacheDo("toJS", function () {
         var js;
         js = __template(wraptmpl, {statement: _this.statement()});
-        if ( ! this.options.prettyprint) return js;
+        if ( ! (this.options && this.options.prettyprint)) return js;
         var beautifyOption = {
           indent_size : this.options.indent_size || 2,
           indent_char : this.options.indent_char || ' ',

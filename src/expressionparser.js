@@ -103,6 +103,7 @@
       return this.cacheDo("simpleExpression", function () {
         return _this.try_(
           _this.keywordExpression,
+          _this.binaryExpression,
           _this.unaryExpression,
           _this.primary
         );
@@ -131,13 +132,29 @@
         args = "";
         _this.many1(function () {
           _this.skipSpace();
-          methodName += _this.keywordSelector().replace(':', '_'); //eg: inject_into_
+          methodName += _this.keywordSelector().replace(':', ''); // "inject:into" becomes "injectinto" 
           _this.skipSpace();
           args += _this.primary() + ", ";
           _this.skipSpace();
         });
         return methodName + "(" + args.slice(0,-2) + ")";
       });  
+    }
+
+    ExpressionParser.prototype.binaryExpression = function () {
+      var _this = this;
+      return this.cacheDo("vinaryExpression", function () {
+        var receiver,
+            operator,
+            argument;
+        _this.skipSpace();
+        receiver = _this.primaryReceiver();
+        _this.skipSpace();
+        operator = _this.primitive();
+        _this.skipSpace();
+        argument = _this.primary();
+        return receiver + " " + operator + " " + argument;
+      });
     }
 
     // from | receiver selector
