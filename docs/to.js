@@ -5,15 +5,10 @@
   
   Klass = (function (_super) {
     __extends(Klass, _super);
+    var Klass;
     
-    function Klass () {
-      this.someArray = null;
-      this.index = null;
-      this.init();
-    }
-
-    Klass.prototype.init = function () {
-      this.someArray = Array.new_();
+    Klass = function () {
+      this.someArray = (1).to(10);
       this.index = 0;
     };
     
@@ -21,16 +16,16 @@
       return this.someArray.at_(this.index);
     };
 
-    Klass.prototype.current_ = function (replacement) {
-      this.someArray.at_put_(this.index, replacement);
+    Klass.prototype.replaceCurrentWith = function (replacement) {
+      this.someArray.[this.index] = replacement;
       return this;
     };
     
     Klass.prototype.incrementPointer = function () {
       var origin;
-      origin = index.deepCopy();
-      index = index.plus_(1);
-      (origin.concat_(' to ').concat_(index)).print();
+      origin = this.index;
+      index = index + 1;
+      (origin + ' to ' + index).print();
       return index;
     };
 
@@ -40,10 +35,11 @@
     var _cascade;
     _cascade = Klass.new_();
     _cascade.incrementPointer();
-    _cascade.current_(3);
+    _cascade.replaceCurrentWith(3);
     _cascade.current().print();
+    return _cascade;
   })();
 
-  [1, 2, 3, 4].inject_into_(0, function (a, lastres) { return lastres.plus_(a); });
+  [1, 2, 3, 4].injectinto(0, function (a, lastres) { return lastres + a; });
 
 }).call(this);
