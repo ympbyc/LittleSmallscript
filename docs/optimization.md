@@ -113,26 +113,28 @@ Human method: [:name |
   this at: #myname put: name
 ] at: #constructor.
 
-Human method [:name |
+Human method: [:name |
   window alert: ('Hello ' <+> name)
 ] at: #talkTo
 ```
 
 ```javascript
 var Human;
-Human = (function () {
+Human = (function (_super) {
   var Human;
 
   Human = function (name) {
    this.myname = name;
   };
 
+  Human.prototype = new _super();
+
   Human.prototype.talkTo = function (name) {
     window.alert('Hello ' + name)
   };
 
   return Human;
-});
+})(Animal);
 ```
 
 This notation is derived from CoffeeScript
