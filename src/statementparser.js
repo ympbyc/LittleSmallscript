@@ -54,6 +54,7 @@
         ret += " return " + _this.expression() + ";";
         _this.skipSpace();
         _this.optional(function () { return _this.chr("."); });
+        _this.skipSpace();
 
         return ret;
       });
