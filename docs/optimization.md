@@ -52,12 +52,13 @@ res = (0).to(9).collect(function (i) {
 ```
 
 Clearly Little Smallscript wins the readability in this case.  
-We have to balance between familiarity, efficiancy and readability and carefully choose what to optimize and what to left as is.
+
+We have to balance between familiarity, efficiancy and readability and carefully choose what to optimize and what to leave as is.
 
 Direction
 ----------
 
-Little Smallscript promotes functional proggramming style over imperative style. This often means that the use of statements should be kept minimim.  
+Little Smallscript promotes functional programming style over imperative style. This often means that the use of statements should be kept minimim.  
 fors and whiles should only be used for library functions, and are not for users to write.
 
 Therefore I decided to optimize only the methods that does not require statements.
@@ -129,12 +130,12 @@ Human = (function (_super) {
 
   Human.prototype = new _super();
 
-  Human.prototype.talkTo = function (name) {
-    window.alert('Hello ' + name)
-  };
-
   return Human;
-})(Animal);
+})(Animal)
+
+Human.prototype.talkTo = function (name) {
+  window.alert('Hello ' + name)
+};
 ```
 
 This notation is derived from CoffeeScript
