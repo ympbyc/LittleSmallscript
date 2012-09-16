@@ -14,3 +14,4 @@ Map method: [:w :h | | _this |
 Map method: [^ this at: '_map'] at: 'show'.
 
 (Map new_; width: 10 height: 5) show
+

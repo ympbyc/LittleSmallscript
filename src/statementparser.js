@@ -12,7 +12,7 @@
   var LittleParsers, StatementParser;
 
   try {
-    LittleParsers = require('./statementparsers').LittleParsers;
+    LittleParsers = require('./littleparsers').LittleParsers;
   } catch (err) {
     if ( ! (LittleParsers = window.LittleParsers)) throw "littleparsers.js is required";
   }
