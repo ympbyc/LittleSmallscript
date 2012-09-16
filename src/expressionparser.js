@@ -87,7 +87,7 @@
             _this.semicolon();
             _this.skipSpace();
             return "_receiver" + "." + _this.continuation() + ";";
-          })
+          });
         });
         return __template(tmpl, {simpleExpression:se, body:conti});
       });
@@ -139,7 +139,7 @@
         });
         return methodName + "(" + args.slice(0,-2) + ")";
       });  
-    }
+    };
 
     ExpressionParser.prototype.binaryExpression = function () {
       var _this = this;
@@ -155,7 +155,7 @@
         argument = _this.primary();
         return receiver + " " + operator + " " + argument;
       });
-    }
+    };
 
     // from | receiver selector
     // to   | receiver.selector()

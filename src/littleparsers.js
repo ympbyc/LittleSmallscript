@@ -10,7 +10,7 @@
 (function () {
   'use strict';
   
-  var Packrat, LittleParsers, ExpressionParser, BlockParser;
+  var Packrat, LittleParsers;
 
   try {
     Packrat = require('./packratparser').Packrat;
@@ -60,8 +60,8 @@
     // ;
     LittleParsers.prototype.semicolon = function () {
       var _this = this;
-      return this.cacheDo("colon", function () { return _this.chr(";") });
-    }
+      return this.cacheDo("colon", function () { return _this.chr(";"); });
+    };
 
     // <-
     LittleParsers.prototype.assignmentArrow = function () {
@@ -165,7 +165,7 @@
     };
 
     return LittleParsers;
-  })()
+  })();
   
   try {
     exports.LittleParsers = LittleParsers;

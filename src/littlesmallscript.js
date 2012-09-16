@@ -30,7 +30,7 @@
       dest_str = dest_str.replace(new RegExp('%'+key+'%', 'g'), it || "");
     });
     return dest_str;
-  };;
+  };
   
   try {
     Packrat = require("./packratparser").Packrat;
@@ -87,7 +87,7 @@
     };
     
     return LittleSmallscript;
-  })()
+  })();
   
   try {
     exports.LittleSmallscript = LittleSmallscript;

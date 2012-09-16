@@ -1,4 +1,6 @@
 (function () {
+  'use strict';
+
   var LittleSmallscript, fs, optimist, argv, readline, rl;
   
   LittleSmallscript = require("./littlesmallscript").LittleSmallscript;

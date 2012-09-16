@@ -12,8 +12,5 @@ ToDo:
   * unary over binary over keywords
   * self assert: foo size = 1 becomes this.assert(foo.size() === 1)
 
-* command-line tool
-  * compile file, compile and print, interactive shell
-
 * interactive web interface
   * something like "try coffeescript"

@@ -23,7 +23,7 @@
     StatementParser = function (input) {
       this.cache = {};
       this.input = input;
-    }
+    };
     StatementParser.prototype = new LittleParsers("");
 
     /*    expression                     *

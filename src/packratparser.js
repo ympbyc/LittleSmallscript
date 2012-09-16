@@ -23,11 +23,11 @@
     var Packrat, NoParse;
 
     /* constructor */
-    function Packrat (input) {
+    Packrat = function (input) {
       this.input = input;
       this.index = 0;
       this.cache = {};
-    }
+    };
 
     /*
      * Cache parsers instead of evaluating them every time.
@@ -59,10 +59,11 @@
      * constructor for Error objects that is thrown on failure
      */
     NoParse = (function () {
-      function NoParse () {
+      var NoParse;
+      NoParse = function () {
       };
       
-      NoParse.prototype = new Error;
+      NoParse.prototype = new Error();
       
       return NoParse;
     })();
@@ -71,7 +72,7 @@
      * throw NoParse
      */
     Packrat.prototype.noParse = function () {
-      throw new NoParse;
+      throw new NoParse();
     };
 
     /*--- Definition of basic combinators ---*/
@@ -243,7 +244,7 @@
     Packrat.prototype.chr = function (ch) {
       var c;
       c = this.anyChar();
-      return c == ch ? c : this.noParse()
+      return c === ch ? c : this.noParse();
     };
     
     /*
@@ -257,7 +258,7 @@
         if (c !== ch) _this.noParse();
       });
       return str;
-    }
+    };
 
     /*
      * Reular expression
@@ -271,7 +272,7 @@
         return match;
       }
       this.noParse();
-    }
+    };
     
     return Packrat;
     
