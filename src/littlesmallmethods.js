@@ -21,15 +21,6 @@
   };
   Function.prototype.new_ = function () {
     var newInstance = new this();
-    if (Object.defineProperty !== undefined && Object.defineProperty !== null) {
-      Object.defineProperty(newInstance, '__collection__', {enumerable:false, value:[], writable:true});
-      Object.defineProperty(newInstance, '__keys__', {enumerable:false, value:[], writable:true});
-      Object.defineProperty(newInstance, '__generatorIndex__', {enumerable:false, value:-1, writable:true});
-    } else {
-      newInstance.__collection__ = []; // internal use for generators
-      newInstance.__keys__ = [];
-      newInstance.__generatorIndex__ = -1; // internal use for generators
-    }
     if (newInstance.__init) newInstance.__init.call(newInstance);
     if (newInstance.init) newInstance.init.apply(newInstance, arguments);
     return newInstance;
@@ -61,25 +52,6 @@
     return null;
   };
   Object.prototype.error = function (str) { throw str; };
-  Object.prototype.__updateCollection = function () {
-    this.__collection__ = [];
-    this.__keys__ = [];
-    var _this = this;
-    return this.do_(function (it, key) {
-      if (it !== undefined) {
-        _this.__collection__.push(it);
-        _this.__keys__.push(key);
-      }
-    });
-  };
-
-  Object.prototype.first = function () { 
-    this.__updateCollection();
-    return this.__collection__[this.__generatorIndex__+1].notNil() ? this.__collection__[++this.__generatorIndex__] : this;
-  };
-  Object.prototype.next = function () {
-    return this.__collection__[this.__generatorIndex__+1] ? this.__collection__[++this.__generatorIndex__] : null;
-  };
   Object.prototype.isKindOf = function (Klass) { return this instanceof Klass; };
   Object.prototype.isMemberOf = function (Klass) { return this.class_() === Klass;  };
   Object.prototype.isNil = function () { return this === null || this === undefined;  };
@@ -129,18 +101,14 @@
     var _this = this;
     col.do_(function (it, key) {
       _this[key] = it;
-      _this.__collection__.push(it);
-      _this.__keys__.push(key);
     });
     return this;
   };
   Object.prototype.asArray = function () {
-    this.__updateCollection(); //for safety
-    return this.__collection__.concat([]);
+    return this.collect(function (it) {return it});
   };
   Object.prototype.asString = function () {
-    this.__updateCollection(); //for safety
-    return this.__collection__.inject_into_('', function (it, lastres) {
+    return this.asArray().injectinto('', function (it, lastres) {
       return lastres + String(it);
     });
   };
@@ -184,8 +152,7 @@
     return lastres;
   };
   Object.prototype.isEmpty = function () { 
-    this.__updateCollection(); //for safety
-    return this.__collection__.length === 0; 
+    return this.size() === 0;
   };
   Object.prototype.occuranceOf = function (item) {
     return this.injectinto(0, function (it, lst) { return (item === it) ? ++lst : lst; });
@@ -223,8 +190,7 @@
     return ret;
   };
   Object.prototype.size = function () { 
-    this.__updateCollection(); //for safety
-    return this.__collection__.length;  
+    return this.injectinto(0,function (a,b) {return b+1});
   };
   Object.prototype.asDictionary = function () {
     var ret = {},
@@ -241,7 +207,7 @@
   // at:ifAbsent:
   Object.prototype.atifAbsent = function (key, fn) {
     try {
-      return this.at_(key);
+      return this.at(key);
     } catch (err) {
       return fn.call(this);
     }
@@ -250,13 +216,11 @@
   Object.prototype.atAllput = function (keys, item) {
     var _this = this;
     keys.do_(function (key) { return _this[key] = item;  });
-    this.__updateCollection();
     return this;
   };
   // at:put:
   Object.prototype.atput = function (key, item) {
     this[key] = item;
-    this.__updateCollection();
     return this;
   };
   Object.prototype.includesKey = function (key) {
@@ -277,18 +241,17 @@
     }
   };
   Object.prototype.keys = function () {
-    this.__updateCollection(); //for safety
-    return this.__keys__;
+    if (Object.keys) return Object.keys(this);
+    this.collect(function (it, key) {return key});
   };
   Object.prototype.keysDo = function (fn) {
     return this.keys().do_(fn);
   };
   Object.prototype.keySelect = function (fn) {
-    return this.keys().select_(fn);
+    return this.keys().select(fn);
   };
   Object.prototype.removeKey = function (key) {
     if (this[key].isNil()) throw "Object.removeKey: slot " + key + " not found";
-    this.__updateCollection();
     return delete this[key];
   };
   // removeKey:ifAbsent:
@@ -299,12 +262,8 @@
       return fn.call(this);
     }
   };
-  Object.prototype.currentKey = function () {
-    this.__updateCollection(); //for safety
-    return this.__keys__[this.__generatorIndex__];
-  };
 
-  Array.prototype.addLast = function (item) { this.push(item); this.__updateCollection(); return this; };  
+  Array.prototype.addLast = function (item) { this.push(item); return this; };  
   Array.prototype.do_ = Array.prototype.binaryDo = Array.prototype.forEach || Object.prototype.do_;
   Array.prototype.collect = Array.prototype.map || function (fn) {
     var ret = [], 
@@ -391,7 +350,6 @@
       this[i] = replacement[j];
       ++j;
     }
-    this.__updateCollection();
     return this;
   };
   Array.prototype.startingAt = function (idx) { return this.slice(idx);  };

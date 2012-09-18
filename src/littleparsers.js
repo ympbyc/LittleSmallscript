@@ -86,7 +86,9 @@
         return _this.try_(
           _this.numberLiteral,
           _this.stringLiteral,
-          _this.arrayLiteral
+          _this.symbolLiteral,
+          _this.arrayLiteral,
+          _this.hashLiteral
         );
       });
     };
@@ -111,6 +113,15 @@
       });
     };
     
+    // #abc -> abc
+    LittleParsers.prototype.symbolLiteral = function () {
+      var _this = this;
+      return this.cacheDo("symbolLiteral", function () {
+        _this.chr('#');
+        return '"' + _this.variable() + '"';
+      });
+    };
+
     // #(1 2 3) -> [1, 2, 3]
     LittleParsers.prototype.arrayLiteral = function () {
       var _this = this;
@@ -125,6 +136,31 @@
         }).slice(0, -1);
         _this.chr(")");
         ret += "]";
+        return ret;
+      });
+    };
+    
+    LittleParsers.prototype.hashLiteral = function () {
+      var _this = this;
+      return this.cacheDo("hashLiteral", function () {
+        var ret = "";
+        _this.string("#{");
+        ret += "{";
+        ret += _this.many(function () {
+          var key, val;
+          _this.skipSpace();
+          key = _this.try_(
+            _this.stringLiteral,
+            _this.numberLiteral,
+            _this.symbolLiteral
+          );
+          _this.chr(':');
+          _this.skipSpace();
+          val = _this.primary();
+          return key + ':' + val + ',';
+        });
+        _this.chr("}");
+        ret += "}";
         return ret;
       });
     };

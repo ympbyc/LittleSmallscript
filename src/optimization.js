@@ -19,14 +19,20 @@
   optimTmpl = {
     "at" : "%receiver%[%arg1%]",
     "atput" : "%receiver%[%arg1%] = %arg2%",
+    "do" : "%receiver%.do_(%arg1%)",
+    "value" : "%receiver%(%arg1%)",
+    "valuevalue" : "%receiver%(%args%)",
+    "valuevaluevalue" : "%receiver%(%args%)",
+    "valuevaluevaluevalue" : "%receiver%(%args%)",
+    "valuevaluevaluevaluevalue" : "%receiver%(%args%)",
     "ifTrue" : "%receiver% ? (%arg1%)() : void 0",
     "ifFalse" : "%receiver% ? void 0 : (%arg1%)()",
     "ifTrueifFalse" : "%receiver% ? (%arg1%)() : (%arg2%)()",
     "ifFalseifTrue" : "%receiver% ? (%arg2%)() : (%arg1%)()",
-    "and" : "%receiver% && %arg1%",
-    "or"  : "%receiver% || %arg1%",
-    "eqv" : "%receiver% === %arg1%",
-    "xor" : "(%receiver% && !%arg1%) || (!%receiver% && %arg1%)",
+    "and" : "%receiver% && %arg1%()",
+    "or"  : "%receiver% || %arg1%()",
+    "eqv" : "%receiver% === %arg1%()",
+    "xor" : "(%receiver% && !%arg1%()) || (!%receiver% && %arg1%())",
     "not" : "! %receiver%",
     "new" : "new %receiver%(%args%)",
     "subclass" : "(function (_super) { var _Constructor; _Constructor = function (/* &rest arguments */) { if (this.init) this.init.apply(this,arguments); }; _Constructor.prototype = new _super(); return _Constructor; })(%receiver%)",
@@ -46,7 +52,7 @@
   };
   
   var oa = function (kw) {
-    if (optimTmpl[kw]) return true;
+    if (optimTmpl.hasOwnProperty(kw)) return true;
     return false;
   };
   

@@ -78,17 +78,25 @@
       var _this = this,
           tmpl = "(function () { var _receiver = %simpleExpression%; %body% return _receiver;  })()";
       return this.cacheDo("cascade", function () {
-        var se, conti;
+        var se, conti, brackets;
         se = _this.simpleExpression(); // obj mes / obj sel arg / obj kw: arg kw2: arg
         try {
-          if (_this.notFollowedBy(_this.semicolon) === null) return se;
+          _this.notFollowedBy(_this.semicolon);
+          brackets = "";
+          conti = _this.many(function () {
+            var conti = _this.continuation();
+            brackets += "(";
+            return conti + ")";
+          });
+          if ( ! conti) return se;
+          return brackets + se + conti;
         } catch (e) {}
         conti = _this.optional(function () {
           return _this.many(function () {
             _this.skipSpace();
             _this.semicolon();
             _this.skipSpace();
-            return "_receiver" + "." + _this.continuation() + ";";
+            return "_receiver" + _this.continuation() + ";";
           });
         });
         return __template(tmpl, {simpleExpression:se, body:conti});
@@ -160,17 +168,26 @@
 
     ExpressionParser.prototype.binaryExpression = function () {
       var _this = this;
-      return this.cacheDo("vinaryExpression", function () {
-        var receiver,
-            operator,
-            argument;
+      return this.cacheDo("binaryExpression", function () {
+        var receiver,binaryMessage;
         _this.skipSpace();
         receiver = _this.primaryReceiver();
+        binaryMessage = _this.binaryMessage();
+        return receiver + " " + operator + " " + argument;
+      });
+    };
+    
+    // from | <+> 1
+    // to   | + 1
+    ExpressionParser.prototype.binaryMessage = function () {
+      var _this = this;
+      return this.cacheDo("binaryMessage", function () {
+        var operator, argument;
         _this.skipSpace();
         operator = _this.primitive();
         _this.skipSpace();
         argument = _this.primary();
-        return receiver + " " + operator + " " + argument;
+        return operator + " " + argument;
       });
     };
 
@@ -179,32 +196,36 @@
     ExpressionParser.prototype.unaryExpression = function () {
       var _this = this;
       return this.cacheDo("unaryExpression", function () {
-        var a = "";
-        a += _this.primaryReceiver();
+        var receiver, unarySelector;
+        receiver = _this.primaryReceiver();
         _this.skipSpace();
-        a += ".";
-        _this.skipSpace();
-        a += _this.unaryMessage();
-        return a;
+        unarySelector = _this.unarySelector();
+        
+        //optimize if optimization is available
+        if (_this.options.optimization && optimization.optimizationAvailable(unarySelector))
+          return optimization.optimize(receiver, unarySelector, []);
+        
+        return receiver + '.' + unarySelector + '()';
       });
     };
-
+    
     // from | selector
     // to   | selector()
     ExpressionParser.prototype.unaryMessage = function () {
       var _this = this;
       return this.cacheDo("unaryMessage", function () {
-        return _this.unarySelector() + "()";
+        return _this.unarySelector() + '()';
       });
     };
-
 
     ExpressionParser.prototype.continuation = function () {
       var _this = this;
       return this.cacheDo("continuation", function () {
+        _this.skipSpace();
         return _this.try_(
-          _this.keywordMessage,
-          _this.unaryMessage
+          function () { return "." + _this.keywordMessage().methodCall; },
+          _this.binaryMessage,
+          function () { return "." + _this.unaryMessage(); }
         );
       });
     };
