@@ -9,7 +9,7 @@
 (function () {
   'use strict';
 
-  var LittleParsers, ExpressionParser, 
+  var LittleParsers, optimization, ExpressionParser, 
   __each = function (obj, fn) {
     for (var key in obj)
       if (obj.hasOwnProperty(key))
@@ -26,8 +26,10 @@
 
   try {
     LittleParsers = require('./littleparsers').LittleParsers;
+    optimization = require('./optimization');
   } catch (err) {
     if ( ! (LittleParsers = window.LittleParsers)) throw "littleparsers.js is required";
+    if ( ! (optimization = window.optimization)) throw "optimization.js is required";
   }
 
   ExpressionParser = (function () {
@@ -116,9 +118,20 @@
       var _this = this;
       return this.cacheDo("keywordExpression", function () {
         var receiver,
-            methodCall;
+            methodCall,
+            methodName,
+            args,
+            tmp;
         receiver = _this.primaryReceiver();
-        methodCall = _this.keywordMessage();
+        tmp = _this.keywordMessage();
+        methodCall = tmp.methodCall;
+        methodName = tmp.methodName;
+        args = tmp.args;
+        
+        //optimize if optimization is available
+        if (_this.options.optimization && optimization.optimizationAvailable(methodName))
+          return optimization.optimize(receiver, methodName, args);
+
         return receiver + "." + methodCall;
       });
     };
@@ -129,15 +142,19 @@
       var _this = this;
       return this.cacheDo("keywordMessage", function () {
         var methodName = "",
-        args = "";
+        args = [];
         _this.many1(function () {
           _this.skipSpace();
           methodName += _this.keywordSelector().replace(':', ''); // "inject:into" becomes "injectinto" 
           _this.skipSpace();
-          args += _this.primary() + ", ";
+          args.push(_this.primary())
           _this.skipSpace();
         });
-        return methodName + "(" + args.slice(0,-2) + ")";
+        return {
+          methodCall : methodName + "(" + args.join(", ") + ")",
+          methodName : methodName,
+          args : args
+        };
       });  
     }
 

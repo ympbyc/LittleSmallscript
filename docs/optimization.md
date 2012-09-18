@@ -52,7 +52,7 @@ res = (0).to(9).collect(function (i) {
 ```
 
 Clearly Little Smallscript wins the readability in this case.  
-We have to balance between familiarity, efficiancy and readability and carefully choose what to optimize and what to left as is.
+We have to balance between familiarity, efficiency and readability and carefully choose what to optimize and what to left as is.
 
 Direction
 ----------

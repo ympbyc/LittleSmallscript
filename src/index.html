@@ -5,6 +5,7 @@
       <script src="packratparser.js"></script>
       <script src="littleparsers.js"></script>
       <script src="blockparser.js"></script>
+      <script src="optimization.js"></script>
       <script src="expressionparser.js"></script>
       <script src="statementparser.js"></script>
       <script src="littlesmallscript.js"></script>
@@ -79,7 +80,7 @@ Robot new_: 'Yendor'
         (function () {
           var edited = false;
           var compile_writeAt_ = function (txt, jQ) {
-            var js = new LittleSmallscript(txt, {prettyprint: true}).toJS();
+            var js = new LittleSmallscript(txt, {prettyprint: true, optimization: true}).toJS();
             jQ.text(js);
             return js;
           };
