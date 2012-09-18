@@ -17,60 +17,21 @@
           width: 90%;
           height: 20em;
         }
-        #lss {
-          color: #d3d3d3;
-        }
-        #lss:focus {
-          color: #000;
+        .error {
+          background-color: #FF9A95;
         }
       </style>
     </head>
     <body>
       <div id="container">
         <div>
-          <textarea id="lss" class="source">
-| Robot Enemy  |
-Enemy <- Object subclass.
-Enemy method: [:myname |
-  this at: '_name' put: myname.
-  this
-] at: 'init'.
-Enemy method: [| ret caught |
-  ret <- false.
-  caught <- (((Math random) <*> 10) <<> 3).
-  caught ifTrue: [ret <- true].
-  ret
-] at: 'isCaught'.
-Robot <- Object subclass.
-Robot method: [:myname |
-  this at: '_name' put: myname.
-  this
-] at: 'init'.
-Robot method: [| message |
-  message <- 'Hello. I am ' <+> ((this at: '_name') <+> '.').
-  window alert: message.
-  message
-] at: 'greet'.
-Robot method: [:enemy :block | | mes |
-  mes <- (((this at: '_name') <+> ' is chasing') <+> (enemy at: '_name')).
-  [enemy isCaught] whileFalse: [window alert: mes].
-  block value
-] withKeywords: #('chaseEnemy' 'whenCaught').
-
-Robot new_: 'Yendor' 
-  ; greet 
-  ; chaseEnemy: (Enemy new_: 'Demogorgon') whenCaught: [
-    window alert: 'a robot caught his enemy'
-  ]
-          </textarea>
-        </div>
-        <div>
-          <button id="_compile-btn">compile</button>
-          <button id="_eval-btn">compile and eval</button>
+          <p class="error"></p><br />
+          <textarea id="lss" class="source"></textarea>
         </div>
         <div>
           <textarea id="js" class="source" disabled></textarea>
         </div>
+        <div><button id="_eval-btn">run</button></div>
         <div>
           <textarea id="console" class="source" disabled></textarea>
         </div>
@@ -80,12 +41,17 @@ Robot new_: 'Yendor'
         (function () {
           var edited = false;
           var compile_writeAt_ = function (txt, jQ) {
-            var js = new LittleSmallscript(txt, {prettyprint: true, optimization: true}).toJS();
+            $('.error').text('');
+            try {
+              var js = new LittleSmallscript(txt, {prettyprint: true, optimization: true}).toJS();
+            } catch (err) {
+              $('.error').text(err);
+            }
             jQ.text(js);
             return js;
           };
           $(function () {
-            $('#_compile-btn').click(function () {
+            $('#lss').on('keyup', function () {
               return compile_writeAt_($('#lss').val(), $('#js'));
             });
             $('#_eval-btn').click(function () {
@@ -94,7 +60,7 @@ Robot new_: 'Yendor'
               try {
                 res = eval(js);
               } catch (err) {
-                res = err;
+                res = err.type;
               }
               $('#console').text(JSON.stringify(res));
             });

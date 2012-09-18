@@ -68,7 +68,7 @@
         var js;
         js = __template(wraptmpl, {statement: _this.statement()});
         if (this.index < this.input.length)
-          ;//throw 'Parse error at '+this.index+'th character.'; //ToDo: line number and parser name
+          throw 'Parse error at '+this.index+'th character.'; //ToDo: line number and parser name
         if ( ! (this.options && this.options.prettyprint)) return js;
         var beautifyOption = {
           indent_size : this.options.indent_size || 2,
