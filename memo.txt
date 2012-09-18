@@ -8,8 +8,9 @@ ToDo:
   * (1 < 3).ifTrue(function(){return 'yay';}) -> if (1 < 3) { return 'yay';  }
   * etc
 
-* command-line tool
-  * compile file, compile and print, interactive shell
+* priority
+  * unary over binary over keywords
+  * self assert: foo size = 1 becomes this.assert(foo.size() === 1)
 
 * interactive web interface
   * something like "try coffeescript"

@@ -19,21 +19,6 @@
     Sc.prototype.__init = function () {}; //internal use only
     return Sc;
   };
-  Function.prototype.subclassWithVariables_ = function (vararr) {
-    var Sc = this.subclass();
-    Sc.prototype.__init = function () {
-      if (Object.defineProperty !== undefined && Object.defineProperty !== null) {
-        Object.defineProperty(newInstance, '__instanceVariables__', {enumerable:false, value:[], writable:false});
-      } else {
-        this.__instanceVariables__ = [];
-      }
-      for (var key in vararr) {
-        this[vararr[key]] = null;
-        this.__instanceVariables__.push(vararr[key]);
-      }
-    }
-    return Sc;
-  };
   Function.prototype.new_ = function () {
     var newInstance = new this();
     if (Object.defineProperty !== undefined && Object.defineProperty !== null) {
@@ -52,13 +37,6 @@
   // method:at:
   Function.prototype.methodat = function (fn, slot) {
     return this.prototype[slot] = fn;
-
-    if (Function.prototype.bind !== null && Function.prototype.bind !== undefined)
-      return this.prototype[slot] = fn.bind(this);
-    var _this = this;
-    return this.prototype[slot] = function (/* &rest argument */) { 
-      return fn.apply(_this, arguments);
-    };
   };
   // method:withKeywords:
   Function.prototype.methodwithKeywords = function (fn, arr) {
@@ -67,10 +45,10 @@
   };
 
   Object.prototype.asString = Object.prototype.toString;
-  Object.prototype.class_ = function () { return this.constructor };
+  Object.prototype.class_ = function () { return this.constructor; };
   Object.prototype.copy = Object.prototype.shallowCopy = function () { return this; };
   Object.prototype.deepCopy = function () {
-    var a = new this.constructor || Object;
+    var a = new (this.constructor || Object);
     for (var key in this) {
       if (__hasProp.call(this, key)) a[key] = this[key];
     }
@@ -78,7 +56,7 @@
   };
   Object.prototype.do_ = Object.prototype.binaryDo = function (fn) {
     for (var key in this) {
-      if (__hasProp.call(this, key) && new String(key).search(/__/) !== 0) fn(this[key], key);
+      if (__hasProp.call(this, key) && String(key).search(/__/) !== 0) fn(this[key], key);
     }
     return null;
   };
@@ -103,11 +81,11 @@
     return this.__collection__[this.__generatorIndex__+1] ? this.__collection__[++this.__generatorIndex__] : null;
   };
   Object.prototype.isKindOf = function (Klass) { return this instanceof Klass; };
-  Object.prototype.isMemberOf = function (Klass) { return this.class_() === Klass;  }
+  Object.prototype.isMemberOf = function (Klass) { return this.class_() === Klass;  };
   Object.prototype.isNil = function () { return this === null || this === undefined;  };
   Object.prototype.notNil = function () { return this !== null && this !== undefined;  };
   Object.prototype.print = Object.printString = function () { return JSON ? JSON.stringify(this) : this.toString();  };
-  Object.prototype.respondsTo = function (name) { return this[name].notNil() };
+  Object.prototype.respondsTo = function (name) { return this[name].notNil(); };
   
   Boolean.prototype.and = function (fn) { return this.valueOf() ? (fn.call(this) ? true : false) : false;  };
   Boolean.prototype.or = function (fn) { return  this.valueOf() ? true : (fn.call(this) ? true : false); };
@@ -136,9 +114,9 @@
   };
   // to:by:
   Number.prototype.toby = function (tonum, bynum) {
-    var i = this-1;
-    res = [];
-    while (i+=bynum <= tonum)
+    var i = this-1,
+        res = [];
+    while (i += bynum <= tonum)
       res.push(i);
     return res;
   };
@@ -163,7 +141,7 @@
   Object.prototype.asString = function () {
     this.__updateCollection(); //for safety
     return this.__collection__.inject_into_('', function (it, lastres) {
-      return lastres + new String(it);
+      return lastres + String(it);
     });
   };
   Object.prototype.collect = function (fn) {
@@ -179,7 +157,6 @@
       if (fn.call(this, it)) return it;
     });
     throw "Object.detect could not find an item that satisfies "+fn.toString()+".";
-    return null;
   };
   // detect:ifAbsent:
   Object.prototype.detectifAbsent = function (fn1, fn2) {
@@ -195,7 +172,7 @@
       return true;
     } catch (err) {
       return false;
-    };
+    }
   };
   // inject:into:
   Object.prototype.injectinto = function (initialValue,fn) {
@@ -211,7 +188,7 @@
     return this.__collection__.length === 0; 
   };
   Object.prototype.occuranceOf = function (item) {
-    return this.injectinto(0, function (it, lst) { return (item === it) ? ++lst : lst });
+    return this.injectinto(0, function (it, lst) { return (item === it) ? ++lst : lst; });
   };
   Object.prototype.remove = function (item) {
     var found = false,
@@ -290,7 +267,7 @@
       if (this[key] === item) return key;
     }
     throw "Object.indexOf: not found";
-  }
+  };
   // indexOf:ifAbsent:
   Object.prototype.indexOfifAbsent = function (item, fn) {
     try {
@@ -395,7 +372,7 @@
       if (fn.call(_this, it)) ret = key;
     });
     if (ret) return ret;
-    throw "Array.findLast: not found"
+    throw "Array.findLast: not found";
   };
   // findLast:ifAbsent:
   Array.prototype.findLastifAbsent = function (fn1, fn2) {
@@ -407,7 +384,7 @@
   };
   Array.prototype.firstKey = function () { return 0;  };
   Array.prototype.last = function () { return this[this.length-1];  };
-  Array.prototype.lastKey = function () { return this.length - 1;  }
+  Array.prototype.lastKey = function () { return this.length - 1;  };
   // replaceFrom:to:with:
   Array.prototype.replaceFromtowith = function (from, to, replacement) {
     for (var i = from, j = 0; i < to; ++i) {
@@ -433,16 +410,16 @@
   String.prototype.at = function (idx) { return this[idx]; };
   // at:put:
   String.prototype.atput = function (idx, item) {
-    this = this.substring(0,idx-1) + item + this.substring(idx+1);
+    this = this.substring(0, idx - 1) + item + this.substring(idx + 1);
     return this;
   };
   // copyFrom:length:
-  String.prototype.copyFromlength = function (from, length) { return this.substring(from, from+length)  };
+  String.prototype.copyFromlength = function (from, length) { return this.substring(from, from + length);  };
   // copyFrom:to:
   String.prototype.copyFromto = String.prototype.substring;
-  String.prototype.print = function () { try { console.log(this) } catch (err) { throw "String.print: no console found" } };
+  String.prototype.print = function () { try { return console.log(this); } catch (err) { throw "String.print: no console found"; } };
   String.prototype.size = function () { return this.length; };
-  String.prototype.sameAs = function (str) { return this.toLowerCase() === str.toLowerCase() };
+  String.prototype.sameAs = function (str) { return this.toLowerCase() === str.toLowerCase(); };
   
   Function.prototype.value = function () { return this(); };
   // value:value:...

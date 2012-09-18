@@ -89,7 +89,7 @@
             _this.semicolon();
             _this.skipSpace();
             return "_receiver" + "." + _this.continuation() + ";";
-          })
+          });
         });
         return __template(tmpl, {simpleExpression:se, body:conti});
       });
@@ -156,7 +156,7 @@
           args : args
         };
       });  
-    }
+    };
 
     ExpressionParser.prototype.binaryExpression = function () {
       var _this = this;
@@ -172,7 +172,7 @@
         argument = _this.primary();
         return receiver + " " + operator + " " + argument;
       });
-    }
+    };
 
     // from | receiver selector
     // to   | receiver.selector()
