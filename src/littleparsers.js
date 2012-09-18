@@ -168,7 +168,11 @@
     // only alpha-numeric characters (plus $ and _) are accepted due to javasript's limitation
     LittleParsers.prototype.variable = function () {
       var _this = this;
-      return this.cacheDo("variable", function () {return _this.regex(/^[a-zA-Z_$][a-zA-Z0-9_$]*/);});
+      return this.cacheDo("variable", function () {
+        var v = _this.regex(/^[a-zA-Z_$][a-zA-Z0-9_$]*/);
+        if (v === 'self') return 'this';
+        return v;
+      });
     };
 
     // :foo

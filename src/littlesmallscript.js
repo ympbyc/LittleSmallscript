@@ -63,7 +63,7 @@
     
     LittleSmallscript.prototype.toJS = function () {
       var _this = this,
-          wraptmpl = "(function () { %statement% }).call(this);";
+          wraptmpl = "(function () { 'use strict'; %statement% }).call(this);";
       return this.cacheDo("toJS", function () {
         var js;
         js = __template(wraptmpl, {statement: _this.statement()});
