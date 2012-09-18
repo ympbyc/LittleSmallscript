@@ -63,11 +63,14 @@
       return this.cacheDo("colon", function () { return _this.chr(";"); });
     };
 
-    // <-
+    // <- or :=
     LittleParsers.prototype.assignmentArrow = function () {
       var _this = this;
       return this.cacheDo("assignmentArrow", function () { 
-        return _this.string("<-");
+        return _this.try_(
+          function () { return _this.string(":="); },
+          function () { return _this.string("<-"); }
+        );
       });
     };
     
@@ -97,7 +100,7 @@
     LittleParsers.prototype.numberLiteral = function () {
       var _this = this;
       return this.cacheDo("numberLiteral", function () { 
-        return _this.regex(/^[0-9]+/);
+        return _this.regex(/^-?[0-9]+/);
       });
     };
 
@@ -131,9 +134,9 @@
         ret += "[";
         ret += _this.many(function () {
           _this.skipSpace();
-          //return _this.expression() + ",";
-          return _this.primary() + ",";
+          return _this.expression() + ",";
         }).slice(0, -1);
+        _this.skipSpace();
         _this.chr(")");
         ret += "]";
         return ret;
@@ -156,9 +159,10 @@
           );
           _this.chr(':');
           _this.skipSpace();
-          val = _this.primary();
+          val = _this.expression();
           return key + ':' + val + ',';
-        });
+        }).slice(0, -1);
+        _this.skipSpace();
         _this.chr("}");
         ret += "}";
         return ret;
@@ -194,10 +198,20 @@
     // foo
     LittleParsers.prototype.unarySelector = LittleParsers.prototype.variable;
     
-    // ignore whitespaces
+    // ignore whitespaces and comments
     LittleParsers.prototype.skipSpace = function () {
+      var _this = this;
+      this.optional(this.space);
+      this.optional(function () { return _this.between(_this.commentQuote, _this.anyChar, _this.commentQuote); });
       return this.optional(this.space);
     };
+    
+    LittleParsers.prototype.commentQuote = function () {
+      var _this = this;
+      return this.cacheDo("commentQuote", function () {
+        return _this.chr('"');
+      });
+    }; 
     
     // ^ can be prefixed to the last expression in a statement
     LittleParsers.prototype.explicitReturn = function () {

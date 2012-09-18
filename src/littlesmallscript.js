@@ -63,17 +63,20 @@
     
     LittleSmallscript.prototype.toJS = function () {
       var _this = this,
-          wraptmpl = "(function () { 'use strict'; %statement% }).call(this);";
+          wraptmpl = "(function () {\n\n 'use strict';\n\n %statement% }).call(this);";
       return this.cacheDo("toJS", function () {
         var js;
         js = __template(wraptmpl, {statement: _this.statement()});
         if (this.index < this.input.length)
-          throw 'Parse error at '+this.index+'th character.'; //ToDo: line number and parser name
+          throw {
+            message: 'Parse error at '+this.index+'th character.',
+            partialjs: js
+          }; //ToDo: line number and parser name
         if ( ! (this.options && this.options.prettyprint)) return js;
         var beautifyOption = {
           indent_size : this.options.indent_size || 2,
           indent_char : this.options.indent_char || ' ',
-          preserve_newlines : false,
+          preserve_newlines : true,
           jslint_happy : this.options.jslint || true
         };
         try {

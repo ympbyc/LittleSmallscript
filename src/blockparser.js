@@ -48,7 +48,7 @@
         var parameters, body;
         _this.blockStart();
         parameters = _this.blockHead();
-        body = _this.statement();
+        body = _this.optional(_this.statement);
         _this.blockEnd();
         return __template(destinationTemplate, {parameters:parameters, body:body});
       });

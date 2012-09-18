@@ -46,16 +46,14 @@
           _this.chr(".");
           _this.skipSpace();
           
-          return a + "; ";
+          return a + ";\n\n";
         });
         
         _this.optional(_this.explicitReturn);
         _this.skipSpace();
-        ret += " return " + _this.expression() + ";";
+        ret += " return " + _this.expression() + ";\n\n";
         _this.skipSpace();
-        _this.optional(function () { return _this.chr("."); });
-        _this.skipSpace();
-
+     
         return ret;
       });
     };

@@ -396,6 +396,12 @@
     while ( ! this()) if (fn) fn.call(this);
     return null;
   };
-
+  Function.prototype.tryCatch = function (fn) {
+    try {
+      return this();
+    } catch (err) {
+      return fn.call(this, err);
+    }
+  };
   
 }).call(this);

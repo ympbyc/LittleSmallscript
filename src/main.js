@@ -31,7 +31,7 @@
     
     rl.on("line", function(input) {
       try {
-        var js = new LittleSmallscript(input, {prettyprint:true, optimize:true}).toJS();
+        var js = new LittleSmallscript(input, {prettyprint:true, optimization:true}).toJS();
         console.log(js+'\n');
         console.log(eval(js)+'\n');
       } catch (err) {
@@ -49,7 +49,7 @@
     return fs.readFile(fileName, 'utf8', function (err, lssString) {
       if (err) throw err;
       try {
-        var js = new LittleSmallscript(lssString, {prettyprint: argv.prettyprint||false, optimize: argv.optimize||false}).toJS();
+        var js = new LittleSmallscript(lssString, {prettyprint: argv.prettyprint||false, optimization: argv.optimize||false}).toJS();
         if (argv.p) return console.log(js);
         fs.writeFile(argv.c.replace(/\.([^\.])+$/, '.js'), js, function (err) {
           if (err) throw err;

@@ -45,7 +45,8 @@
             try {
               var js = new LittleSmallscript(txt, {prettyprint: true, optimization: true}).toJS();
             } catch (err) {
-              $('.error').text(err);
+              $('.error').text(err.message||err.type||err);
+              if (err.partialjs) jQ.text(err.partialjs);
             }
             jQ.text(js);
             return js;

@@ -36,7 +36,7 @@
     "not" : "! %receiver%",
     "new" : "new %receiver%(%args%)",
     "subclass" : "(function (_super) { var _Constructor; _Constructor = function (/* &rest arguments */) { if (this.init) this.init.apply(this,arguments); }; _Constructor.prototype = new _super(); return _Constructor; })(%receiver%)",
-    "methodat" : "%receiver%.prototype[%arg2%] = %arg1%"
+    "methodat" : "%receiver%.prototype[%arg2%] = %arg1%",
   };
 
   var classes = {};
@@ -44,7 +44,7 @@
   var optimize = function (receiver, methodName, args) {
     return __template(optimTmpl[methodName], {
       "receiver" : receiver,
-      "args": args.join(', '),
+      "args" : args.join(', '),
       "arg1": args[0],
       "arg2": args[1],
       "arg3": args[3]
