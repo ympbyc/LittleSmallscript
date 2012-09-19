@@ -100,7 +100,7 @@
     LittleParsers.prototype.numberLiteral = function () {
       var _this = this;
       return this.cacheDo("numberLiteral", function () { 
-        return _this.regex(/^-?[0-9]+/);
+        return _this.regex(/^-?[0-9]+(\.?[0-9]+)?/);
       });
     };
 
@@ -112,7 +112,7 @@
           _this.apostrophe,
           _this.anyChar,
           _this.apostrophe
-        ) + '"';
+        ).replace(/\n/g, '\\n') + '"';
       });
     };
     

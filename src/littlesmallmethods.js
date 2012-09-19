@@ -403,5 +403,14 @@
       return fn.call(this, err);
     }
   };
+  Function.prototype.tryCatchfinally = function (fn1, fn2) {
+    try {
+      this();
+    } catch (err) {
+      fn1.call(this, err);
+    } finally {
+      return fn2.call(this);
+    }
+  };
   
 }).call(this);

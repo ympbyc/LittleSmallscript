@@ -63,7 +63,7 @@
     
     LittleSmallscript.prototype.toJS = function () {
       var _this = this,
-          wraptmpl = "(function () {\n\n 'use strict';\n\n %statement% }).call(this);";
+          wraptmpl = "(function () { 'use strict'; %statement% }).call(this);";
       return this.cacheDo("toJS", function () {
         var js;
         js = __template(wraptmpl, {statement: _this.statement()});
@@ -76,7 +76,7 @@
         var beautifyOption = {
           indent_size : this.options.indent_size || 2,
           indent_char : this.options.indent_char || ' ',
-          preserve_newlines : true,
+          preserve_newlines : false,
           jslint_happy : this.options.jslint || true
         };
         try {

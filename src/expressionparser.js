@@ -81,7 +81,7 @@
         var se, conti, brackets;
         se = _this.simpleExpression(); // obj mes / obj sel arg / obj kw: arg kw2: arg
         try {
-          _this.notFollowedBy(_this.semicolon);
+          _this.notFollowedBy(function () { _this.skipSpace(); _this.semicolon(); });
           brackets = "";
           conti = _this.many(function () {
             var conti = _this.continuation();

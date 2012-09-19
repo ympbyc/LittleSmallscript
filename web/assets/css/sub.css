@@ -5,6 +5,19 @@ p {
   line-height: 1.5em;
   font-size: 1.1em
 }
+.note {
+  font-weight: bold;
+  color: red;
+}
+.idle {
+  font-weight: bold;
+  font-size: 1.6em;
+  line-height: 2.2em;
+}
+.idle > a {
+  color: #333;
+  text-decoration: underline;
+}
 .whiteback {
   background-color: #fff;
 }
@@ -15,7 +28,7 @@ p {
   text-decoration: underline;
 }
 .compare-codes {
-  width: 800px;
+  width: 890px;
   overflow: hidden;
   border-radius: 5px;
   background-color: rgb(245, 245, 245);
@@ -24,12 +37,12 @@ p {
   border: none;
 }
 .compare-right {
-  width: 399px;
+  width: 450px;
   float: left;
   border-left: 1px dotted #999;
 }
 .compare-left {
-  width: 400px;
+  width: 439px;
   float: left;
 }
 br.clear {

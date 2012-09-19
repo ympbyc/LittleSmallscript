@@ -46,12 +46,12 @@
           _this.chr(".");
           _this.skipSpace();
           
-          return a + ";\n\n";
+          return a + "; ";
         });
         
         _this.optional(_this.explicitReturn);
         _this.skipSpace();
-        ret += " return " + _this.expression() + ";\n\n";
+        ret += " return " + _this.expression() + "; ";
         _this.skipSpace();
      
         return ret;
