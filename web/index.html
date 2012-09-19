@@ -27,12 +27,7 @@
     <link rel="apple-touch-icon-precomposed" href="assets/ico/apple-touch-icon-57-precomposed.png">
     <link href="assets/css/prettify.css" rel="stylesheet">
     <link href="assets/css/sub.css" rel="stylesheet">
-    <style>
-      .nav-bar { position: fixed; width: 97%; margin: 20px auto 10px auto; }
-      .container { width: 900px; }
-      #introduction { margin-top: 20px; }
-    </style>
-  </head>
+</head>
   
   <body>
     <div class="navbar navbar-fixed-top nav-bar">
@@ -43,7 +38,7 @@
           </a>
           <ul class="nav">
             <li>
-              <a href="#">
+              <a id="table-of-contents-toggle" href="#">
                 <b>
                   TABLE OF CONTENTS
                 </b>
@@ -55,26 +50,51 @@
             </li>
             <ul class="nav">
               <li>
-                <a href="#">
+                <a id="try-little-smallscript-toggle" href="#">
                   <b>
                     TRY LITTLESMALLSCRIPT
                   </b>
                 </a>
               </li>
               <li>
-                <a href="#">
+                <a id="fork-me-on-github" href="https://github.com/ympbyc/LittleSmallscript">
                   <b>
-                    ANNOTATED SOURCE
+                    FORK ME ON GITHUB
                   </b>
                 </a>
               </li>
-              <li>
+              <li class="error" style="display:none">
+                <a href="#">
+                  <b id="lss-error">
+                  </b>
+                </a>
               </li>
             </ul>
           </ul>
         </div>
       </div>
+    </div><!-- /navbar -->
+    <div id="dropdown">
+      <div id="table-of-contents" class="hidden">
+        <ul>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#installation">Installation</a></li>
+          <li><a href="#usage">Usage</a></li>
+          <li><a href="#language-reference">Language Reference</a></li>
+          <li><a href="#changelog">Change Log</a></li>
+        </ul>
+      </div>
+      <div id="try-little-smallscript" class="hidden">
+        <div class="console">
+          <textarea class="console-left" id="lss-source"></textarea>
+          <textarea class="console-right" id="js-source"></textarea>
+          <div class="console-buttons">
+            <a href="#" id="eval-button" class="btn btn-success"><i class="icon-white icon-play"></i> Run</a>
+          </div>
+        </div>
+      </div>
     </div>
+
     <div class="container" id="mainWrap">
       <div id="introduction">
         <p>
@@ -166,7 +186,7 @@ cubes = list.collect(function (num) {
         <p>This section is also yet to be written. Command-line tool itself is already available and is in the /src directory.</p>
       </div>
       
-      <div id="language-referaence">
+      <div id="language-reference">
         <h2>Language Reference</h2>
         <p>blah blah blah</p>
 
@@ -674,10 +694,18 @@ hi = function () {
     </script>
     <script src="assets/js/prettify.js">
     </script>
-    <script>
-      $(function () {
-        window.prettyPrint();
-      });
+
+    <script src="../src/packratparser.js"></script>
+    <script src="../src/littleparsers.js"></script>
+    <script src="../src/blockparser.js"></script>
+    <script src="../src/optimization.js"></script>
+    <script src="../src/expressionparser.js"></script>
+    <script src="../src/statementparser.js"></script>
+    <script src="../src/littlesmallscript.js"></script>
+    <script src="../src/littlesmallmethods.js"></script>
+    <script src="../lib/beautify.js"></script>
+
+    <script src="assets/js/lssweb.js">
     </script>
   </body>
 

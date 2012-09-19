@@ -22,62 +22,43 @@ Direction:
   * reference: https://github.com/ympbyc/LittleSmallscript/blob/master/src/littlesmallmethods.js
   * "obj unary" becomes "obj.unary()". "array at: 1 put: 2" becomes "array.atput(1, 2)".
   * binary messages take inline js for selector: ((x <%> 2) <==> 0)
-  
-Goal:
-----------
-Create a translator that can translate docs/from.st to docs/to.js.
-Make resulting javascript code similar to that of CoffeeScript.
 
 Current working example:
 ------------------------
 The language is changing every second so do example codes. Here's what works at least for now.
 
 ```smalltalk
-| Robot Enemy  |
-Enemy <- Object subclass.
-Enemy method: [:myname |
-  this at: '_name' put: myname.
-  this
-] at: 'init'.
-Enemy method: [| ret caught |
-  ret <- false.
-  caught <- (((Math random) <*> 10) <<> 3).
-  caught ifTrue: [ret <- true].
-  ret
-] at: 'isCaught'.
-Robot <- Object subclass.
-Robot method: [:myname |
-  this at: '_name' put: myname.
-  this
-] at: 'init'.
-Robot method: [| message |
-  message <- 'Hello. I am ' <+> ((this at: '_name') <+> '.').
-  window alert: message.
-  message
-] at: 'greet'.
-Robot method: [:enemy :block | | mes |
-  mes <- (((this at: '_name') <+> ' is chasing') <+> (enemy at: '_name')).
-  [enemy isCaught] whileFalse: [window alert: mes].
-  block value
-] withKeywords: #('chaseEnemy' 'whenCaught').
+| Animal Snake sam |
 
-Robot new_: 'Yendor' 
-  ; greet 
-  ; chaseEnemy: (Enemy new_: 'Demogorgon') whenCaught: [
-    window alert: 'a robot caught his enemy'
-  ]
+Animal := Object subclass.
+
+Animal method: [:name | 
+  this at: #name put: name
+] at: #init.
+
+Animal method: [:metres |
+  window alert: (@name <+> 'moved ' <+> metres <+> 'm.')
+] at: #move.
+
+Snake := Animal subclass.
+Snake method: [
+  "'super' is not supported yet"
+  window alert: 'Slithering...'.
+  self move: 5
+] at: #crawl.
+
+sam := Snake new: 'Sammy the Python'.
+sam crawl
 ```
 
 Milestones:
 ----------
-5am 10 Sep 2012  
 
-v0.0.1  
-Implemented a PEG parser in javascript.  
-Can now parse and generate expressions and literals.  
-Messages are compiled to method calling, blocks are compiled to function literal.  
-Temporary variable declaration is yet to be supported.  
+1am 20 Sep 2012
 
+v0.0.3
+Ready to ship! Known bugs are to be fixed.
+Added optimization.
 
 12pm 12 Sep 2012  
 
@@ -89,3 +70,10 @@ Binary messages with javascript operators. 1 <+> 1;
 Much of Little Smalltalk's built-in methods are provided via the library: LittleSmallmethods.js.  
 Prettyprint using beautify.js.  
 
+5am 10 Sep 2012  
+
+v0.0.1  
+Implemented a PEG parser in javascript.  
+Can now parse and generate expressions and literals.  
+Messages are compiled to method calling, blocks are compiled to function literal.  
+Temporary variable declaration is yet to be supported.  

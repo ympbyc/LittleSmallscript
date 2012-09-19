@@ -366,11 +366,7 @@
   };
 
   String.prototype.at = function (idx) { return this[idx]; };
-  // at:put:
-  String.prototype.atput = function (idx, item) {
-    this = this.substring(0, idx - 1) + item + this.substring(idx + 1);
-    return this;
-  };
+
   // copyFrom:length:
   String.prototype.copyFromlength = function (from, length) { return this.substring(from, from + length);  };
   // copyFrom:to:
