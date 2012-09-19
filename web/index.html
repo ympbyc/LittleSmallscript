@@ -75,9 +75,7 @@
         </div>
       </div>
     </div>
-    <div class="container">
-      <div class="container">
-      </div>
+    <div class="container" id="mainWrap">
       <div id="introduction">
         <p>
           <strong>Little Smallscript is a dialect of Smalltalk that compiles into JavaScript.</strong> Hidden behind the huge Smalltalk Environment, Smalltalk always had a beautiful syntax that is fit for object oriented scripting. Little Smallscript is an attempt to let Smalltalk see the light of day again. (Although I've never written Smalltalk before ;p)
@@ -171,6 +169,48 @@ cubes = list.collect(function (num) {
       <div id="language-referaence">
         <h2>Language Reference</h2>
         <p>blah blah blah</p>
+
+        <h3>Structure</h3>
+        <div class="compare-codes">
+          <pre class="prettyprint">
+Statement
+  optional: &lt;variableDeclaration&gt;
+  many    : sequence: &lt;expression&gt; .
+  required: &lt;expression&gt;
+
+Variable Declaration
+  required: |
+  many    : variable
+  required: |
+
+Expression
+  many    : &lt;assignment&gt;
+  required: &lt;cascade&gt;
+
+Assignment
+  required: variable
+  try     : :=, <-
+
+Cascade
+  required: &lt;primary&gt;
+  many    : &lt;message&gt;
+  many    : sequence: ; &lt;message&gt;
+
+Primary
+  try : literal, &lt;block&gt;, variable, sequence: ( &lt;cascade&gt; )
+
+Message
+  try : unarySelector, sequence: binarySelector argument, many sequence: keywordSelector argument
+
+Block
+  required: [
+  optional: sequence: many: parameter |
+  optional: &lt;statement&gt;
+  required: ]
+          </pre>
+        </div><!-- /compare codes -->
+        <br class="clear">
+
         <h3>Function</h3>
         <p>
           Functions are defined by an open bracket, optional list of parameters followed by an vertical bar, the function body, and the closing bracket. The empty function looks like this: <span class="whiteback">[]</span>
@@ -198,6 +238,7 @@ cube = function (x) {
             </pre>
           </div>
         </div><!-- /compare-codes -->
+        <br class="clear">
         
         <h3>Objects and Arrays</h3>
         <p>
@@ -260,6 +301,161 @@ kids = {
             </pre>
           </div>
         </div><!-- /compare-codes -->
+        <br class="clear">
+
+        <h3>Local Variable Declarations</h3>
+        <p>
+          Variable declaration can only appear at the start of a statement.
+          Space delimited alpha-numeric charactors placed between two vertical bars are declared as local variables.
+        </p>
+        <div class="compare-codes">
+          <div class="compare-left">
+            <pre class="prettyprint">
+| foo bar |
+foo := bar := 1.
+[| foo | 
+  foo := 2.
+  foo
+] value. "=> 2"
+foo      "=> 1"
+            </pre>
+          </div>
+          <div class="compare-right">
+            <pre class="prettyprint lang-js">
+var foo, bar;
+foo = bar = 1;
+(function () {
+  var foo;
+  foo = 2;
+  return foo
+})(); //=> 2
+foo;  //=> 1
+            </pre>
+          </div>
+        </div><!-- /compare-codes -->
+        <p>Little Smallscript is a lexicaly scoped language. Temporary variables are enclosed in its function scope.</p>
+        <br class="clear">
+
+        <h3>IfTrue, IfFalse, and Conditional Assignment</h3>
+        <p>There are no "if then else" syntax in Smalltalk. Instead "ifTrue" and "ifFalse" are defined as a method of Boolean's instances.</p>
+        <div class="compare-codes">
+          <div class="compare-left">
+            <pre class="prettyprint">
+1 ifTrue: ['1 is true'].
+0 ifFalse: ['0 is false'].
+foo := x ifTrue: [1] ifFalse: [2]
+            </pre>
+          </div>
+          <div class="compare-right">
+            <pre class="prettyprint lang-js">
+/* When optimization is enabled */
+1 ? (function () { return '1 is true'; })() : void 0;
+0 ? void 0 : (function () { return '0 is false'; })();
+foo = x ? (function () { return 1; })() : (function () { return 2; })();
+              
+/* When optimization is disabled */
+(1).ifTrue(function () { return '1 is true'; });
+(0).ifFalse(function () { return '0 is false' });
+foo = x.ifTrueifFalse(function () { return 1; }, function () { return 2; });
+            </pre>
+          </div>
+        </div><!-- /compare-codes -->
+        <p>When optimization is enabled, ifTrue and ifFalse are compiled into conditional expressions for efficiency.</p>
+        <br class="clear">
+
+        <h3>Iteration Over Objects and Arrays</h3>
+        <p>
+          Various iteration methods are provided via the prelude module.
+          The most basic one is "do" and "collect" (they are identical to Array.forEach and Array.map in JS)
+        </p>
+        <div class="compare-codes">
+          <div class="compare-left">
+            <pre class="prettyprint">
+| yearsOld |
+
+"Eat Lunch"
+#(#toast #cheese #wine) do: [:food | eat value: food].
+
+"Objects"
+yearsOld := #{#max:10 #ida:9 #tim:11}.
+ages := yearsOld collect: [:age :child | 
+  child <+> ' is ' <+> age
+]
+            </pre>
+          </div>
+          <div class="compare-right">
+            <pre class="prettyprint lang-js">
+var yearsOld;
+
+["toast", "cheese", "wine"].do_(function (food) {
+  eat(food);
+});
+
+yearsOld = {"max":10, "ida":9, "tim":11};
+ages = yearsOld.collect(function (age, child) {
+  return ((child + " is ") + age);
+});
+            </pre>
+          </div>
+        </div><!-- /compare-codes -->
+        <br class="clear">
+        <p>While loop is created with whileTrue - instance method of Function.</p>
+        <div class="compare-codes">
+          <div class="compare-left">
+            <pre class="prettyprint">
+| counter |
+counter := 0.
+[counter &lt;&lt;&gt 10] whileTrue: [window alert: counter]
+            </pre>
+          </div>
+          <div class="compare-right">
+            <pre class="prettyprint lang-js">
+var counter;
+
+counter = 0;
+
+(function () {
+  return (counter < 10);
+}).whileTrue(function () {
+  window.alert(counter);
+});
+            </pre>
+          </div>
+        </div><!-- /compare-codes -->
+        <br class="clear">
+        
+        <h3>Classes and Inheritance</h3>
+        <p>
+          Little `Smalltalk' and other Smalltalk dialects have special syntax for defining classes; LittleSmallscript doesn't.<br>
+          Since classes are first class objects, they are capable of handling messages. New class is created by passing "subclass" message to an existing class, and methods are attached to it with "method:at:" or "method:withKeywords:".
+        </p>
+        <div class="compare-codes">
+          <div class="compare-left">
+            <pre class="prettyprint">
+| Animal Snake |
+
+Animal <- Object subclass.
+
+Animal method: [:name | 
+  this at: #name put: name
+] at: #init.
+
+Animal method: [:metres |
+  window alert: (@name <+> 'moved ' <+> metres <+> 'm.')
+] at: #move.
+
+Snake <- Animal subclass.
+Snake method: [
+  
+            </pre>
+          </div>
+          <div class="compare-right">
+            <pre class="prettyprint lang-js">
+
+            </pre>
+          </div>
+        </div><!-- /compare-codes -->
+        <br class="clear">
         
       </div><!-- /reference -->
       <br class="clear">
