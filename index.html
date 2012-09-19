@@ -531,7 +531,7 @@ ages = yearsOld.collect(function (age, child) {
             <pre class="prettyprint">
 | counter |
 counter := 0.
-[counter &lt;&lt;&gt 10] whileTrue: [window alert: counter]
+[counter &lt;&lt;&gt 10] whileTrue: [window alert: counter. counter <+=> 1]
             </pre>
           </div>
           <div class="compare-right">
@@ -544,6 +544,7 @@ counter = 0;
   return (counter &lt; 10);
 }).whileTrue(function () {
   window.alert(counter);
+  return counter += 1;
 });
             </pre>
           </div>
