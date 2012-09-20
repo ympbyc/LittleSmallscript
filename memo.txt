@@ -1,7 +1,0 @@
-ToDo:
-
-* warn parse error
-  * when the parse doesn't complete. tell the user the current line number and possible cause of error.
-
-* interactive web interface
-  * something like "try coffeescript"
