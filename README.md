@@ -58,8 +58,8 @@ Milestones:
 
 v0.0.4
 Fixed many bugs.  
-bynary messages now take bare operators instead of primitives.
-
+Binary messages now take bare operators instead of primitives.
+method:at: and method:dot: fixes the scope of 'self'.
 
 1am 20 Sep 2012
 
