@@ -52,7 +52,8 @@
 
     /* scope of self */
     if (methodName === "methodat" || methodName === "methoddot") {
-      var fn = args[0], insertIndex = "function () {".length;
+      var fn = args[0], 
+      insertIndex = fn.match(/^function\s*\([^)]*\)\s*{/)[0].length;
       fn = fn.replace(/([^a-zA-Z0-9_$])this([^a-zA-Z0-9_$])/g, "$1_this$2");
       fn = fn.substring(0,insertIndex) + "var _this = this;" + fn.substring(insertIndex);
       args[0] = fn;
