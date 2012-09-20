@@ -68,7 +68,7 @@
         var js;
         js = __template(wraptmpl, {statement: _this.statement()});
         if (this.index < this.input.length) {
-          var newlines = this.input.substring(this.index).match(/\n/g) || [];
+          var newlines = this.input.substring(0, this.index).match(/\n/g) || [];
           throw {
             message: 'Parse error at line '+(newlines.length+1),
             partialjs: js
