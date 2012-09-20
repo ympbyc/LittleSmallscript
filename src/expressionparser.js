@@ -283,7 +283,7 @@
         return _this.between(
           function () { 
             var ret = _this.chr("<"); 
-            _this.notFollowedBy(_this.toParser("-");); 
+            _this.notFollowedBy(_this.toParser("-")); 
             return ret; 
           }, 
           _this.anyChar, 
