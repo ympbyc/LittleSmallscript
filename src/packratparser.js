@@ -255,7 +255,6 @@
       str.split('').forEach(function (ch) {
         var c;
         c = _this.anyChar();
-        console.log(c +" : "+ch);
         if (c !== ch) _this.noParse();
       });
       return str;
