@@ -43,7 +43,7 @@
      *   parameters              */
     BlockParser.prototype.block = function () {
       var _this = this,
-          destinationTemplate = "function (%parameters%) { var self = this; %body% }";
+          destinationTemplate = "function (%parameters%) { %body% }";
       return this.cacheDo("block", function () {
         var parameters, body;
         _this.blockStart();
