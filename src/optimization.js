@@ -42,14 +42,14 @@
     "methoddot" : "%receiver%.prototype.%arg2% = %arg1%"
   };
 
-  var variablep = function (v) { return v.search(/^[a-zA-Z$_][a-zA-Z0-9$_]*$/) === 0; };
+  var symbolp = function (v) { return v.search(/^[a-zA-Z$_][a-zA-Z0-9$_]*$/) === 0; };
 
   var optimize = function (receiver, methodName, args) {
     
     /* special cases */
-    if (methodName === "methodat" && variablep(args[1])) methodName = "methoddot";
-    if (methodName === "at" && variablep(args[0])) methodName = "dot";
-    if (methodName === "atput" && variablep(args[0])) methodName = "dotput";
+    if (methodName === "methodat" && symbolp(args[1])) { args[1] = args[1].substring(1); methodName = "methoddot"; }
+    if (methodName === "at" && symbolp(args[0])) { args[0] = args[0].substring(1); methodName = "dot"; }
+    if (methodName === "atput" && symbolp(args[0])) { args[0] = args[0].substring(1); methodName = "dotput"; }
     /* end */
    
     return __template(optimTmpl[methodName], {
