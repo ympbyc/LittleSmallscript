@@ -42,7 +42,7 @@
     "methoddot" : "%receiver%.prototype.%arg2% = %arg1%"
   };
 
-  var symbolp = function (v) { return v.search(/^[a-zA-Z$_][a-zA-Z0-9$_]*$/) === 0; };
+  var symbolp = function (v) { return v.search(/^#[a-zA-Z$_][a-zA-Z0-9$_]*$/) === 0; };
 
   var optimize = function (receiver, methodName, args) {
     
