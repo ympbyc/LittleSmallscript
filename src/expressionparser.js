@@ -302,7 +302,6 @@
           _this.toParser("-"),
           _this.toParser("*"),
           _this.toParser("/"),
-          _this.toParser("."),
           _this.toParser("+="),
           _this.toParser("-="),
           _this.toParser("*="),
