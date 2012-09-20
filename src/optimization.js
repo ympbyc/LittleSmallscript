@@ -20,7 +20,7 @@
     "at" : "%receiver%[%arg1%]",
     "atput" : "%receiver%[%arg1%] = %arg2%",
     "dot" : "%receiver%.%arg1%",
-    "dotput:" : "%receiver%.%arg1% = %arg2%",
+    "dotput" : "%receiver%.%arg1% = %arg2%",
     "do" : "%receiver%.do_(%arg1%)",
     "value" : "%receiver%(%arg1%)",
     "valuevalue" : "%receiver%(%args%)",
@@ -42,14 +42,12 @@
     "methoddot" : "%receiver%.prototype.%arg2% = %arg1%"
   };
 
-  var symbolp = function (v) { return v.search(/^#[a-zA-Z$_][a-zA-Z0-9$_]*$/) === 0; };
-
   var optimize = function (receiver, methodName, args) {
     
     /* special cases */
-    if (methodName === "methodat" && symbolp(args[1])) { args[1] = args[1].substring(1); methodName = "methoddot"; }
-    if (methodName === "at" && symbolp(args[0])) { args[0] = args[0].substring(1); methodName = "dot"; }
-    if (methodName === "atput" && symbolp(args[0])) { args[0] = args[0].substring(1); methodName = "dotput"; }
+    if (methodName === "methoddot") args[1] = args[1].replace(/^"(.+)"$/, "$1");
+    if (methodName === "dot") args[0] = args[0].replace(/^"(.+)"$/, "$1");
+    if (methodName === "dotput") args[0] = args[0].replace(/^"(.+)"$/, "$1");
     /* end */
    
     return __template(optimTmpl[methodName], {

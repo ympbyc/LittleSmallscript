@@ -116,12 +116,12 @@
       });
     };
     
-    // #abc -> abc
+    // #abc -> "abc"
     LittleParsers.prototype.symbolLiteral = function () {
       var _this = this;
       return this.cacheDo("symbolLiteral", function () {
         _this.chr('#');
-        return "#" + _this.variable();
+        return '"' + _this.variable() + '"';
       });
     };
 
