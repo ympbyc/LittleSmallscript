@@ -19,6 +19,8 @@
   optimTmpl = {
     "at" : "%receiver%[%arg1%]",
     "atput" : "%receiver%[%arg1%] = %arg2%",
+    "dot" : "%receiver%.%arg1%",
+    "dotput:" : "%receiver%.%arg1% = %arg2%",
     "do" : "%receiver%.do_(%arg1%)",
     "value" : "%receiver%(%arg1%)",
     "valuevalue" : "%receiver%(%args%)",
@@ -37,11 +39,19 @@
     "new" : "new %receiver%(%args%)",
     "subclass" : "(function (_super) { var _Constructor; _Constructor = function (/* &rest arguments */) { if (this.init) this.init.apply(this,arguments); }; _Constructor.prototype = new _super(); return _Constructor; })(%receiver%)",
     "methodat" : "%receiver%.prototype[%arg2%] = %arg1%",
+    "methoddot" : "%receiver%.prototype.%arg2% = %arg1%"
   };
 
-  var classes = {};
+  var variablep = function (v) { v.search(/^[a-zA-Z$_][a-zA-Z0-9$_]*$/) === 0; };
 
   var optimize = function (receiver, methodName, args) {
+    
+    /* special cases */
+    if (methodName === "methodat" && variablep(args[1])) methodName = "methoddot";
+    if (methodName === "at" && variablep(args[0])) methodName = "dot";
+    if (methodName === "atput" && variablep(args[0])) methodName = "dotput";
+    /* end */
+   
     return __template(optimTmpl[methodName], {
       "receiver" : receiver,
       "args" : args.join(', '),
