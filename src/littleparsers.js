@@ -181,7 +181,7 @@
       var _this = this;
       return this.cacheDo("variable", function () {
         var v = _this.regex(/^[a-zA-Z_$@][a-zA-Z0-9_$]*/);
-        if (v[0] === '@') return 'this.'+v.substring(1); //@foo -> this.foo
+        if (v[0] === '@') return 'self.'+v.substring(1); //@foo -> self.foo
         return v;
       });
     };
