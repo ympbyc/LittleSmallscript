@@ -39,7 +39,7 @@ $(function () {
   //run
   $run.click(function () {
     try {
-      return alert(eval($js.val()));
+      return alert(eval(js));
     } catch (err) {
       return alert(err.message||err.type||"Error");
     }
@@ -48,9 +48,8 @@ $(function () {
   function compileWriteAt (txt, jQ) {
     $error.text('');
     $errorWrp.hide();
-    var js;
     try {
-      js = new LittleSmallscript(txt, {prettyprint: true, optimization: true}).toJS();
+      var js = new LittleSmallscript(txt, {prettyprint: true, optimization: true}).toJS();
     } catch (err) {
       $errorWrp.show();
       $error.text(err.message||err.type||"Error");
