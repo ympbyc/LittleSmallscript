@@ -16,12 +16,12 @@ Direction:
   * We will not build-in Little Smalltalk unique classes such as Bag, List, Bytearray, etc.
 * <del>The first version will not perform any optimization.</del> first version is complete.
 * Some expressions are converted to javascripts syntax, for efficiency and readability.
-  * "(1 <==> 1) ifTrue: ['yay']" -> "(1 === 1).ifTrue(function () {return 'yay';})" -> "if (1 == 1) { 'yay'; }"
+  * "(1 === 1) ifTrue: ['yay']" -> "(1 === 1).ifTrue(function () {return 'yay';})" -> "if (1 === 1) { 'yay'; }"
   * #(1 2 3) at: 0 -> [1,2,3].at(0) -> [1,2,3][0]
 * Other message expressions are translated into method calling expression.
   * reference: https://github.com/ympbyc/LittleSmallscript/blob/master/src/littlesmallmethods.js
   * "obj unary" becomes "obj.unary()". "array at: 1 put: 2" becomes "array.atput(1, 2)".
-  * binary messages take inline js for selector: ((x <%> 2) <==> 0)
+  * binary messages take js operators as selectors: ((x % 2) === 0)
 
 Current working example:
 ------------------------
@@ -37,7 +37,7 @@ Animal method: [:name |
 ] at: #init.
 
 Animal method: [:metres |
-  window alert: (@name <+> 'moved ' <+> metres <+> 'm.')
+  window alert: (@name + 'moved ' + metres + 'm.')
 ] at: #move.
 
 Snake := Animal subclass.
@@ -54,10 +54,17 @@ sam crawl
 Milestones:
 ----------
 
+23pm 20 Sep 2012
+
+v0.0.4
+Fixed many bugs.  
+bynary messages now take bare operators instead of primitives.
+
+
 1am 20 Sep 2012
 
 v0.0.3
-Ready to ship! Known bugs are to be fixed.
+Ready to ship! Known bugs are to be fixed.  
 Added optimization.
 
 12pm 12 Sep 2012  
