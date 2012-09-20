@@ -318,9 +318,10 @@
           _this.toParser(">="),
           _this.toParser("^"),
           _this.toParser("&&"),
-          _this.toParser("||"),
+          _this.toParser("||")
         );
         _this.skipSpace();
+        return op;
       });
     };
 
