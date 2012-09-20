@@ -67,11 +67,13 @@
       return this.cacheDo("toJS", function () {
         var js;
         js = __template(wraptmpl, {statement: _this.statement()});
-        if (this.index < this.input.length)
+        if (this.index < this.input.length) {
+          var newlines = this.input.substring(this.index).match(/\n/g) || [];
           throw {
-            message: 'Parse error at '+this.index+'th character.',
+            message: 'Parse error at line '+(newlines.length+1),
             partialjs: js
           }; //ToDo: line number and parser name
+        }
         if ( ! (this.options && this.options.prettyprint)) return js;
         var beautifyOption = {
           indent_size : this.options.indent_size || 2,
