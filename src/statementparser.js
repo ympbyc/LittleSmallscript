@@ -64,7 +64,7 @@
         var ret = "var ";
         _this.skipSpace();
         _this.verticalBar();
-        ret += _this.many(function () {
+        ret += _this.many1(function () {
           _this.skipSpace();
           return _this.variable() + ", ";
         }).replace(/,\s$/, '; ');
