@@ -287,7 +287,7 @@
             return ret; 
           }, 
           _this.anyChar, 
-          _this.toParser(">");
+          _this.toParser(">")
         );
       });
     };
