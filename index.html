@@ -125,7 +125,7 @@ opposite := true.
 number := opposite ifTrue: [-42].
 
 "Functions:"
-square := [:x | x &lt;*&gt; x].
+square := [:x | x * x].
 
 "Arrays:"
 list := #(1 2 3 4 5).
@@ -134,7 +134,7 @@ list := #(1 2 3 4 5).
 math := #{
   #root: Math at: sqrt
   #square: square 
-  #cube: [:x | square value: x &lt;*&gt; x]
+  #cube: [:x | square value: x * x]
 }.
 
 "Prelude methods:"
@@ -253,7 +253,7 @@ numbers = [1, 2, 3, 4, 5];
 numbers pop.
 
 "Binary messages take a JS operator and an argument"
-2 &lt;+&gt; 3.
+2 + 3.
 
 "Keyword messages take one or more selectors and arguments"
 numbers at: 4 put: 100.
@@ -312,8 +312,8 @@ Object new ; at: 'a' put: 1 ; at: 'b' put: 2 ; at: 'c' put: 3
             <pre class="prettyprint">
 | square cube |
 
-square := [:x | x &lt;*&gt; x].
-cube := [:x | square value: x &lt;*&gt; x].
+square := [:x | x * x].
+cube := [:x | square value: x * x].
 
 [:x| | foo |
   foo := x. 
@@ -505,7 +505,7 @@ foo = x.ifTrueifFalse(function () { return 1; }, function () { return 2; });
 "Objects"
 yearsOld := #{#max:10 #ida:9 #tim:11}.
 ages := yearsOld collect: [:age :child | 
-  child &lt;+&gt; ' is ' &lt;+&gt; age
+  child + ' is ' + age
 ]
             </pre>
           </div>
@@ -531,7 +531,7 @@ ages = yearsOld.collect(function (age, child) {
             <pre class="prettyprint">
 | counter |
 counter := 0.
-[counter &lt;&lt;&gt 10] whileTrue: [window alert: counter. counter <+=> 1]
+[counter &lt; 10] whileTrue: [window alert: counter. counter <+=> 1]
             </pre>
           </div>
           <div class="compare-right">
@@ -568,7 +568,7 @@ Animal method: [:name |
 ] at: #init.
 
 Animal method: [:metres |
-  window alert: (@name &lt;+&gt; 'moved ' &lt;+&gt; metres &lt;+&gt; 'm.')
+  window alert: (@name + 'moved ' + metres + 'm.')
 ] at: #move.
 
 Snake := Animal subclass.
@@ -679,6 +679,12 @@ hi = function () {
       
       <div id="changelog">
         <h2>Change Log</h2>
+        <span class="idle"><a href="https://github.com/ympbyc/LittleSmallscript/tree/v0.0.3">v0.0.4</a></span><span> - Sep 20, 2012</span>
+        <p>
+          Binary selectors are now bare js operators. (e.g: before: 1 <+> 1 now: 1 + 1)
+        </p>
+
+
         <span class="idle"><a href="https://github.com/ympbyc/LittleSmallscript/tree/v0.0.3">v0.0.3</a></span><span> - Sep 19, 2012</span>
         <p>
           Hello, world!
