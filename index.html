@@ -564,7 +564,7 @@ counter = 0;
 Animal := Object subclass.
 
 Animal method: [:name | 
-  self at: #name put: name
+  @name := name
 ] at: #init.
 
 Animal method: [:metres |
