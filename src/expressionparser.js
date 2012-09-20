@@ -184,7 +184,7 @@
       return this.cacheDo("binaryMessage", function () {
         var operator, argument;
         _this.skipSpace();
-        operator = _this.primitive();
+        operator = _this.operator();
         _this.skipSpace();
         argument = _this.primary();
         return operator + " " + argument;
@@ -283,12 +283,44 @@
         return _this.between(
           function () { 
             var ret = _this.chr("<"); 
-            _this.notFollowedBy(function () { return _this.chr("-"); }); 
+            _this.notFollowedBy(_this.toParser("-");); 
             return ret; 
           }, 
           _this.anyChar, 
-          function () { return _this.chr(">"); }
+          _this.toParser(">");
         );
+      });
+    };
+
+    ExpressionParser.prototype.operator = function () {
+      var _this = this;
+      return this.cacheDo("operator", function () {
+        var op;
+        _this.skipSpace();
+        op = _this.try_(
+          _this.toParser("+"),
+          _this.toParser("-"),
+          _this.toParser("*"),
+          _this.toParser("/"),
+          _this.toParser("."),
+          _this.toParser("+="),
+          _this.toParser("-="),
+          _this.toParser("*="),
+          _this.toParser("/="),
+          _this.toParser("==="),
+          _this.toParser("!=="),
+          _this.toParser("instanceof"),
+          _this.toParser("%"),
+          _this.toParser("%="),
+          _this.toParser("<"),
+          _this.toParser(">"),
+          _this.toParser("<="),
+          _this.toParser(">="),
+          _this.toParser("^"),
+          _this.toParser("&&"),
+          _this.toParser("||"),
+        );
+        _this.skipSpace();
       });
     };
 

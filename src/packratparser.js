@@ -274,6 +274,13 @@
       this.noParse();
     };
     
+    // only strings for now
+    Packrat.prototype.toParser = function (str) {
+      var _this = this;
+      return function () { return _this.string(str); };
+    };
+
+
     return Packrat;
     
   })();
