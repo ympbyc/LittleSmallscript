@@ -68,7 +68,7 @@
           _this.skipSpace();
           return _this.variable() + ", ";
         }).replace(/,\s$/, '; ');
-        _this.skipSpace();
+        _this.skipSpace(); 
         _this.verticalBar();
         return ret;
       });
