@@ -133,8 +133,12 @@
         _this.string("#(");
         ret += "[";
         ret += _this.many(function () {
+          var item;
           _this.skipSpace();
-          return _this.expression() + ",";
+          item = _this.expression() + ",";
+          _this.skipSpace();
+          _this.optional(function () { return _this.chr(","); });
+          return item;
         }).slice(0, -1);
         _this.skipSpace();
         _this.chr(")");
@@ -157,9 +161,12 @@
             _this.numberLiteral,
             _this.symbolLiteral
           );
+          _this.skipSpace();
           _this.chr(':');
           _this.skipSpace();
           val = _this.expression();
+          _this.skipSpace();
+          _this.optional(function () { return _this.chr(","); });
           return key + ':' + val + ',';
         }).slice(0, -1);
         _this.skipSpace();
