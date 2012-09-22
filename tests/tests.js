@@ -1,0 +1,212 @@
+(function () {
+  'use strict';
+
+  var LittleSmallscript, errors, test, log, lss, p;
+  LittleSmallscript = require("../src/littlesmallscript").LittleSmallscript;
+
+  errors = []
+  test = function (a, mes) {
+    if ( ! a) {
+      if (mes) log(mes); else throw "fail"; 
+    }
+    return true;
+  };
+  log = function (a) {
+    console.log("FAIL:" + a);
+    errors.push(a);
+  };
+  lss = function (input) {
+    return new LittleSmallscript(input);
+  };
+  p = function (a) {
+    console.log(a);
+    return a;
+  };
+
+  /* Packrat  */
+  (function () {
+    var a, example1 = "| foo | foo := 1 + 2 to: #(1 2 3) size ; do: [:a | a]. foo";
+
+    //cacheDo
+    a = lss("111");
+    test(a.anyChar() === a.anyChar(), "cacheDo01");
+
+    //try_
+    a = lss(example1);
+    test(a.try_(
+      a.toParser("foo"),
+      a.toParser("bar"),
+      a.toParser("|"),
+      a.toParser("baz")
+    ) === "|", "try_01")
+      
+    a.skipSpace();
+
+    try {
+      a.try_(
+        a.toParser("1"),
+        a.toParser("2")
+      );
+      log("try_02")
+    } catch (err) {}
+
+    //sequence
+    a = lss(example1);
+    test(a.sequence(
+      a.verticalBar,
+      a.space,
+      a.toParser("foo"),
+      a.space,
+      a.verticalBar
+    ) === "| foo |", "sequence01");
+
+    //optional
+    a = lss(example1);
+    test(a.optional(a.toParser("| foo |")) === "| foo |", "optional01")
+
+    test(a.optional(a.toParser("fooobaaaaa")) === null, "optional02");
+    
+    //followedBy / notFollowedBy
+    a = lss(example1);
+    try {
+      test(a.followedBy(a.verticalBar) === null);
+      test(a.followedBy(a.verticalBar) === null);
+    } catch (e) {
+      log("followedBy01");
+    }
+    try {
+      a.FollowedBy(a.toParser("fooobaaaaa"));
+      log("followedBy02");
+    } catch (e) {}
+    try {
+      test(a.notFollowedBy(a.toParser("fooobaaaaa")) === null);
+      test(a.notFollowedBy(a.toParser("fooobaaaaa")) === null);
+    } catch (e) {
+      log("notFollowedBy01");
+    }
+    try {
+      a.notFollowedBy(a.verticalBar);
+      log("notFollowedBy02");
+    } catch (e) {}
+    
+    //many
+    a = lss(example1);
+    test(a.many(a.anyChar) === example1, "many01");
+
+    test(a.many(a.many(a.colon)) === "", "many02");
+    
+    //many1
+    a = lss(example1);
+    try {
+      test(a.many1("colon"));
+      log("many01");
+    } catch (e) {}
+    
+    //between
+    a = lss(example1);
+    test(a.between(a.verticalBar, a.anyChar, a.verticalBar) === " foo ", "between01");
+
+    //anyChar
+    a = lss(example1);
+    test(a.anyChar() === "|", "anyChar01");
+    
+    //satisfyChar
+    a = lss(example1);
+    test(a.satisfyChar(function (c) { return c === "|"; }) === "|", "satisfyChar");
+
+    //chr
+    a = lss(example1);
+    test(a.chr("|") === "|", "chr01");
+
+    //string
+    a = lss(example1);
+    test(a.string("| foo |") === "| foo |", "string01");
+    
+    //regex
+    a = lss(example1);
+    test(a.regex(/^\|\s[a-z]+\s\|/) === "| foo |", "regex01");
+
+    //toParser
+    a = lss(example1);
+    test(a.toParser("| foo |")() === "| foo |", "toParser01");
+  })();
+  
+  //LittleParsers
+  (function () {
+    var a;
+
+    //whiteSpace
+    a = lss("  \t\n  ");
+    test(a.space() === "  \t\n  ", "space01");
+    
+    //assignmentArrow
+    a = lss(":= <-");
+    test(a.assignmentArrow() === ":=", "assignmentArrow01");
+    a.space();
+    test(a.assignmentArrow() === "<-", "assignmentArrow02")
+
+    //literal
+    a = lss("-12.15'foo'#symbol123#(1 2 #(3))#{#a: 1,#b: #{#a: #()}}");
+    test((function () {
+      return a.literal() + a.literal() + a.literal() + a.literal() + a.literal();
+    })() === '-12.15"foo""symbol123"[ 1, 2, [ 3]]{"a": 1,"b": {"a": []}}', "literal01");
+    a = lss("-12.15'foo'#symbol123#(1 2 #(3))#{#a: 1,#b: #{#a: #()}}");
+    test((function () {
+      return a.numberLiteral() +
+          a.stringLiteral() +
+          a.symbolLiteral() +
+          a.arrayLiteral() +
+          a.hashLiteral();
+    })() === '-12.15"foo""symbol123"[ 1, 2, [ 3]]{"a": 1,"b": {"a": []}}', "literal02");
+
+    //variable
+    a = lss("ab123scdh$_jags#ahj[]");
+    test(a.variable() === "ab123scdh$_jags", "variable01");
+    
+    //colonbvariable
+    a = lss(":c$o_l2on");
+    test(a.colonVariable() === ":c$o_l2on", "colonvariable01");
+    
+    //keywordSelector
+    a = lss("ah_$akd12:foooo");
+    test(a.keywordSelector() === "ah_$akd12:", "keywordSelector01");
+    
+    //unarySelector
+    a = lss("fooo fooo:");
+    test(a.unarySelector() === "fooo", "unarySelector01");
+    a.space();
+    try {
+      a.unarySelector();
+      log(false, "unarySelector02");
+    } catch(e) {}
+    
+    //skipSpace
+    a = lss('   "comment  "  ');
+    a.skipSpace()
+    test(a.index === '   "comment  "  '.length, "skipSpace01");
+  })();
+
+  /* BlockParser */
+  (function () {
+    var a;
+    
+    //block
+    a = lss("[] [1] [:foo| foo] [:foo||bar|foo.bar]");
+    test((function () {
+      return a.many(function () {
+        a.skipSpace();
+        return a.block() + "; ";
+      });
+    })() === "function () {  }; function () {  return  1;  }; function (foo) {  return  foo;  }; function (foo) { var bar;  foo;  return  bar;  }; ", "block01");
+    
+    //blockParameters
+    a = lss(" :foo  :bar :baz");
+    test(a.blockParameters() === "foo, bar, baz", "blockParameters01");
+    
+    //blockHead
+    a = lss(":foo :bar | 123");
+    test(a.blockHead() === "foo, bar", "blockHead01");
+  })();
+
+  if (errors.length === 0) console.log("ALL GREEN");
+}).call(this);

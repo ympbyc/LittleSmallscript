@@ -61,6 +61,7 @@
       return this.cacheDo("blockParameters", function () {
         var vars = "";
         _this.many(function () {
+          _this.skipSpace();
           _this.colon();
           vars += _this.variable() + ", ";
           _this.skipSpace();
