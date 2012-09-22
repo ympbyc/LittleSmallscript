@@ -181,8 +181,7 @@
       var _this = this;
       return this.cacheDo("variable", function () {
         var v = _this.regex(/^[a-zA-Z_$@][a-zA-Z0-9_$]*/);
-        if (v === 'self') return 'this'; // self -> this
-        if (v[0] === '@') return 'this.'+v.substring(1); //@foo -> self.foo
+        if (v[0] === '@') return 'self.'+v.substring(1); //@foo -> self.foo
         return v;
       });
     };
@@ -204,7 +203,14 @@
     };
     
     // foo
-    LittleParsers.prototype.unarySelector = LittleParsers.prototype.variable;
+    LittleParsers.prototype.unarySelector = function () {
+      var _this = this;
+      return _this.cacheDo("unarySelector", function () {
+        var sel = _this.variable();
+        _this.notFollowedBy(_this.colon);
+        return sel;
+      });
+    };
     
     // ignore whitespaces and comments
     LittleParsers.prototype.skipSpace = function () {

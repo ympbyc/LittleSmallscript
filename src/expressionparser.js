@@ -102,7 +102,7 @@
      * receiver unarySelector
      * receiver keyword: argument ...
      */
-    ExpressionParser.prototype.simpleExpression = function () {
+    ExpressionParser.prototype.simpleExpression = function (allowedParsers) {
       var _this = this;
       return this.cacheDo("simpleExpression", function () {
         var receiver, injection;
@@ -112,14 +112,14 @@
         
         _this.many(function () {
           var mes, ret;
-          mes = _this.continuation(); //{}
+          mes = _this.continuation(allowedParsers); //{}
           //optimize if optimization is available
           if (
             _this.options.optimization 
                 && optimization.optimizationAvailable(mes.methodName)
-          ) return injection = optimization.optimize(injection, mes.methodName, mes.args);
+          ) return injection = "(" + optimization.optimize(injection, mes.methodName, mes.args) + ")";
 
-          return injection += mes.toJS();
+          return injection = "(" + injection +  mes.toJS() + ")";
         });
         return injection; // + conti;
       });
@@ -128,14 +128,16 @@
     /*
      * + 1 / foo: 1 bar: 2 / foo
      */
-    ExpressionParser.prototype.continuation = function () {
+    ExpressionParser.prototype.continuation = function (allowedParsers) {
       var _this = this;
       return this.cacheDo("continuation", function () {
-        return _this.try_(
+        allowedParsers = allowedParsers || [
           _this.keywordMessage, //{}
           _this.binaryMessage,  //{}
           _this.unaryMessage    //{}
-        );
+        ];
+        //console.log("conti: "+_this.input.substring(_this.index));
+        return _this.try_.apply(_this, allowedParsers);
       });
     };
     
@@ -149,7 +151,10 @@
           _this.skipSpace();
           methodName += _this.keywordSelector().replace(':', ''); // "inject:into" becomes "injectinto" 
           _this.skipSpace();
-          args.push(_this.primary());
+          args.push(
+            //binary and unary are ranked higher than kwd
+            _this.simpleExpression([_this.binaryMessage, _this.unaryMessage])
+          ); //previously _this.primary()
           _this.skipSpace();
         });
         return {
@@ -170,9 +175,12 @@
         _this.skipSpace();
         operator = _this.operator();
         _this.skipSpace();
-        argument = _this.primary();
+        //unary is ranked higher than binary
+        argument = _this.simpleExpression([_this.unaryMessage]);//primary();
         return {
-          toJS : function () { return this.methodName + "" + "" + this.args; },
+          toJS : function () { 
+            return  this.methodName + "" + this.args; 
+          },
           methodName : operator,
           args : [argument]
         };
@@ -227,10 +235,18 @@
       return this.cacheDo("primaryReceiver", function () {
         return _this.try_(
           function () {
-            return "(" + _this.numberLiteral() + ")";
+            var num = _this.numberLiteral();
+            _this.followedBy(function () {
+              return _this.try_(
+                _this.keywordMessage, _this.unaryMessage
+              );
+            });
+            return "(" + num + ")";
           },
           function () {
-            return "(" + _this.block() + ")";
+            var block = _this.block();
+            _this.followedBy(_this.continuation);
+            return "(" + block + ")";
           },
           _this.primary
         );

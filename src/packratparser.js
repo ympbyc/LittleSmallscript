@@ -46,7 +46,7 @@
       }
       try {
         c.idx = this.index;
-        c.fn = fn.apply(this, [].slice.call(arguments, 2));
+        c.fn = fn.call(this);
         this.cache[s][c.idx] = {fn:c.fn, idx:this.index};
         return c.fn;
       } catch (err) {
@@ -279,7 +279,6 @@
       var _this = this;
       return function () { return _this.string(str); };
     };
-
 
     return Packrat;
     
