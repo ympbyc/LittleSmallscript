@@ -1,4 +1,5 @@
-"AutoTyper automates your live-coding performance"
+"AutoTyper automates your live-coding"
+"jQuery is required"
 
 | AutoTyper autotyper |
 AutoTyper := Object subclass
