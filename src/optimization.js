@@ -43,7 +43,6 @@
   };
 
   var optimize = function (receiver, methodName, args) {
-
     /* special cases */
     if (methodName === "methoddot") { args[1] = args[1].replace(/^"(.+)"$/, "$1"); }
     if (methodName === "dot") args[0] = args[0].replace(/^"(.+)"$/, "$1");
