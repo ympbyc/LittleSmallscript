@@ -134,7 +134,7 @@ list := #(1 2 3 4 5).
 math := #{
   #root: Math at: sqrt
   #square: square 
-  #cube: [:x | square value: x * x]
+  #cube: [:x | (square value: x) * x]
 }.
 
 "Prelude methods:"
@@ -259,7 +259,12 @@ numbers pop.
 numbers at: 4 put: 100.
 
 "Messages can be chained. This example is interpreted as ((Date new) getTime)"
-Date new getTime
+Date new getTime.
+
+"Unary messages have the highest precedence, followed by binary messages, followed by keyword messages."
+a kw: b + c sel.
+b + a kw: c sel.
+c sel + b kw: a
             </pre>
           </div>
           <div class="compare-right">
@@ -271,6 +276,10 @@ numbers.pop();
 numbers[4] = 100;
 
 (new Date().getTime());
+
+a.kw((b + c.sel()));
+(b + a).kw(c.sel());
+(c.sel() + b).kw(a);
             </pre>
           </div>
         </div><!-- /compare-codes -->
@@ -313,7 +322,7 @@ Object new ; at: 'a' put: 1 ; at: 'b' put: 2 ; at: 'c' put: 3
 | square cube |
 
 square := [:x | x * x].
-cube := [:x | square value: x * x].
+cube := [:x | (square value: x) * x].
 
 [:x| | foo |
   foo := x. 
@@ -681,7 +690,8 @@ hi = function () {
         <h2>Change Log</h2>
         <span class="idle"><a href="https://github.com/ympbyc/LittleSmallscript/tree/v0.0.3">v0.0.4</a></span><span> - Sep 20, 2012</span>
         <p>
-          Binary selectors are now bare js operators. (e.g: before: 1 <+> 1 now: 1 + 1)
+          Binary selectors are now bare js operators. (e.g: before: 1 <+> 1 now: 1 + 1)<br />
+          Installed the Precedence order. Unary messages have the highest precedence, followed by binary messages, followed by keyword messages.
         </p>
 
 
