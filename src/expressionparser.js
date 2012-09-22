@@ -119,11 +119,11 @@
             _this.options.optimization 
                 && optimization.optimizationAvailable(mes.methodName)
           ) {
-            injection = "(" + optimization.optimize(injection, mes.methodName, mes.args) + ")";
+            injection = optimization.optimize(injection, mes.methodName, mes.args);
             return injection;
-            }
-          
-          return injection = "(" + injection +  mes.toJS() + ")";
+          }
+          if (mes.wrapMe) return injection = "(" + injection +  mes.toJS() + ")";
+          return injection += mes.toJS();
         });
         return injection; // + conti;
       });
@@ -184,6 +184,7 @@
           toJS : function () { 
             return  this.methodName + "" + this.args; 
           },
+          wrapMe : true,
           methodName : operator,
           args : [argument]
         };
@@ -247,6 +248,14 @@
             return "(" + num + ")";
           },
           function () {
+            _this.followedBy(function () {
+              _this.block();
+              _this.skipSpace();
+              _this.try_(
+                _this.keywordMessage, _this.unaryMessage
+              );
+              return;
+            });
             return "(" + _this.block() + ")";
           },
           _this.primary
