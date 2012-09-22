@@ -90,7 +90,7 @@
             _this.skipSpace();
             _this.semicolon();
             _this.skipSpace();
-            return "_receiver" + _this.continuation(se) + ";";
+            return "_receiver" + _this.continuation().toJS() + ";";
           });
           return __template(tmpl, {simpleExpression: se, body: conti});
         });
@@ -105,21 +105,23 @@
     ExpressionParser.prototype.simpleExpression = function () {
       var _this = this;
       return this.cacheDo("simpleExpression", function () {
-        var receiver, conti;
+        var receiver, injection;
         receiver = _this.primaryReceiver();
-
-        conti = _this.many(function () {
-          var mes;
+        
+        injection = receiver;
+        
+        _this.many(function () {
+          var mes, ret;
           mes = _this.continuation(); //{}
-          console.log("1@"+mes);
           //optimize if optimization is available
           if (
             _this.options.optimization 
                 && optimization.optimizationAvailable(mes.methodName)
-          ) return optimization.optimize(receiver, mes.methodName, mes.args);
-          return mes.toJS();
+          ) return injection = optimization.optimize(injection, mes.methodName, mes.args);
+
+          return injection += mes.toJS();
         });
-        return receiver + conti;
+        return injection; // + conti;
       });
     };
 
@@ -172,7 +174,7 @@
         return {
           toJS : function () { return this.methodName + "" + "" + this.args; },
           methodName : operator,
-          args : argument
+          args : [argument]
         };
       });
     };
@@ -187,7 +189,7 @@
         return {
           toJS : function () { return "." + this.methodName + "()"; },
           methodName : unarySelector,
-          args       : ""
+          args       : []
         };
       });
     };
