@@ -531,7 +531,7 @@ ages = yearsOld.collect(function (age, child) {
             <pre class="prettyprint">
 | counter |
 counter := 0.
-[counter &lt; 10] whileTrue: [window alert: counter. counter <+=> 1]
+[counter &lt; 10] whileTrue: [window alert: counter. counter += 1]
             </pre>
           </div>
           <div class="compare-right">
@@ -653,7 +653,7 @@ hi = function () {
   allHellBreaksLoose.
   catsAndDogsLivingTogether
 ] tryCatch: [:error | 
-  window alert: err
+  window alert: error
 ] finally: [
   cleanUp value
 ] value
