@@ -36,6 +36,7 @@
         console.log(eval(js)+'\n');
       } catch (err) {
         console.log(err.message || err.type || err+'\n');
+        console.log(err.partialjs);
       }
       rl.prompt();
     });

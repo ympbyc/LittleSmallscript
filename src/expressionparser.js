@@ -78,28 +78,22 @@
       var _this = this,
           tmpl = "(function () { var _receiver = %simpleExpression%; %body% return _receiver;  })()";
       return this.cacheDo("cascade", function () {
-        var se, conti, brackets;
-        se = _this.simpleExpression(); // obj mes / obj sel arg / obj kw: arg kw2: arg
-        try {
-          _this.notFollowedBy(function () { _this.skipSpace(); _this.semicolon(); });
-          brackets = "";
-          conti = _this.many(function () {
-            var conti = _this.continuation();
-            brackets += "(";
-            return conti + ")";
-          });
-          if ( ! conti) return se;
-          return brackets + se + conti;
-        } catch (e) {}
-        conti = _this.optional(function () {
-          return _this.many(function () {
+        var se;
+        se = _this.simpleExpression(); // obj mes / obj kw: arg kw2: arg / 1+2+3
+        return _this.try_(function () {
+          _this.skipSpace();
+          _this.notFollowedBy(_this.semicolon);
+          return se;
+        }, function () {
+          var conti;
+          conti =  _this.many(function () {
             _this.skipSpace();
             _this.semicolon();
             _this.skipSpace();
-            return "_receiver" + _this.continuation() + ";";
+            return "_receiver" + _this.continuation(se) + ";";
           });
+          return __template(tmpl, {simpleExpression: se, body: conti});
         });
-        return __template(tmpl, {simpleExpression:se, body:conti});
       });
     };
     
@@ -111,41 +105,39 @@
     ExpressionParser.prototype.simpleExpression = function () {
       var _this = this;
       return this.cacheDo("simpleExpression", function () {
+        var receiver, conti;
+        receiver = _this.primaryReceiver();
+
+        conti = _this.many(function () {
+          var mes;
+          mes = _this.continuation(); //{}
+          console.log("1@"+mes);
+          //optimize if optimization is available
+          if (
+            _this.options.optimization 
+                && optimization.optimizationAvailable(mes.methodName)
+          ) return optimization.optimize(receiver, mes.methodName, mes.args);
+          return mes.toJS();
+        });
+        return receiver + conti;
+      });
+    };
+
+    /*
+     * + 1 / foo: 1 bar: 2 / foo
+     */
+    ExpressionParser.prototype.continuation = function () {
+      var _this = this;
+      return this.cacheDo("continuation", function () {
         return _this.try_(
-          _this.keywordExpression,
-          _this.binaryExpression,
-          _this.unaryExpression,
-          _this.primary
+          _this.keywordMessage, //{}
+          _this.binaryMessage,  //{}
+          _this.unaryMessage    //{}
         );
       });
     };
-
-    // from | receiver keyword1: aaa keyword2: bbb
-    // to   | receiver.keyword1_keyword2_(aaa, bbb)
-    ExpressionParser.prototype.keywordExpression = function () {
-      var _this = this;
-      return this.cacheDo("keywordExpression", function () {
-        var receiver,
-            methodCall,
-            methodName,
-            args,
-            tmp;
-        receiver = _this.primaryReceiver();
-        tmp = _this.keywordMessage();
-        methodCall = tmp.methodCall;
-        methodName = tmp.methodName;
-        args = tmp.args;
-        
-        //optimize if optimization is available
-        if (_this.options.optimization && optimization.optimizationAvailable(methodName))
-          return optimization.optimize(receiver, methodName, args);
-
-        return receiver + "." + methodCall;
-      });
-    };
-
-    // from | sel1: arg1 sel2: arg2
-    // to   | sel1_sel2_(arg1, arg2)
+    
+    //sel1: arg1 sel2: arg2
     ExpressionParser.prototype.keywordMessage = function () {
       var _this = this;
       return this.cacheDo("keywordMessage", function () {
@@ -155,30 +147,20 @@
           _this.skipSpace();
           methodName += _this.keywordSelector().replace(':', ''); // "inject:into" becomes "injectinto" 
           _this.skipSpace();
-          args.push(_this.primary())
+          args.push(_this.primary());
           _this.skipSpace();
         });
         return {
-          methodCall : methodName + "(" + args.join(", ") + ")",
+          toJS : function () {
+            return "." + this.methodName + "(" + this.args.join(", ") + ")"; 
+          },
           methodName : methodName,
           args : args
         };
-      });  
-    };
-
-    ExpressionParser.prototype.binaryExpression = function () {
-      var _this = this;
-      return this.cacheDo("binaryExpression", function () {
-        var receiver,binaryMessage;
-        _this.skipSpace();
-        receiver = _this.primaryReceiver();
-        binaryMessage = _this.binaryMessage();
-        return receiver + " " + operator + " " + argument;
       });
     };
-    
-    // from | <+> 1
-    // to   | + 1
+
+    // + 1
     ExpressionParser.prototype.binaryMessage = function () {
       var _this = this;
       return this.cacheDo("binaryMessage", function () {
@@ -187,49 +169,29 @@
         operator = _this.operator();
         _this.skipSpace();
         argument = _this.primary();
-        return operator + " " + argument;
+        return {
+          toJS : function () { return this.methodName + "" + "" + this.args; },
+          methodName : operator,
+          args : argument
+        };
       });
     };
 
-    // from | receiver selector
-    // to   | receiver.selector()
-    ExpressionParser.prototype.unaryExpression = function () {
-      var _this = this;
-      return this.cacheDo("unaryExpression", function () {
-        var receiver, unarySelector;
-        receiver = _this.primaryReceiver();
-        _this.skipSpace();
-        unarySelector = _this.unarySelector();
-        
-        //optimize if optimization is available
-        if (_this.options.optimization && optimization.optimizationAvailable(unarySelector))
-          return optimization.optimize(receiver, unarySelector, []);
-        
-        return receiver + '.' + unarySelector + '()';
-      });
-    };
-    
-    // from | selector
-    // to   | selector()
+    // receiver selector
     ExpressionParser.prototype.unaryMessage = function () {
       var _this = this;
       return this.cacheDo("unaryMessage", function () {
-        return _this.unarySelector() + '()';
-      });
-    };
-
-    ExpressionParser.prototype.continuation = function () {
-      var _this = this;
-      return this.cacheDo("continuation", function () {
+        var unarySelector;
         _this.skipSpace();
-        return _this.try_(
-          function () { return "." + _this.keywordMessage().methodCall; },
-          _this.binaryMessage,
-          function () { return "." + _this.unaryMessage(); }
-        );
+        unarySelector = _this.unarySelector();
+        return {
+          toJS : function () { return "." + this.methodName + "()"; },
+          methodName : unarySelector,
+          args       : ""
+        };
       });
     };
-
+    
     /*
      * variable, literal, block, primitive, (cascade)
      */
@@ -263,7 +225,7 @@
       return this.cacheDo("primaryReceiver", function () {
         return _this.try_(
           function () {
-            return _this.numberLiteral() + " ";
+            return "(" + _this.numberLiteral() + ")";
           },
           function () {
             return "(" + _this.block() + ")";
