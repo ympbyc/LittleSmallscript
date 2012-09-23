@@ -60,6 +60,7 @@
       var _this = this;
       return this.cacheDo("blockParameters", function () {
         var vars = "";
+        _this.skipSpace();
         _this.many(function () {
           _this.colon();
           vars += _this.variable() + ", ";

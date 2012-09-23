@@ -280,7 +280,6 @@
       return function () { return _this.string(str); };
     };
 
-
     return Packrat;
     
   })();
