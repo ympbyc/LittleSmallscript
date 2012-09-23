@@ -13,11 +13,10 @@
       .alias('c', 'compile')
       .describe('c', 'compile to JavaScript and save as .js files')
       .alias('i', 'interactive')
-      .describe('i', 'run an interactive CoffeeScript REPL')
+      .describe('i', 'run an interactive LittleSmallscript REPL')
       .alias('p', 'print')
       .describe('p', 'print out the compiled JavaScript')
-      .describe('prettyprint', 'prettyprint the compiled JavaScript')
-      .describe('optimize', 'perform optimization')
+      .describe('packed', 'output without prettyprint')
       .argv;
 
   function interactiveShell () {
@@ -50,7 +49,7 @@
     return fs.readFile(fileName, 'utf8', function (err, lssString) {
       if (err) throw err;
       try {
-        var js = new LittleSmallscript(lssString, {prettyprint: argv.prettyprint||false, optimization: argv.optimize||false}).toJS();
+        var js = new LittleSmallscript(lssString, {prettyprint: argv.packed||true, optimization: true}).toJS();
         if (argv.p) return console.log(js);
         fs.writeFile(argv.c.replace(/\.([^\.])+$/, '.js'), js, function (err) {
           if (err) throw err;
