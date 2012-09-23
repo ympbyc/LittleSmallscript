@@ -23,6 +23,8 @@
     return a;
   };
 
+  console.log("=========Packrat=========");
+
   /* Packrat  */
   (function () {
     var a, example1 = "| foo | foo := 1 + 2 to: #(1 2 3) size ; do: [:a | a]. foo";
@@ -131,6 +133,8 @@
     test(a.toParser("| foo |")() === "| foo |", "toParser01");
   })();
   
+  console.log("=========LittleParsers=========");
+
   //LittleParsers
   (function () {
     var a;
@@ -186,6 +190,8 @@
     test(a.index === '   "comment  "  '.length, "skipSpace01");
   })();
 
+  console.log("=========BlockParser=========");
+
   /* BlockParser */
   (function () {
     var a;
@@ -208,6 +214,35 @@
     test(a.blockHead() === "foo, bar", "blockHead01");
   })();
 
+  console.log("=========ExpressionParser=========");
+
+  //ExpressionParser
+  (function () {
+    var a;
+    
+    //expression
+    test(lss("foo := a kw: b + c sel").expression() === "foo =  a.kw((b+c.sel()))", "expression01");
+    test(lss("b + a kw: c sel").expression() === " (b+a).kw(c.sel())", "expression02");
+    test(lss("c sel + b kw: a").expression() === " (c.sel()+b).kw(a)", "expression03");
+    
+    //assignments
+    test(lss("foo := bar := 1").assignments() === "foo = bar = ", "assignments01");
+    
+    //cascade
+    test(lss("Object new ; foo ; bar: 1").cascade() === "(function () { var _receiver = new Object(); _receiver.foo();_receiver.bar(1); return _receiver;  })()", "cascade01");
+
+    //simpleExpression
+    test(lss("b + a kw: c sel").simpleExpression() === "(b+a).kw(c.sel())", "simpleExpression01");
+    
+    //primaryReceiver
+    test(lss("1").primaryReceiver() === "1", "primaryReceiver01");
+    test(lss("1 to: 5").primaryReceiver() === "(1)", "primaryReceiver02");
+    test(lss("[]").primaryReceiver() === "function () {  }", "primaryReceiver03");
+    test(lss("[] tryCatch: []").primaryReceiver() === "(function () {  })", "primaryReceiver04");
+    //primitive
+    test(lss("<alert(1)>").primaryReceiver() === "alert(1)", "primitive01");
+    
+  })();
 
   if (errors.length === 0) console.log("ALL GREEN");
 }).call(this);
