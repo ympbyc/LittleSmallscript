@@ -41,7 +41,6 @@
     };
     ExpressionParser.prototype = new LittleParsers("");
 
-
     /*                             cascade *
      * variable <-@recur(variable)         */
     ExpressionParser.prototype.expression = function () {
@@ -110,17 +109,18 @@
         receiver = _this.primaryReceiver();
         
         injection = receiver;
-        
+
         _this.many(function () {
           var mes, ret;
           mes = _this.continuation(allowedParsers); //{}
-          //optimize if optimization is available
-          if (
-            _this.options.optimization 
-                && optimization.optimizationAvailable(mes.methodName)
-          ) return injection = "(" + optimization.optimize(injection, mes.methodName, mes.args) + ")";
 
-          return injection = "(" + injection +  mes.toJS() + ")";
+          //optimize if optimization is available
+          if (optimization.optimizationAvailable(mes.methodName)) {
+            injection = optimization.optimize(injection, mes.methodName, mes.args);
+            return injection;
+          }
+          if (mes.wrapMe) return injection = "(" + injection +  mes.toJS() + ")";
+          return injection += mes.toJS();
         });
         return injection; // + conti;
       });
@@ -137,7 +137,6 @@
           _this.binaryMessage,  //{}
           _this.unaryMessage    //{}
         ];
-        //console.log("conti: "+_this.input.substring(_this.index));
         return _this.try_.apply(_this, allowedParsers);
       });
     };
@@ -182,6 +181,7 @@
           toJS : function () { 
             return  this.methodName + "" + this.args; 
           },
+          wrapMe : true,
           methodName : operator,
           args : [argument]
         };
@@ -245,9 +245,15 @@
             return "(" + num + ")";
           },
           function () {
-            var block = _this.block();
-            _this.followedBy(_this.continuation);
-            return "(" + block + ")";
+            _this.followedBy(function () {
+              _this.block();
+              _this.skipSpace();
+              _this.try_(
+                _this.keywordMessage, _this.unaryMessage
+              );
+              return;
+            });
+            return "(" + _this.block() + ")";
           },
           _this.primary
         );
