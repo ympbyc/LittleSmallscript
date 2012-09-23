@@ -289,7 +289,7 @@ a.kw((b + c.sel()));
           Cascades are generalized form of method chaining. The left most expression becomes the receiver for all of the following messages. The product of this expression is the receiver.
         </p>
         <p class="note">
-          LittleSmallscript implements Little Smalltalk style cascades. Their behaviour differ from cascades in other common implementation of Smalltalk.
+          LittleSmallscript implements Little Smalltalk style cascades. Their behaviour differ from cascades in other common implementations of Smalltalk.
         </p>
         <div class="compare-codes">
           <div class="compare-left">
@@ -574,18 +574,18 @@ Animal := Object subclass.
 
 Animal method: [:name | 
   @name := name
-] at: #init.
+] dot: #init.
 
 Animal method: [:metres |
   window alert: (@name + ' moved ' + metres + 'm.')
-] at: #move.
+] dot: #move.
 
 Snake := Animal subclass.
 Snake method: [
   "'super' is not supported yet"
   window alert: 'Slithering...'.
   self move: 5
-] at: #crawl.
+] dot: #crawl.
 
 sam := Snake new: 'Sammy the Python'.
 sam crawl
@@ -594,7 +594,6 @@ sam crawl
           <div class="compare-right">
             <pre class="prettyprint lang-js">
 var Animal, Snake, sam;
-
 Animal = (function (_super) {
   var _Constructor;
   _Constructor = function ( /* &rest arguments */ ) {
@@ -603,14 +602,14 @@ Animal = (function (_super) {
   _Constructor.prototype = new _super();
   return _Constructor;
 })(Object);
-
-Animal.prototype["init"] = function (name) {
-  return this["name"] = name;
-};
-Animal.prototype["move"] = function (metres) {
-  return window.alert((((this.name + "moved ") + metres) + "m."));
-};
-
+Animal.prototype.init = (function (name) {
+  var _this = this;
+  return _this.name = name;
+});
+Animal.prototype.move = (function (metres) {
+  var _this = this;
+  return window.alert((((_this.name + " moved ") + metres) + "m."));
+});
 Snake = (function (_super) {
   var _Constructor;
   _Constructor = function ( /* &rest arguments */ ) {
@@ -619,11 +618,11 @@ Snake = (function (_super) {
   _Constructor.prototype = new _super();
   return _Constructor;
 })(Animal);
-
-Snake.prototype["crawl"] = function () {
+Snake.prototype.crawl = (function () {
+  var _this = this;
   window.alert("Slithering...");
-  return this.move(5);
-};
+  return _this.move(5);
+});
 sam = new Snake("Sammy the Python");
 sam.crawl();
             </pre>
