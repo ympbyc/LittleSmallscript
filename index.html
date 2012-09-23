@@ -183,7 +183,20 @@ cubes = list.collect(function (num) {
       
       <div id="usage">
         <h2>Usage</h2>
-        <p>This section is also yet to be written. Command-line tool itself is already available and is in the /src directory.</p>
+        <p>There is a command line tool available as /src/main.js</p>
+        <pre class="prettyprint">
+          #compile a file to JavaScript and save as .js file
+          node main.js -c from.st
+          node main.js --compile from.st
+
+          #print out the compiled JavaScript
+          node main.js -p from.st
+          node main.js --print from.st
+
+          #run an interactive LittleSmallscript
+          node main.js -i
+          node main.js --interactive
+        </pre>
       </div>
       
       <div id="language-reference">
