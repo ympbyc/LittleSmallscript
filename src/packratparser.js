@@ -194,7 +194,7 @@
       var v, vs, _this = this;
       v = fn.call(this);
       vs = this.many(function () { return fn.call(_this); });
-      return v += vs;
+      return v + "" + vs;
     };
 
     /*

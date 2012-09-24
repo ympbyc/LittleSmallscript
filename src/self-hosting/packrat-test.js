@@ -2,7 +2,6 @@
   'use strict';
   var LittleParser, MyParser, mp;
   LittleParser = require('./littleparser').LittleParser;
-  console.log(LittleParser);
   MyParser = (function (_super) {
     var _Constructor;
     _Constructor = function ( /* &rest arguments */ ) {

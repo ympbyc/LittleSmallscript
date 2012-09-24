@@ -14,7 +14,7 @@ LittleParser@space  := [
   ]
 ]
 .
-LittleParser@blockStart := method: [
+LittleParser@blockStart := [
   self cache: #blockStart parser: (self chr: '[')
 ]
 .

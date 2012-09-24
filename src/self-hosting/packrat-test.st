@@ -1,8 +1,6 @@
 | LittleParser MyParser mp |
 LittleParser := <require('./littleparser')> dot: #LittleParser
 .
-console log: LittleParser
-.
 MyParser := LittleParser subclass
 .
 MyParser dot:#init method:[:input|
@@ -11,6 +9,7 @@ MyParser dot:#init method:[:input|
 ]
 .
 MyParser dot:#toJS method:[
+  "self between: [self chr:'['] and: [self chr: ']'] accept: [self anyChar]"
   self try_: #(
     @literal
   )

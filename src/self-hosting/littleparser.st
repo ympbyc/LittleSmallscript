@@ -10,40 +10,50 @@ LittleParser dot:#init method:[:input|
 .
 LittleParser dot:#space method:[
   self cache: #space parser: [
-    self regex: (RegExp new: '^[\s\n\t]+')
+    self regex: (RegExp new: '^[\\s\\n\\t]+')
   ]
 ]
 .
 LittleParser dot:#blockStart method: [
-  self cache: #blockStart parser: (self chr: '[')
+  self cache: #blockStart parser: [self chr: '[']
 ]
 .
 LittleParser dot:#blockEnd method:[
-  self cache: #blockEnd parser: (self chr: ']')
+  self cache: #blockEnd parser: [self chr: ']']
 ]
 .
 LittleParser dot:#verticalBar method:[
-  self cache: #verticalBar parser: (self chr: ']')
+  self cache: #verticalBar parser: [self chr: ']']
 ]
 .
 LittleParser dot:#colon method:[
-  self cache: #verticalBar parser: (self chr: ']')
+  self cache: #verticalBar parser: [self chr: ']']
 ]
 .
 LittleParser dot:#semicolon method:[
-  self cache: #semicolon parser: (self chr: ';')
+  self cache: #semicolon parser: [self chr: ';']
 ]
 .
 LittleParser dot:#assignmentArrow method:[
-  self cache: #assignmentArrow parser: (self string: ':=')
+  self cache: #assignmentArrow parser: [self string: ':=']
 ]
 .
 LittleParser dot:#apostrophe method:[
-  self cache: #apostrophe parser: (self chr: <"'">)
+  self cache: #apostrophe parser: [self chr: <"'">]
+]
+.
+LittleParser dot:#arrayStart method: [
+  self cache: #arrayStart parser: [self string: '#(']
+]
+.
+LittleParser dot:#closeParen method: [
+  self cache: #closeParen parser: [self string: ')']
 ]
 .
 LittleParser dot:#variable method:[
-  self regex: (RegExp new: '[a-zA-Z_$][a-zA-Z0-9_$]')
+  self cache: #variable parser: [
+    self regex: (RegExp new: '^[a-zA-Z_$][a-zA-Z0-9_$]*')
+  ]
 ]
 .
 LittleParser dot:#literal method:[
@@ -59,22 +69,22 @@ LittleParser dot:#literal method:[
 .
 LittleParser dot:#numberLiteral method:[
   self cache: #numberLiteral parser: [
-    self regex: (RegExp new: '^-?[0-9]+(\.?[0-9]+)?')
+    self regex: (RegExp new: '^-?[0-9]+(\\.?[0-9]+)?')
   ]
 ]
 .
 LittleParser dot:#stringLiteral method:[
   self cache: #stringLiteral parser: [
     '\"' + (self 
-          between: (self@apostrophe) 
-          and: (self@apostrophe) 
-          accept: (self@anyChar)) + '\"'
+          between: @apostrophe
+          and: @apostrophe 
+          accept: @anyChar) + '\"'
   ]
 ]
 .
 LittleParser dot:#symbolLiteral method:[
   self cache: #symbolLiteral parser:[
-    (self chr: '#') call: self.
+    self chr: '#'.
     '\"' + self variable + '\"'
   ]
 ]
@@ -82,22 +92,21 @@ LittleParser dot:#symbolLiteral method:[
 LittleParser dot:#arrayLiteral method:[|args|
   self cache:#arrayLiteral parser:[
     args := #().
-    (self string: '#(') call: self.
+    self arrayStart.
     self many: [
-      self p: '@@@@@@'.
-      args push: self expression.
+      args push: self literal.
       self skipSpace.
-      self optional: (self chr: ',').
+      self optional: [self chr: ','].
       self skipSpace
     ].
-    (self chr: ')') value.
+    self closeParen.
     '[' + (args join: ', ') + ']'
   ]
 ]
 .
 LittleParser dot:#skipSpace method:[
   self cache:#skipSpace parser:[
-    self optional: self@space
+    self optional: @space
   ]
 ]
 .

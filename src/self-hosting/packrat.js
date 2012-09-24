@@ -2,6 +2,15 @@
   'use strict';
   var Packrat;
   require('../littlesmallmethods');
+  Number.prototype.timesString = function (str) {
+    var _this = this;
+    var ret;
+    ret = "";
+    _this.timesRepeat(function (i) {
+      return (ret += str);
+    });
+    return ret;
+  };
   Packrat = (function (_super) {
     var _Constructor;
     _Constructor = function ( /* &rest arguments */ ) {
@@ -14,23 +23,29 @@
     var _this = this;
     _this.input = input;
     _this.index = 0;
-    return _this.cache = {};
+    _this.cache = {};
+    return _this.logNest = -1;
   };
   Packrat.prototype.cacheparser = function (s, fn) {
     var _this = this;
-    var c;
-    console.log(s);
+    var c, logIndent;
     fn = (fn || function () {});
     c = {};
+    (_this.logNest += 1);
+    logIndent = _this.logNest.timesString("  ");
+    console.log(((((logIndent + "ENTER : ") + s) + " : ") + _this.input.substring(_this.index)));
     (function () {
       return (_this.cache[s] === undefined) ? (_this.cache[s] = {})() : void 0;
     }).tryCatch(function () {
       return _this.cache[s] = {};
     });
-    return _this.cache[s][_this.index] ? ((function () {
+    return (_this.cache[s][_this.index] !== undefined) ? ((function () {
       c = _this.cache[s][_this.index];
-      return c.idx ? ((function () {
-        return _this.index = c.idx;
+      return (c.idx !== undefined) ? ((function () {
+        console.log(((((logIndent + "CACHED: ") + s) + " : ") + c.fn));
+        (_this.logNest -= 1);
+        _this.index = c.idx;
+        return c.fn;
       }))() : (function () {
         return _this.noParse();
       })();
@@ -38,13 +53,17 @@
       return (function () {
         c.idx = _this.index;
         c.fn = fn.call(_this);
-        _this.cache[s][_this.index] = {
+        _this.cache[s][c.idx] = {
           "fn": c.fn,
           "idx": _this.index
         };
+        console.log(((((logIndent + "PASS  : ") + s) + " : ") + c.fn));
+        (_this.logNest -= 1);
         return c.fn;
       }).tryCatch(function (err) {
         _this.cache[s][_this.index] = null;
+        console.log(((logIndent + "FAIL  : ") + s));
+        (_this.logNest -= 1);
         return _this.error(err);
       });
     })();
@@ -140,6 +159,7 @@
   };
   Packrat.prototype.many = function (parser) {
     var _this = this;
+    var a;
     return _this.try_([function () {
       return _this.many1(function () {
         return parser.call(_this);
@@ -160,13 +180,13 @@
   Packrat.prototype.betweenandaccept = function (start, end, inbetween) {
     var _this = this;
     var ret;
-    _this.sequence([start, (function () {
+    _this.sequence([start, function () {
       return ret = _this.many(function () {
-        var a;
         _this.notFollowedBy(end);
-        return a = inbetween.call(_this);
+        return inbetween.call(_this);
       });
-    }).end()]);
+    },
+    end]);
     return ret;
   };
   Packrat.prototype.anyChar = function () {
@@ -174,7 +194,7 @@
     var c;
     c = _this.input[_this.index];
     (_this.index += 1);
-    return c ? ((function () {
+    return (c !== undefined) ? ((function () {
       return c;
     }))() : (function () {
       return _this.noParse();
@@ -184,31 +204,28 @@
     var _this = this;
     var c;
     c = _this.anuChar();
-    return fn.valueifTrueifFalse(c, c, function () {
+    return fn.valueifTrueifFalse((c !== undefined), c, function () {
       return _this.noParse();
     });
   };
   Packrat.prototype.chr = function (ch) {
     var _this = this;
     var c;
-    return function () {
-      c = _this.anyChar();
-      return (c === ch) ? ((function () {
-        return c;
-      }))() : (function () {
-        return _this.noParse();
-      })();
-    };
+    c = _this.anyChar();
+    return (c === ch) ? ((function () {
+      return c;
+    }))() : (function () {
+      return _this.noParse();
+    })();
   };
   Packrat.prototype.string = function (str) {
     var _this = this;
-    return function () {
-      return (_this.input.substring(_this.index, str.length) === str) ? ((function () {
-        return str;
-      }))() : (function () {
-        return _this.noParse();
-      })();
-    };
+    return (_this.input.substring(_this.index, (_this.index + str.length)) === str) ? ((function () {
+      (_this.index += str.length);
+      return str;
+    }))() : (function () {
+      return _this.noParse();
+    })();
   };
   Packrat.prototype.regex = function (regex) {
     var _this = this;

@@ -1,35 +1,51 @@
 | Packrat |
 <require('../littlesmallmethods')>
 .
+Number dot:#timesString method: [:str | | ret |
+  ret := ''.
+  self timesRepeat:[:i| ret += str].
+  ret
+]
+.
 Packrat := Object subclass
 .
 Packrat dot:#init method:[:input |
   @input := input.
   @index := 0.
-  @cache := #{}
+  @cache := #{}.
+  @logNest := -1
 ]
 .
 "cache:parser:"
-Packrat dot:#cacheparser method:[:s :fn| | c |
-  console log: s.
+Packrat dot:#cacheparser method:[:s :fn| | c logIndent |
   fn := fn || [].
   c := #{}.
+  @logNest += 1.
+  logIndent := @logNest timesString: '  '.
+  console log: logIndent + 'ENTER : ' + s + ' : ' + (@input substring: @index).
   [(@cache at: s) === undefined ifTrue: (@cache at: s put: #{})]tryCatch:[
     @cache at: s put: #{}
   ].
-  ((@cache at: s) at: @index) ifTrue: [
+  ((@cache at: s) at: @index) !== undefined ifTrue: [
     c := (@cache at: s) at: @index.
-    c@idx ifTrue: [
-      @index := c@idx
+    c@idx !== undefined ifTrue: [
+      console log: logIndent + 'CACHED: ' + s + ' : ' + c@fn.
+      @logNest -= 1.
+      @index := c@idx.
+      c@fn
     ] ifFalse: [self noParse]
   ] ifFalse: [
     [
       c@idx := @index.
       c@fn := fn call: self.
-      (@cache at: s) at: @index put: #{#fn: c@fn, #idx: @index}.
+      (@cache at: s) at: c@idx put: #{#fn: c@fn, #idx: @index}.
+      console log: logIndent + 'PASS  : ' + s + ' : ' + c@fn.
+      @logNest -= 1.
       c@fn
     ] tryCatch: [:err|
       (@cache at: s) at: @index put: null.
+      console log: logIndent + 'FAIL  : ' + s.
+      @logNest -= 1.
       self error: err
     ]
   ]
@@ -83,7 +99,7 @@ Packrat dot:#notFollowedBy method:[:parser| | f i |
   f ifTrue: [self noParse] ifFalse: [null]
 ]
 .
-Packrat dot:#many method:[:parser |
+Packrat dot:#many method:[:parser | |a|
   self try_: #(
     [ self many1: [parser call: self] ],
     ['']
@@ -99,11 +115,11 @@ Packrat dot:#many1 method:[:parser | | v vs  |
 "between:and:accept"
 Packrat dot:#betweenandaccept method:[:start :end :inbetween | | ret | 
   self sequence: #(
-    start
-    [ret := self many: [| a|
+    start,
+    [ret := self many: [
       self notFollowedBy: end.
-      a := inbetween call: self
-    ]]
+      inbetween call: self
+    ]],
     end
   ).
   ret
@@ -112,22 +128,22 @@ Packrat dot:#betweenandaccept method:[:start :end :inbetween | | ret |
 Packrat dot:#anyChar method:[| c |
   c := @input at: @index.
   @index += 1.
-  c ifTrue: [c] ifFalse: [self noParse]
+  c !== undefined ifTrue: [c] ifFalse: [self noParse]
 ]
 .
 Packrat dot:#satisfyChar method:[:fn | | c |
   c := self anuChar.
-  fn value: c ifTrue: c ifFalse: [self noParse]
+  fn value: c !== undefined ifTrue: c ifFalse: [self noParse]
 ]
 .
 Packrat dot:#chr method:[:ch | | c |
-  [ c := self anyChar.
-    c === ch ifTrue: [c] ifFalse: [self noParse] ]
+  c := self anyChar.
+    c === ch ifTrue: [c] ifFalse: [self noParse]
 ]
 .
 Packrat dot:#string method:[:str |
-  [ (@input sub: @index string: (str@length))
-    === str ifTrue: [str] ifFalse: [self noParse] ]
+  (@input sub: @index string: (@index+str@length))
+    === str ifTrue: [@index += str@length. str] ifFalse: [self noParse]
 ]
 .
 Packrat dot:#regex method:[:regex| | rc match |
