@@ -10,21 +10,27 @@
     _Constructor.prototype = new _super();
     return _Constructor;
   })(Object);
-  Packrat.prototype.init = (function (input) {
+  Packrat.prototype.init = function (input) {
     var _this = this;
     _this.input = input;
     _this.index = 0;
     return _this.cache = {};
-  });
-  Packrat.prototype.cacheDo = (function (s, fn) {
+  };
+  Packrat.prototype.cacheparser = function (s, fn) {
     var _this = this;
     var c;
+    console.log(s);
     fn = (fn || function () {});
     c = {};
-    return (_this.cache[s] && _this.cache[s][_this.index]) ? ((function () {
+    (function () {
+      return (_this.cache[s] === undefined) ? (_this.cache[s] = {})() : void 0;
+    }).tryCatch(function () {
+      return _this.cache[s] = {};
+    });
+    return _this.cache[s][_this.index] ? ((function () {
       c = _this.cache[s][_this.index];
-      return c.idx() ? ((function () {
-        return _this.index = c.idx();
+      return c.idx ? ((function () {
+        return _this.index = c.idx;
       }))() : (function () {
         return _this.noParse();
       })();
@@ -42,31 +48,31 @@
         return _this.error(err);
       });
     })();
-  });
-  Packrat.prototype.noParse = (function () {
+  };
+  Packrat.prototype.noParse = function () {
     var _this = this;
     return _this.error(("Parse error at:" + _this.index));
-  });
-  Packrat.prototype.try_ = (function (parsers) {
+  };
+  Packrat.prototype.try_ = function (parsers) {
     var _this = this;
     var ret, i;
     i = _this.index;
     parsers.do_(function (parser) {
-      return ret ? void 0 : (function () {
+      return (ret === undefined) ? (function () {
         return (function () {
           return ret = parser.call(_this);
         }).tryCatch(function () {
           return _this.index = i;
         });
-      })();
+      })() : void 0;
     });
     return (ret !== undefined) ? ((function () {
       return ret;
     }))() : (function () {
-      return _this.noParse();
+      return _this.noParse("try_");
     })();
-  });
-  Packrat.prototype.sequence = (function (parsers) {
+  };
+  Packrat.prototype.sequence = function (parsers) {
     var _this = this;
     var ret, i, fail;
     i = _this.index;
@@ -88,8 +94,8 @@
     })() : ((function () {
       return ret;
     }))();
-  });
-  Packrat.prototype.optional = (function (parser) {
+  };
+  Packrat.prototype.optional = function (parser) {
     var _this = this;
     var ret, i;
     i = _this.index;
@@ -99,8 +105,8 @@
       _this.index = i;
       return null;
     });
-  });
-  Packrat.prototype.followedBy = (function (parser) {
+  };
+  Packrat.prototype.followedBy = function (parser) {
     var _this = this;
     var f, i;
     f = true;
@@ -115,8 +121,8 @@
     }))() : (function () {
       return null;
     })();
-  });
-  Packrat.prototype.notFollowedBy = (function (parser) {
+  };
+  Packrat.prototype.notFollowedBy = function (parser) {
     var _this = this;
     var f, i;
     f = false;
@@ -131,19 +137,18 @@
     }))() : (function () {
       return null;
     })();
-  });
-  Packrat.prototype.many = (function (parser) {
+  };
+  Packrat.prototype.many = function (parser) {
     var _this = this;
-    return _this.
-    try ((function () {
+    return _this.try_([function () {
       return _this.many1(function () {
         return parser.call(_this);
       });
-    }), function () {
+    }, function () {
       return "";
-    });
-  });
-  Packrat.prototype.many1 = (function (parser) {
+    }]);
+  };
+  Packrat.prototype.many1 = function (parser) {
     var _this = this;
     var v, vs;
     v = parser.call(_this);
@@ -151,8 +156,20 @@
       return parser.call(_this);
     });
     return (v + vs);
-  });
-  Packrat.prototype.anyChar = (function () {
+  };
+  Packrat.prototype.betweenandaccept = function (start, end, inbetween) {
+    var _this = this;
+    var ret;
+    _this.sequence([start, (function () {
+      return ret = _this.many(function () {
+        var a;
+        _this.notFollowedBy(end);
+        return a = inbetween.call(_this);
+      });
+    }).end()]);
+    return ret;
+  };
+  Packrat.prototype.anyChar = function () {
     var _this = this;
     var c;
     c = _this.input[_this.index];
@@ -162,16 +179,16 @@
     }))() : (function () {
       return _this.noParse();
     })();
-  });
-  Packrat.prototype.satisfyChar = (function (fn) {
+  };
+  Packrat.prototype.satisfyChar = function (fn) {
     var _this = this;
     var c;
     c = _this.anuChar();
     return fn.valueifTrueifFalse(c, c, function () {
       return _this.noParse();
     });
-  });
-  Packrat.prototype.chr = (function (ch) {
+  };
+  Packrat.prototype.chr = function (ch) {
     var _this = this;
     var c;
     return function () {
@@ -182,8 +199,8 @@
         return _this.noParse();
       })();
     };
-  });
-  Packrat.prototype.string = (function (str) {
+  };
+  Packrat.prototype.string = function (str) {
     var _this = this;
     return function () {
       return (_this.input.substring(_this.index, str.length) === str) ? ((function () {
@@ -192,7 +209,25 @@
         return _this.noParse();
       })();
     };
-  });
+  };
+  Packrat.prototype.regex = function (regex) {
+    var _this = this;
+    var rc, match;
+    rc = regex.exec(_this.input.substring(_this.index));
+    return rc.isKindOf(Array) ? ((function () {
+      match = rc[0];
+      (_this.index += match.size());
+      return match;
+    }))() : (function () {
+      console.log("regexFalse");
+      return _this.noParse("regex");
+    })();
+  };
+  Packrat.prototype.p = function (s) {
+    var _this = this;
+    console.log(s);
+    return s;
+  };
   exports.Packrat = Packrat;
   return Packrat;
 }).call(this);

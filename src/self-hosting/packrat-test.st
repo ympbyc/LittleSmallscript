@@ -1,9 +1,22 @@
-| Packrat pkrt |
-Packrat := <require('./packrat')> dot: #Packrat
+| LittleParser MyParser mp |
+LittleParser := <require('./littleparser')> dot: #LittleParser
 .
-pkrt := Packrat new: '12345'.
-console log: ((pkrt try_: #(
-  pkrt string: '08765',
-  pkrt string: '12345',
-  pkrt string: '76122'
-)) === '12345')
+console log: LittleParser
+.
+MyParser := LittleParser subclass
+.
+MyParser dot:#init method:[:input|
+  @input := input.
+  @cache := #{}
+]
+.
+MyParser dot:#toJS method:[
+  self try_: #(
+    @literal
+  )
+]
+.
+
+mp := MyParser new: '#(1)'
+.
+mp p: mp toJS

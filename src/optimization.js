@@ -40,23 +40,25 @@
     "subclass" : "(function (_super) { var _Constructor; _Constructor = function (/* &rest arguments */) { if (this.init) this.init.apply(this,arguments); }; _Constructor.prototype = new _super(); return _Constructor; })(%receiver%)",
     "methodat" : "%receiver%.prototype[%arg2%] = %arg1%",
     "methoddot" : "%receiver%.prototype.%arg2% = %arg1%",
-    "dotmethod" : "%receiver%.prototype.%arg1% = %arg2%"
+    "dotmethod" : "%receiver%.prototype.%arg1% = %arg2%",
+    "atmethod" : "%receiver%.prototype[%arg1%] = %arg2%",
   };
 
   var optimize = function (receiver, methodName, args) {
     /* special cases */
     if (methodName === "methoddot") { args[1] = args[1].replace(/^"(.+)"$/, "$1"); }
+    if (methodName === "dotmethod") { args[0] = args[0].replace(/^"(.+)"$/, "$1"); }
     if (methodName === "dot") args[0] = args[0].replace(/^"(.+)"$/, "$1");
     if (methodName === "dotput") args[0] = args[0].replace(/^"(.+)"$/, "$1");
     /* end */
 
     /* scope of self */
-    if (methodName === "methodat" || methodName === "methoddot") {
-      var fn = args[0], 
+    if (["methodat", "methoddot", "dotmethod"].indexOf(methodName) > -1) {
+      var fn = args[methodName==="dotmethod"?1:0], 
       insertIndex = fn.match(/^\(?function\s*\([^)]*\)\s*{/)[0].length;
       fn = fn.replace(/([^a-zA-Z0-9_$])this([^a-zA-Z0-9_$])/g, "$1_this$2");
       fn = fn.substring(0,insertIndex) + "var _this = this;" + fn.substring(insertIndex);
-      args[0] = fn;
+      args[methodName==="dotmethod"?1:0]  = fn;
     }
     /* end */
 

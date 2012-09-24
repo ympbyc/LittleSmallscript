@@ -55,6 +55,8 @@
           if (err) throw err;
         });
       } catch (err) {
+        console.log(err.message||err.type||JSON.stringify(err));
+        if (err.partialjs) console.log('###partial js###\n'+err.partialjs+'\n#########');
         throw err;
       }
     });

@@ -1,7 +1,25 @@
 (function () {
   'use strict';
-  var Packrat, pkrt;
-  Packrat = require('./packrat').Packrat;
-  pkrt = new Packrat("12345");
-  return console.log((pkrt.try_([pkrt.string("08765"), pkrt.string("12345"), pkrt.string("76122")]) === "12345"));
+  var LittleParser, MyParser, mp;
+  LittleParser = require('./littleparser').LittleParser;
+  console.log(LittleParser);
+  MyParser = (function (_super) {
+    var _Constructor;
+    _Constructor = function ( /* &rest arguments */ ) {
+      if (this.init) this.init.apply(this, arguments);
+    };
+    _Constructor.prototype = new _super();
+    return _Constructor;
+  })(LittleParser);
+  MyParser.prototype.init = function (input) {
+    var _this = this;
+    _this.input = input;
+    return _this.cache = {};
+  };
+  MyParser.prototype.toJS = function () {
+    var _this = this;
+    return _this.try_([_this.literal]);
+  };
+  mp = new MyParser("#(1)");
+  return mp.p(mp.toJS());
 }).call(this);
