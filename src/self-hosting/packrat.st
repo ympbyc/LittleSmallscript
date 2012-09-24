@@ -28,12 +28,10 @@ Packrat dot:#cacheparser method:[:s :fn| | c logIndent |
   ].
   ((@cache at: s) at: @index) !== undefined ifTrue: [
     c := (@cache at: s) at: @index.
-    c@idx !== undefined ifTrue: [
-      console log: logIndent + 'CACHED: ' + s + ' : ' + c@fn.
-      @logNest -= 1.
-      @index := c@idx.
-      c@fn
-    ] ifFalse: [self noParse]
+    @index := c@idx.
+    console log: logIndent + 'CACHED: ' + s + ' : ' + c@fn.
+    @logNest -= 1.
+    c@fn
   ] ifFalse: [
     [
       c@idx := @index.
@@ -43,10 +41,10 @@ Packrat dot:#cacheparser method:[:s :fn| | c logIndent |
       @logNest -= 1.
       c@fn
     ] tryCatch: [:err|
-      (@cache at: s) at: @index put: null.
+      (@cache at: s) at: c@idx put: null.
       console log: logIndent + 'FAIL  : ' + s.
       @logNest -= 1.
-      self error: err
+      self noParse
     ]
   ]
 ]

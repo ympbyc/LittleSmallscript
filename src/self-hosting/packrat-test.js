@@ -19,6 +19,6 @@
     var _this = this;
     return _this.try_([_this.literal]);
   };
-  mp = new MyParser("#(1)");
+  mp = new MyParser("#(1 2 #bar #(3))");
   return mp.p(mp.toJS());
 }).call(this);

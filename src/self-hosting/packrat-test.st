@@ -9,13 +9,12 @@ MyParser dot:#init method:[:input|
 ]
 .
 MyParser dot:#toJS method:[
-  "self between: [self chr:'['] and: [self chr: ']'] accept: [self anyChar]"
   self try_: #(
     @literal
   )
 ]
 .
 
-mp := MyParser new: '#(1)'
+mp := MyParser new: '#(1 2 #bar #(3))'
 .
 mp p: mp toJS

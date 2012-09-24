@@ -41,14 +41,10 @@
     });
     return (_this.cache[s][_this.index] !== undefined) ? ((function () {
       c = _this.cache[s][_this.index];
-      return (c.idx !== undefined) ? ((function () {
-        console.log(((((logIndent + "CACHED: ") + s) + " : ") + c.fn));
-        (_this.logNest -= 1);
-        _this.index = c.idx;
-        return c.fn;
-      }))() : (function () {
-        return _this.noParse();
-      })();
+      _this.index = c.idx;
+      console.log(((((logIndent + "CACHED: ") + s) + " : ") + c.fn));
+      (_this.logNest -= 1);
+      return c.fn;
     }))() : (function () {
       return (function () {
         c.idx = _this.index;
@@ -61,10 +57,10 @@
         (_this.logNest -= 1);
         return c.fn;
       }).tryCatch(function (err) {
-        _this.cache[s][_this.index] = null;
+        _this.cache[s][c.idx] = null;
         console.log(((logIndent + "FAIL  : ") + s));
         (_this.logNest -= 1);
-        return _this.error(err);
+        return _this.noParse();
       });
     })();
   };
