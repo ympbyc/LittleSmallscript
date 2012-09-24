@@ -23,6 +23,18 @@ Direction:
   * "obj unary" becomes "obj.unary()". "array at: 1 put: 2" becomes "array.atput(1, 2)".
   * binary messages take js operators as selectors: ((x % 2) === 0)
 
+ToDo:
+-----
+* Self hosting
+  * v0.1.0 will be self-hosted.
+  * This is what I'm working on right now.
+* Class definition syntax
+  * v0.1.0 might have one or perhaps not
+* Error messages
+  * Accurate line number
+  * Failed token
+  * Stack traces
+
 Current working example:
 ------------------------
 The language is changing every second so do example codes. Here's what works at least for now.
