@@ -1,0 +1,198 @@
+(function () {
+  'use strict';
+  var Packrat;
+  require('../littlesmallmethods');
+  Packrat = (function (_super) {
+    var _Constructor;
+    _Constructor = function ( /* &rest arguments */ ) {
+      if (this.init) this.init.apply(this, arguments);
+    };
+    _Constructor.prototype = new _super();
+    return _Constructor;
+  })(Object);
+  Packrat.prototype.init = (function (input) {
+    var _this = this;
+    _this.input = input;
+    _this.index = 0;
+    return _this.cache = {};
+  });
+  Packrat.prototype.cacheDo = (function (s, fn) {
+    var _this = this;
+    var c;
+    fn = (fn || function () {});
+    c = {};
+    return (_this.cache[s] && _this.cache[s][_this.index]) ? ((function () {
+      c = _this.cache[s][_this.index];
+      return c.idx() ? ((function () {
+        return _this.index = c.idx();
+      }))() : (function () {
+        return _this.noParse();
+      })();
+    }))() : (function () {
+      return (function () {
+        c.idx = _this.index;
+        c.fn = fn.call(_this);
+        _this.cache[s][_this.index] = {
+          "fn": c.fn,
+          "idx": _this.index
+        };
+        return c.fn;
+      }).tryCatch(function (err) {
+        _this.cache[s][_this.index] = null;
+        return _this.error(err);
+      });
+    })();
+  });
+  Packrat.prototype.noParse = (function () {
+    var _this = this;
+    return _this.error(("Parse error at:" + _this.index));
+  });
+  Packrat.prototype.try_ = (function (parsers) {
+    var _this = this;
+    var ret, i;
+    i = _this.index;
+    parsers.do_(function (parser) {
+      return ret ? void 0 : (function () {
+        return (function () {
+          return ret = parser.call(_this);
+        }).tryCatch(function () {
+          return _this.index = i;
+        });
+      })();
+    });
+    return (ret !== undefined) ? ((function () {
+      return ret;
+    }))() : (function () {
+      return _this.noParse();
+    })();
+  });
+  Packrat.prototype.sequence = (function (parsers) {
+    var _this = this;
+    var ret, i, fail;
+    i = _this.index;
+    ret = "";
+    fail = false;
+    parsers.do_(function (parser) {
+      return fail ? void 0 : (function () {
+        return (function () {
+          return (ret += parser.call(_this));
+        }).tryCatch(function (err) {
+          _this.index = i;
+          fail = true;
+          return _this.noParse();
+        });
+      })();
+    });
+    return fail ? (function () {
+      return _this.noParse();
+    })() : ((function () {
+      return ret;
+    }))();
+  });
+  Packrat.prototype.optional = (function (parser) {
+    var _this = this;
+    var ret, i;
+    i = _this.index;
+    return (function () {
+      return parser.call(_this);
+    }).tryCatch(function () {
+      _this.index = i;
+      return null;
+    });
+  });
+  Packrat.prototype.followedBy = (function (parser) {
+    var _this = this;
+    var f, i;
+    f = true;
+    i = _this.index;
+    (function () {
+      parser.call(_this);
+      return f = false;
+    }).tryCatch(function () {});
+    _this.index = i;
+    return f ? ((function () {
+      return _this.noParse();
+    }))() : (function () {
+      return null;
+    })();
+  });
+  Packrat.prototype.notFollowedBy = (function (parser) {
+    var _this = this;
+    var f, i;
+    f = false;
+    i = _this.index;
+    (function () {
+      parser.call(_this);
+      return f = true;
+    }).tryCatch(function () {});
+    _this.index = i;
+    return f ? ((function () {
+      return _this.noParse();
+    }))() : (function () {
+      return null;
+    })();
+  });
+  Packrat.prototype.many = (function (parser) {
+    var _this = this;
+    return _this.
+    try ((function () {
+      return _this.many1(function () {
+        return parser.call(_this);
+      });
+    }), function () {
+      return "";
+    });
+  });
+  Packrat.prototype.many1 = (function (parser) {
+    var _this = this;
+    var v, vs;
+    v = parser.call(_this);
+    vs = _this.many(function () {
+      return parser.call(_this);
+    });
+    return (v + vs);
+  });
+  Packrat.prototype.anyChar = (function () {
+    var _this = this;
+    var c;
+    c = _this.input[_this.index];
+    (_this.index += 1);
+    return c ? ((function () {
+      return c;
+    }))() : (function () {
+      return _this.noParse();
+    })();
+  });
+  Packrat.prototype.satisfyChar = (function (fn) {
+    var _this = this;
+    var c;
+    c = _this.anuChar();
+    return fn.valueifTrueifFalse(c, c, function () {
+      return _this.noParse();
+    });
+  });
+  Packrat.prototype.chr = (function (ch) {
+    var _this = this;
+    var c;
+    return function () {
+      c = _this.anyChar();
+      return (c === ch) ? ((function () {
+        return c;
+      }))() : (function () {
+        return _this.noParse();
+      })();
+    };
+  });
+  Packrat.prototype.string = (function (str) {
+    var _this = this;
+    return function () {
+      return (_this.input.substring(_this.index, str.length) === str) ? ((function () {
+        return str;
+      }))() : (function () {
+        return _this.noParse();
+      })();
+    };
+  });
+  exports.Packrat = Packrat;
+  return Packrat;
+}).call(this);

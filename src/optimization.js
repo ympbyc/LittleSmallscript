@@ -39,7 +39,8 @@
     "new" : "new %receiver%(%args%)",
     "subclass" : "(function (_super) { var _Constructor; _Constructor = function (/* &rest arguments */) { if (this.init) this.init.apply(this,arguments); }; _Constructor.prototype = new _super(); return _Constructor; })(%receiver%)",
     "methodat" : "%receiver%.prototype[%arg2%] = %arg1%",
-    "methoddot" : "%receiver%.prototype.%arg2% = %arg1%"
+    "methoddot" : "%receiver%.prototype.%arg2% = %arg1%",
+    "dotmethod" : "%receiver%.prototype.%arg1% = %arg2%"
   };
 
   var optimize = function (receiver, methodName, args) {
