@@ -116,6 +116,15 @@ LittleParser dot:#expression method:[
   ]
 ]
 .
+LittleParser dot:#templateapply method:[:template :hashmap | | dest_str |
+  dest_str := template.
+  hashmap do: [:it :key |
+    (it === null) || (it === undefined) ifTrue: [it := ''].
+    dest_str := dest_str rep: (RegExp ne: '%'+key+'%' w: 'g') lace: it
+  ].
+  dest_str
+]
+.
 exports@LittleParser := LittleParser
 .
 LittleParser

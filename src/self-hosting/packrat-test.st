@@ -1,7 +1,7 @@
-| LittleParser MyParser mp |
-LittleParser := <require('./littleparser')> dot: #LittleParser
+| BlockParser MyParser mp |
+BlockParser := <require('./blockparser')> dot: #BlockParser
 .
-MyParser := LittleParser subclass
+MyParser := BlockParser subclass
 .
 MyParser dot:#init method:[:input|
   @input := input.
@@ -9,12 +9,20 @@ MyParser dot:#init method:[:input|
 ]
 .
 MyParser dot:#toJS method:[
-  self try_: #(
-    @literal
-  )
+  [self try_: #(
+    @block
+  )] tryCatch: [:err| | line rest token |
+	  console log: @maxIndex.
+	  [line := ((@input sub:0 string:@maxIndex) match:</\n/g>) size + 1]
+	  tryCatch: [line := 0].
+	  rest := @input substring:@maxIndex.
+	  token := rest sub:0 string:(rest search:</[\.\s\t\n]|$/>).
+	  console log: 'Parse error on line '+line+'. Unexpected '+token+'.'
+	]
 ]
 .
 
-mp := MyParser new: '#(1 2 #bar #(3))'
+mp := MyParser new: 
+'[#(1 2 #aaa #(3))]'
 .
 mp p: mp toJS

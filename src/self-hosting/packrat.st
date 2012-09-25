@@ -13,6 +13,7 @@ Packrat dot:#init method:[:input |
   @input := input.
   @index := 0.
   @cache := #{}.
+  @maxIndex := 0.
   @logNest := -1
 ]
 .
@@ -20,30 +21,44 @@ Packrat dot:#init method:[:input |
 Packrat dot:#cacheparser method:[:s :fn| | c logIndent |
   fn := fn || [].
   c := #{}.
+  
+  "debug feature"
   @logNest += 1.
   logIndent := @logNest timesString: '  '.
   console log: logIndent + 'ENTER : ' + s + ' : ' + (@input substring: @index).
+  
   [(@cache at: s) === undefined ifTrue: (@cache at: s put: #{})]tryCatch:[
     @cache at: s put: #{}
   ].
   ((@cache at: s) at: @index) !== undefined ifTrue: [
     c := (@cache at: s) at: @index.
     @index := c@idx.
+    
+    "debug feature"
+    @index > @maxIndex ifTrue: [@maxIndex := @index]. "save max index for error message"
     console log: logIndent + 'CACHED: ' + s + ' : ' + c@fn.
     @logNest -= 1.
+    
     c@fn
   ] ifFalse: [
     [
       c@idx := @index.
       c@fn := fn call: self.
       (@cache at: s) at: c@idx put: #{#fn: c@fn, #idx: @index}.
+      
+      "debug feature"
+      @index > @maxIndex ifTrue: [@maxIndex := @index]. "save max index for error message"
       console log: logIndent + 'PASS  : ' + s + ' : ' + c@fn.
       @logNest -= 1.
+
       c@fn
     ] tryCatch: [:err|
       (@cache at: s) at: c@idx put: null.
+      
+      "debug feature"
       console log: logIndent + 'FAIL  : ' + s.
       @logNest -= 1.
+      
       self noParse
     ]
   ]

@@ -136,6 +136,18 @@
       return _this.literal();
     });
   };
+  LittleParser.prototype.templateapply = function (template, hashmap) {
+    var _this = this;
+    var dest_str;
+    dest_str = template;
+    hashmap.do_(function (it, key) {
+      ((it === null) || (it === undefined)) ? (function () {
+        return it = "";
+      })() : void 0;
+      return dest_str = dest_str.replace(new RegExp((("%" + key) + "%"), "g"), it);
+    });
+    return dest_str;
+  };
   exports.LittleParser = LittleParser;
   return LittleParser;
 }).call(this);

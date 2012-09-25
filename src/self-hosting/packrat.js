@@ -24,6 +24,7 @@
     _this.input = input;
     _this.index = 0;
     _this.cache = {};
+    _this.maxIndex = 0;
     return _this.logNest = -1;
   };
   Packrat.prototype.cacheparser = function (s, fn) {
@@ -42,6 +43,9 @@
     return (_this.cache[s][_this.index] !== undefined) ? ((function () {
       c = _this.cache[s][_this.index];
       _this.index = c.idx;
+      (_this.index > _this.maxIndex) ? (function () {
+        return _this.maxIndex = _this.index;
+      })() : void 0;
       console.log(((((logIndent + "CACHED: ") + s) + " : ") + c.fn));
       (_this.logNest -= 1);
       return c.fn;
@@ -53,6 +57,9 @@
           "fn": c.fn,
           "idx": _this.index
         };
+        (_this.index > _this.maxIndex) ? (function () {
+          return _this.maxIndex = _this.index;
+        })() : void 0;
         console.log(((((logIndent + "PASS  : ") + s) + " : ") + c.fn));
         (_this.logNest -= 1);
         return c.fn;
