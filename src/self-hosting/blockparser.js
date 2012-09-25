@@ -32,11 +32,12 @@
       var vars;
       vars = "";
       _this.skipSpace();
-      return _this.manyvaluevalue((function () {
+      _this.many(function () {
         _this.colon();
-        ((vars += _this.variable()) + ", ");
+        (vars += (_this.variable() + ", "));
         return _this.skipSpace();
-      }).vars.slice(), (0), - 2);
+      });
+      return vars.slice((0), - 2);
     });
   };
   BlockParser.prototype.blockHead = function () {
@@ -49,6 +50,7 @@
         (params.length > (0)) ? (function () {
           return _this.verticalBar();
         })() : void 0;
+        _this.skipSpace();
         return params;
       });
     });

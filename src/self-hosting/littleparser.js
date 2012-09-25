@@ -36,13 +36,13 @@
   LittleParser.prototype.verticalBar = function () {
     var _this = this;
     return _this.cacheparser("verticalBar", function () {
-      return _this.chr("]");
+      return _this.chr("|");
     });
   };
   LittleParser.prototype.colon = function () {
     var _this = this;
-    return _this.cacheparser("verticalBar", function () {
-      return _this.chr("]");
+    return _this.cacheparser("colon", function () {
+      return _this.chr(":");
     });
   };
   LittleParser.prototype.semicolon = function () {

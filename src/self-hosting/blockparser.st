@@ -18,8 +18,8 @@ BlockParser dot: #blockParameters method: [
     self skipSpace.
     self many: [
       self colon.
-      vars += self variable + ', '.
-      self skipSpace]
+      vars += (self variable + ', ').
+      self skipSpace].
     vars@slice value: 0 value: -2]]
 .
 BlockParser dot: #blockHead method: [
@@ -29,6 +29,7 @@ BlockParser dot: #blockHead method: [
       params := self blockParameters.
       params@length > 0 ifTrue: [
         self verticalBar].
+      self skipSpace.
       params]]]
 .
 exports dot: #BlockParser put: BlockParser

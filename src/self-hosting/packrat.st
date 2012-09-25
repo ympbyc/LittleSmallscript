@@ -33,7 +33,7 @@ Packrat dot:#cacheparser method:[:s :fn| | c logIndent |
   ((@cache at: s) at: @index) !== undefined ifTrue: [
     c := (@cache at: s) at: @index.
     @index := c@idx.
-    
+
     "debug feature"
     @index > @maxIndex ifTrue: [@maxIndex := @index]. "save max index for error message"
     console log: logIndent + 'CACHED: ' + s + ' : ' + c@fn.
@@ -145,7 +145,7 @@ Packrat dot:#anyChar method:[| c |
 ]
 .
 Packrat dot:#satisfyChar method:[:fn | | c |
-  c := self anuChar.
+  c := self anyChar.
   fn value: c !== undefined ifTrue: c ifFalse: [self noParse]
 ]
 .

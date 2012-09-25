@@ -22,7 +22,6 @@ MyParser dot:#toJS method:[
 ]
 .
 
-mp := MyParser new: 
-'[#(1 2 #aaa #(3))]'
+mp := MyParser new: '[:a :baa | #(1 2 #aaa #(3))]'
 .
 mp p: mp toJS

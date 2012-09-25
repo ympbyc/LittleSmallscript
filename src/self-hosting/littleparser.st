@@ -23,11 +23,11 @@ LittleParser dot:#blockEnd method:[
 ]
 .
 LittleParser dot:#verticalBar method:[
-  self cache: #verticalBar parser: [self chr: ']']
+  self cache: #verticalBar parser: [self chr: '|']
 ]
 .
 LittleParser dot:#colon method:[
-  self cache: #verticalBar parser: [self chr: ']']
+  self cache: #colon parser: [self chr: ':']
 ]
 .
 LittleParser dot:#semicolon method:[

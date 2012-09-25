@@ -32,6 +32,6 @@
       return console.log((((("Parse error on line " + line) + ". Unexpected ") + token) + "."));
     });
   };
-  mp = new MyParser("[#(1 2 #aaa #(3))]");
+  mp = new MyParser("[:a :baa | #(1 2 #aaa #(3))]");
   return mp.p(mp.toJS());
 }).call(this);

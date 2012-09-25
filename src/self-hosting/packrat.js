@@ -206,7 +206,7 @@
   Packrat.prototype.satisfyChar = function (fn) {
     var _this = this;
     var c;
-    c = _this.anuChar();
+    c = _this.anyChar();
     return fn.valueifTrueifFalse((c !== undefined), c, function () {
       return _this.noParse();
     });
