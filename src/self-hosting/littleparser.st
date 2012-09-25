@@ -50,9 +50,64 @@ LittleParser dot:#closeParen method: [
   self cache: #closeParen parser: [self string: ')']
 ]
 .
+LittleParser dot:#hashStart method:[
+  self cache:#hashStart parser:[self string: '#{']
+]
+.
+LittleParser dot:#hashEnd method: [
+  self cache: #hashEnd parser: [self string: '}']
+]
+.
 LittleParser dot:#variable method:[
   self cache: #variable parser: [
     self regex: (RegExp new: '^[a-zA-Z_$][a-zA-Z0-9_$]*')
+  ]
+]
+.
+LittleParser dot:#extendedVariable method:[
+  self cache: #extendedVariable parser:[| v |
+    v := self regex: (RegExp new: '^[a-zA-Z_$@][a-zA-Z0-9_$@]*').
+    v === 'self' ifTrue: ['this']
+    ifFalse: [
+      (v at: 0) === '@' ifTrue: [v := 'this.'+(v sub:0 string:1)]. "@foo -> thos.foo"
+      v rep:</@/g> lace:'.' "foo@bar -> foo.bar"
+    ]
+  ]
+]
+.
+LittleParser dot:#keywordSelector method:[
+  self cache:#keywordSelector parser:[
+    self sequence: #(@variable, @colon)
+  ]
+]
+.
+LittleParser dot:#unarySelector method:[
+  self cache:#unarySelector parser:[| sel |
+    sel := self sequence: #(@variable).
+    self notFollowedBy: @colon.
+    sel
+  ]
+]
+.
+LittleParser dot:#explicitReturn method:[
+  self cache:#explicitReturn parser:[
+    self chr: '^'
+  ]
+]
+.
+LittleParser dot:#commentQuote method:[
+  self cache: #commentQuote parser:[
+    self chr: '\"'
+  ]
+]
+.
+LittleParser dot:#skipSpace method:[
+  self cache:#skipSpace parser:[
+    self optional: @space.
+    self many: [
+      self between: @commentQuote and: @commentQuote accept: @anyChar.
+      self optional: @space
+    ]
   ]
 ]
 .
@@ -62,7 +117,8 @@ LittleParser dot:#literal method:[
       @numberLiteral,
       @stringLiteral,
       @symbolLiteral,
-      @arrayLiteral
+      @arrayLiteral,
+      @block
     )
   ]
 ]
@@ -104,15 +160,25 @@ LittleParser dot:#arrayLiteral method:[|args|
   ]
 ]
 .
-LittleParser dot:#skipSpace method:[
-  self cache:#skipSpace parser:[
-    self optional: @space
-  ]
-]
-.
-LittleParser dot:#expression method:[
-  self cache:#expression parser:[
-    self literal
+LittleParser dot:#hashLiteral method:[
+  self cache:#hashLiteral parser:[| ret |
+    self hashStart.
+    ret += '{'.
+    ret += ((self many: [| key val |
+      self skipSpace.
+      key := self try_: #(@stringLiteral, @numberLiteral, @symbolLiteral).
+      self skipSpace.
+      self colon.
+      self skipSpace.
+      val := self literal.
+      self skipSpace.
+      self optional: [self chr: ','].
+      key + ':' + val + ','
+    ]) sli: 0 ce:-1).
+    self skipSpace.
+    self hashEnd.
+    ret += '}'.
+    ret
   ]
 ]
 .

@@ -18,7 +18,7 @@
       var parameters, body;
       _this.blockStart();
       parameters = _this.blockHead();
-      body = _this.optional(_this.literal);
+      body = _this.optional(_this.expression);
       _this.blockEnd();
       return _this.templateapply(dst_tmpl, {
         "parameters": parameters,

@@ -18,7 +18,7 @@ Packrat dot:#init method:[:input |
 ]
 .
 "cache:parser:"
-Packrat dot:#cacheparser method:[:s :fn| | c logIndent |
+Packrat dot:#cacheparser method:[:s :fn| | c slot logIndent |
   fn := fn || [].
   c := #{}.
   
@@ -30,8 +30,9 @@ Packrat dot:#cacheparser method:[:s :fn| | c logIndent |
   [(@cache at: s) === undefined ifTrue: (@cache at: s put: #{})]tryCatch:[
     @cache at: s put: #{}
   ].
-  ((@cache at: s) at: @index) !== undefined ifTrue: [
-    c := (@cache at: s) at: @index.
+  slot := (@cache at: s) at: @index.
+  (slot !== undefined) && (slot !== null) ifTrue: [
+    c := slot.
     @index := c@idx.
 
     "debug feature"

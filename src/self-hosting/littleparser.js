@@ -75,16 +75,80 @@
       return _this.string(")");
     });
   };
+  LittleParser.prototype.hashStart = function () {
+    var _this = this;
+    return _this.cacheparser("hashStart", function () {
+      return _this.string("#{");
+    });
+  };
+  LittleParser.prototype.hashEnd = function () {
+    var _this = this;
+    return _this.cacheparser("hashEnd", function () {
+      return _this.string("}");
+    });
+  };
   LittleParser.prototype.variable = function () {
     var _this = this;
     return _this.cacheparser("variable", function () {
       return _this.regex(new RegExp("^[a-zA-Z_$][a-zA-Z0-9_$]*"));
     });
   };
+  LittleParser.prototype.extendedVariable = function () {
+    var _this = this;
+    return _this.cacheparser("extendedVariable", function () {
+      var v;
+      v = _this.regex(new RegExp("^[a-zA-Z_$@][a-zA-Z0-9_$@]*"));
+      return (v === "self") ? ((function () {
+        return "_this";
+      }))() : (function () {
+        (v[0] === "@") ? (function () {
+          return v = ("_this." + v.substring((0), 1));
+        })() : void 0;
+        return v.replace(/@/g, ".");
+      })();
+    });
+  };
+  LittleParser.prototype.keywordSelector = function () {
+    var _this = this;
+    return _this.cacheparser("keywordSelector", function () {
+      return _this.sequence([_this.variable, _this.colon]);
+    });
+  };
+  LittleParser.prototype.unarySelector = function () {
+    var _this = this;
+    return _this.cacheparser("unarySelector", function () {
+      var sel;
+      sel = _this.sequence([_this.variable]);
+      _this.notFollowedBy(_this.colon);
+      return sel;
+    });
+  };
+  LittleParser.prototype.explicitReturn = function () {
+    var _this = this;
+    return _this.cacheparser("explicitReturn", function () {
+      return _this.chr("^");
+    });
+  };
+  LittleParser.prototype.commentQuote = function () {
+    var _this = this;
+    return _this.cacheparser("commentQuote", function () {
+      return _this.chr("\"");
+    });
+  };
+  LittleParser.prototype.skipSpace = function () {
+    var _this = this;
+    return _this.cacheparser("skipSpace", function () {
+      _this.optional(_this.space);
+      return _this.many(function () {
+        _this.betweenandaccept(_this.commentQuote, _this.commentQuote, _this.anyChar);
+        return _this.optional(_this.space);
+      });
+    });
+  };
   LittleParser.prototype.literal = function () {
     var _this = this;
     return _this.cacheparser("literal", function () {
-      return _this.try_([_this.numberLiteral, _this.stringLiteral, _this.symbolLiteral, _this.arrayLiteral]);
+      return _this.try_([_this.numberLiteral, _this.stringLiteral, _this.symbolLiteral, _this.arrayLiteral, _this.block]);
     });
   };
   LittleParser.prototype.numberLiteral = function () {
@@ -124,16 +188,30 @@
       return (("[" + args.join(", ")) + "]");
     });
   };
-  LittleParser.prototype.skipSpace = function () {
+  LittleParser.prototype.hashLiteral = function () {
     var _this = this;
-    return _this.cacheparser("skipSpace", function () {
-      return _this.optional(_this.space);
-    });
-  };
-  LittleParser.prototype.expression = function () {
-    var _this = this;
-    return _this.cacheparser("expression", function () {
-      return _this.literal();
+    return _this.cacheparser("hashLiteral", function () {
+      var ret;
+      _this.hashStart();
+      (ret += "{");
+      (ret += _this.many(function () {
+        var key, val;
+        _this.skipSpace();
+        key = _this.try_([_this.stringLiteral, _this.numberLiteral, _this.symbolLiteral]);
+        _this.skipSpace();
+        _this.colon();
+        _this.skipSpace();
+        val = _this.literal();
+        _this.skipSpace();
+        _this.optional(function () {
+          return _this.chr(",");
+        });
+        return (((key + ":") + val) + ",");
+      }).slice((0), - 1));
+      _this.skipSpace();
+      _this.hashEnd();
+      (ret += "}");
+      return ret;
     });
   };
   LittleParser.prototype.templateapply = function (template, hashmap) {

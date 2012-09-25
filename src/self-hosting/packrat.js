@@ -29,7 +29,7 @@
   };
   Packrat.prototype.cacheparser = function (s, fn) {
     var _this = this;
-    var c, logIndent;
+    var c, slot, logIndent;
     fn = (fn || function () {});
     c = {};
     (_this.logNest += 1);
@@ -40,8 +40,9 @@
     }).tryCatch(function () {
       return _this.cache[s] = {};
     });
-    return (_this.cache[s][_this.index] !== undefined) ? ((function () {
-      c = _this.cache[s][_this.index];
+    slot = _this.cache[s][_this.index];
+    return ((slot !== undefined) && (slot !== null)) ? ((function () {
+      c = slot;
       _this.index = c.idx;
       (_this.index > _this.maxIndex) ? (function () {
         return _this.maxIndex = _this.index;

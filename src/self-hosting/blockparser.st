@@ -8,7 +8,7 @@ BlockParser dot:#block method: [| dst_tmpl |
   self cache: #block parser: [| parameters body |
     self blockStart.
     parameters := self blockHead.
-    body := self optional: @literal.
+    body := self optional: @expression.
     self blockEnd.
     self template: dst_tmpl apply: #{#parameters:parameters #body:body}]]
 .
