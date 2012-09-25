@@ -17,19 +17,19 @@ BlockParser dot: #blockParameters method: [
     vars := ''.
     self skipSpace.
     self many: [
-    	self colon.
-    	vars += self variable + ', '.
-    	self skipSpace]
+      self colon.
+      vars += self variable + ', '.
+      self skipSpace]
     vars@slice value: 0 value: -2]]
 .
 BlockParser dot: #blockHead method: [
   self cache: #blockHead parser: [
     self optional: [|params|
-    	self skipSpace.
-    	params := self blockParameters.
-    	params@length > 0 ifTrue: [
-    		self verticalBar].
-    	params]]]
+      self skipSpace.
+      params := self blockParameters.
+      params@length > 0 ifTrue: [
+        self verticalBar].
+      params]]]
 .
 exports dot: #BlockParser put: BlockParser
 .
