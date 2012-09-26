@@ -17,6 +17,14 @@ Packrat dot:#init method:[:input |
   @logNest := -1
 ]
 .
+Packrat dot:#getIndex method:[
+  @index
+]
+.
+Packrat dot:#getInputLength method:[
+  @input@length
+]
+.
 "cache:parser:"
 Packrat dot:#cacheparser method:[:s :fn| | c slot logIndent |
   fn := fn || [].

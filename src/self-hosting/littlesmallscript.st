@@ -58,6 +58,6 @@ LittleSmallscript dot:#toJS method:[| wrapTmpl js beautifyOption |
 ]
 .
 
-mp := LittleSmallscript new: '| foo bar | foo := 1. bar.'
+mp := LittleSmallscript new: 'foo at: #hoge put: 1'
 .
 console log: mp toJS

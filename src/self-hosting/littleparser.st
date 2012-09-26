@@ -145,7 +145,7 @@ LittleParser dot:#arrayLiteral method:[|args|
     args := #().
     self arrayStart.
     self many: [
-      args push: self literal.
+      args push: self expression.
       self skipSpace.
       self optional: [self chr: ','].
       self skipSpace
@@ -165,7 +165,7 @@ LittleParser dot:#hashLiteral method:[
       self skipSpace.
       self colon.
       self skipSpace.
-      val := self literal.
+      val := self expression.
       self skipSpace.
       self optional: [self chr: ','].
       key + ':' + val + ','

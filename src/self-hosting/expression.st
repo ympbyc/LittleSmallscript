@@ -1,5 +1,7 @@
-| Packrat Expression |
+| Packrat optimization Expression |
 Packrat := <require('./packrat')> dot: #Packrat
+.
+optimization := <require('./optimization')>
 .
 Expression := Packrat subclass
 .
@@ -56,11 +58,17 @@ Expression dot:#simpleExpression method:[:allowedParsers |
     self many:[| mes ret |
       mes := self continuation: allowedParsers.
 
-      "optimization comes here"
-
-      mes@wrapMe 
-        ifTrue: [injection := '(' + injection + mes@js + ')']
-        ifFalse: [injection += mes@js]
+      "optimize if optimization is available"
+      (optimization@optimizationAvailable value: mes@methodName)
+        ifTrue: [
+          console log: 'bbb'.
+          injection := optimization@optimize value: injection value: mes@methodName value: mes@args
+        ]
+        ifFalse:[
+          mes@wrapMe 
+            ifTrue: [injection := '(' + injection + mes@js + ')']
+            ifFalse: [injection += mes@js]
+        ]
     ].
     injection
   ]
@@ -191,7 +199,6 @@ Expression dot:#operator method:[| p |
       p value: '%',
       p value: '===',
       p value: '!==',
-      p value: 'instanceof',
       p value: '<=',
       p value: '>=',
       p value: '<',

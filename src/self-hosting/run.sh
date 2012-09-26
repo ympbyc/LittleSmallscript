@@ -8,6 +8,8 @@ echo expression &&
 node ../main.js -c expression.st &&
 echo statement &&
 node ../main.js -c statement.st &&
+echo optimization &&
+node ../main.js -c optimization.st &&
 echo littlesmallscript &&
 node ../main.js -c littlesmallscript.st &&
 
