@@ -10,11 +10,6 @@
     _Constructor.prototype = new _super();
     return _Constructor;
   })(Packrat);
-  LittleParser.prototype.init = function (input) {
-    var _this = this;
-    _this.input = input;
-    return _this.cache = {};
-  };
   LittleParser.prototype.space = function () {
     var _this = this;
     return _this.cacheparser("space", function () {

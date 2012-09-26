@@ -10,12 +10,6 @@
     _Constructor.prototype = new _super();
     return _Constructor;
   })(LittleParser);
-  Expression.prototype.init = function () {
-    var _this = this;
-    _this.input = "";
-    _this.index = 0;
-    return _this.cache = {};
-  };
   Expression.prototype.expression = function () {
     var _this = this;
     var tmpl;

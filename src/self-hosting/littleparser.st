@@ -3,11 +3,6 @@ Packrat := <require('./packrat')> dot: #Packrat
 .
 LittleParser := Packrat subclass
 .
-LittleParser dot:#init method:[:input|
-  @input := input.
-  @cache := #{}
-]
-.
 LittleParser dot:#space method:[
   self cache: #space parser: [
     self regex: (RegExp new: '^[\\s\\n\\t]+')

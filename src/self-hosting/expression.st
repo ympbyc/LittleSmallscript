@@ -3,12 +3,6 @@ LittleParser := <require('./littleparser')> dot:#LittleParser
 .
 Expression := LittleParser subclass
 .
-Expression dot:#init method:[
-  @input := ''.
-  @index := 0.
-  @cache := #{}
-]
-.
 Expression dot:#expression method:[| tmpl |
   tmpl := '%assignments%%cascade%'.
   self cache:#expression parser:[

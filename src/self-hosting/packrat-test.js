@@ -1,9 +1,10 @@
 (function () {
   'use strict';
-  var LittleParser, BlockParser, Expression, MyParser, mp;
+  var LittleParser, BlockParser, Expression, Statement, MyParser, mp;
   LittleParser = require('./littleparser').LittleParser;
   BlockParser = require('./blockparser').BlockParser;
   Expression = require('./expression').Expression;
+  Statement = require('./statement').Statement;
   MyParser = (function (_super) {
     var _Constructor;
     _Constructor = function ( /* &rest arguments */ ) {
@@ -16,6 +17,9 @@
     return MyParser.prototype[key] = item;
   });
   Expression.prototype.do_(function (item, key) {
+    return MyParser.prototype[key] = item;
+  });
+  Statement.prototype.do_(function (item, key) {
     return MyParser.prototype[key] = item;
   });
   MyParser.prototype.init = function (input) {
@@ -38,15 +42,17 @@
   };
   MyParser.prototype.toJS = function () {
     var _this = this;
-    (function () {
-      return _this.try_([_this.expression]);
+    var ret;
+    ret = (function () {
+      return _this.try_([_this.statement]);
     }).tryCatch(function () {
       return _this.onError();
     });
-    return (_this.index < _this.input.length) ? (function () {
+    (_this.index < _this.input.length) ? (function () {
       return _this.onError({});
     })() : void 0;
+    return ret;
   };
-  mp = new MyParser("Object new ; at:#a put:1");
-  return mp.p(mp.toJS());
+  mp = new MyParser("| foo bar | foo := 1. bar.");
+  return console.log(mp.toJS());
 }).call(this);

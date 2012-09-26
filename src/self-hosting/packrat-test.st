@@ -1,9 +1,11 @@
-| LittleParser BlockParser Expression MyParser mp |
+| LittleParser BlockParser Expression Statement MyParser mp |
 LittleParser := <require('./littleparser')> dot: #LittleParser
 .
 BlockParser := <require('./blockparser')> dot: #BlockParser
 .
 Expression := <require('./expression')> dot: #Expression
+.
+Statement := <require('./statement')> dot: #Statement
 .
 MyParser := LittleParser subclass
 .
@@ -12,6 +14,10 @@ BlockParser@prototype do:[:item:key|
 ]
 .
 Expression@prototype do:[:item:key|
+  MyParser@prototype at:key put:item
+]
+.
+Statement@prototype do:[:item:key|
   MyParser@prototype at:key put:item
 ]
 .
@@ -29,14 +35,15 @@ MyParser dot:#onError method:[:err| | line rest token |
   console log: 'Parse error on line '+line+'. Unexpected '+token+'.'
 ]
 .
-MyParser dot:#toJS method:[
-  [self try_: #(
-    @expression
+MyParser dot:#toJS method:[| ret |
+  ret := [self try_: #(
+    @statement
   )] tryCatch: [self onError].
-  @index < @input@length ifTrue: [@onError value: #{}]
+  @index < @input@length ifTrue: [@onError value: #{}].
+  ret
 ]
 .
 
-mp := MyParser new: 'Object new ; at:#a put:1'
+mp := MyParser new: '| foo bar | foo := 1. bar.'
 .
-mp p: mp toJS
+console log: mp toJS
