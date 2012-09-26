@@ -1,7 +1,7 @@
-| LittleParser Expression |
-LittleParser := <require('./littleparser')> dot:#LittleParser
+| Packrat Expression |
+Packrat := <require('./packrat')> dot: #Packrat
 .
-Expression := LittleParser subclass
+Expression := Packrat subclass
 .
 Expression dot:#expression method:[| tmpl |
   tmpl := '%assignments%%cascade%'.

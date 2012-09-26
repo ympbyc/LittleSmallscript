@@ -1,7 +1,7 @@
-| LittleParser BlockParser |
-LittleParser := <require('./littleparser')> dot: #LittleParser
+| Packrat BlockParser |
+Packrat := <require('./packrat')> dot: #Packrat
 .
-BlockParser := LittleParser subclass
+BlockParser := Packrat subclass
 .
 BlockParser dot:#block method: [| dst_tmpl |
   dst_tmpl := 'function (%parameters%) { %body% }'.

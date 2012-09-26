@@ -1,7 +1,7 @@
-| LittleParser Statement |
-LittleParser := <require('./littleparser')> dot: #LittleParser
+| Packrat Statement |
+Packrat := <require('./packrat')> dot: #Packrat
 .
-Statement := LittleParser subclass
+Statement := Packrat subclass
 .
 Statement dot:#statement method:[
   self cache:#statement parser:[| ret vd |
