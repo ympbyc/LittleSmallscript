@@ -57,7 +57,6 @@ LittleSmallscript dot:#toJS method:[| wrapTmpl js beautifyOption |
   <require('../../lib/beautify.js')> js_: js beautify: beautifyOption 
 ]
 .
-
-mp := LittleSmallscript new: 'foo at: #hoge put: 1'
+exports@LittleSmallscript := LittleSmallscript
 .
-console log: mp toJS
+LittleSmallscript

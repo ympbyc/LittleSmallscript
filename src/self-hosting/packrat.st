@@ -180,6 +180,10 @@ Packrat dot:#regex method:[:regex| | rc match |
   ]
 ]
 .
+Packrat dot:#toParser method:[:str|
+  [self string: str]
+]
+.
 Packrat dot:#p method:[:s |
   console log: s.
   s

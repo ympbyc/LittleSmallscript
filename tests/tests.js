@@ -2,13 +2,14 @@
   'use strict';
 
   var LittleSmallscript, errors, test, log, lss, p;
-  LittleSmallscript = require("../src/littlesmallscript").LittleSmallscript;
+  LittleSmallscript = require("../src/self-hosting/littlesmallscript").LittleSmallscript;
 
   errors = []
   test = function (a, mes) {
     if ( ! a) {
       if (mes) log(mes); else throw "fail"; 
     }
+    console.log('SUCCESS:' + mes);
     return true;
   };
   log = function (a) {
