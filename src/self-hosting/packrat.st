@@ -155,12 +155,12 @@ Packrat dot:#anyChar method:[| c |
 .
 Packrat dot:#satisfyChar method:[:fn | | c |
   c := self anyChar.
-  fn value: c !== undefined ifTrue: c ifFalse: [self noParse]
+  ((fn value: c) !== undefined) ifTrue: [c] ifFalse: [self noParse]
 ]
 .
 Packrat dot:#chr method:[:ch | | c |
   c := self anyChar.
-    c === ch ifTrue: [c] ifFalse: [self noParse]
+  c === ch ifTrue: [c] ifFalse: [self noParse]
 ]
 .
 Packrat dot:#string method:[:str |

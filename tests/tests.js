@@ -36,20 +36,20 @@
 
     //try_
     a = lss(example1);
-    test(a.try_(
+    test(a.try_([
       a.toParser("foo"),
       a.toParser("bar"),
       a.toParser("|"),
       a.toParser("baz")
-    ) === "|", "try_01")
+    ]) === "|", "try_01")
       
     a.skipSpace();
 
     try {
-      a.try_(
+      a.try_([
         a.toParser("1"),
         a.toParser("2")
-      );
+      ]);
       log("try_02")
     } catch (err) {}
 
@@ -107,7 +107,7 @@
     
     //between
     a = lss(example1);
-    test(a.between(a.verticalBar, a.anyChar, a.verticalBar) === " foo ", "between01");
+    test(a.betweenandaccept(a.verticalBar, a.verticalBar, a.anyChar) === " foo ", "between01");
 
     //anyChar
     a = lss(example1);
