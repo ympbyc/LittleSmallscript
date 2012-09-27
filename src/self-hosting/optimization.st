@@ -43,14 +43,14 @@ canUseDotNotation := [:str| | v identifier |
 .
 optimize := [:receiver :methodName :args |
   "special cases"
-  methodName === 'at' ifTrue: [| identifier |
+  (methodName === 'at') || (methodName === 'dot') ifTrue: [| identifier |
     identifier := (canUseDotNotation value: (args at: 0)).
     identifier !== null ifTrue: [
       args at: 0 put: identifier.
       methodName := 'dot'
     ]
   ].
-  methodName === 'atput' ifTrue: [| identifier |
+  (methodName === 'atput') || (methodName === 'dotput') ifTrue: [| identifier |
     identifier := (canUseDotNotation value: (args at: 0)).
     identifier !== null ifTrue: [
       args at: 0 put: identifier.

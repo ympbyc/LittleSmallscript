@@ -7,7 +7,7 @@ Statement dot:#statement method:[
   self cache:#statement parser:[| ret vd |
     ret := ''.
     self skipSpace.
-    vd := self optional: @variableDecalaration.
+    vd := self optional: @variableDeclaration.
     vd !== null ifTrue:[ ret += vd ].
 
     self skipSpace.
@@ -20,16 +20,16 @@ Statement dot:#statement method:[
 
       a + '; '
     ]).
-    ret += self expression + '; '.
+    ret := ret + 'return ' + self expression + ';'.
     self skipSpace.
     self optional: [ self chr: '.' ]. "allow tail period"
 
-    ret + '; '
+    ret
   ]
 ]
 .
-Statement dot:#variableDecalaration method:[
-  self cache:#variableDecalaration parser:[| ret |
+Statement dot:#variableDeclaration method:[
+  self cache:#variableDeclaration parser:[| ret |
     ret := 'var '.
     self skipSpace.
     self verticalBar.

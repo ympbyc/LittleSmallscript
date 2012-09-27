@@ -14,7 +14,8 @@ Packrat dot:#init method:[:input |
   @index := 0.
   @cache := #{}.
   @maxIndex := 0.
-  @logNest := -1
+  @logNest := -1.
+  @stackTrace := ''
 ]
 .
 Packrat dot:#getIndex method:[
@@ -33,7 +34,7 @@ Packrat dot:#cacheparser method:[:s :fn| | c slot logIndent |
   "debug feature"
   @logNest += 1.
   logIndent := @logNest timesString: '  '.
-  console log: logIndent + 'ENTER : ' + s + ' : ' + (@input substring: @index).
+  @stackTrace += (logIndent + 'ENTER : ' + s + ' : ' + (@input substring: @index) + '\n').
   
   [(@cache at: s) === undefined ifTrue: (@cache at: s put: #{})]tryCatch:[
     @cache at: s put: #{}
@@ -45,7 +46,7 @@ Packrat dot:#cacheparser method:[:s :fn| | c slot logIndent |
 
     "debug feature"
     @index > @maxIndex ifTrue: [@maxIndex := @index]. "save max index for error message"
-    console log: logIndent + 'CACHED: ' + s + ' : ' + c@fn.
+    @stackTrace +=  (logIndent + 'CACHED: ' + s + ' : ' + c@fn + '\n').
     @logNest -= 1.
     
     c@fn
@@ -57,7 +58,7 @@ Packrat dot:#cacheparser method:[:s :fn| | c slot logIndent |
       
       "debug feature"
       @index > @maxIndex ifTrue: [@maxIndex := @index]. "save max index for error message"
-      console log: logIndent + 'PASS  : ' + s + ' : ' + c@fn.
+      @stackTrace += (logIndent + 'PASS  : ' + s + ' : ' + c@fn + '\n').
       @logNest -= 1.
 
       c@fn
@@ -65,7 +66,7 @@ Packrat dot:#cacheparser method:[:s :fn| | c slot logIndent |
       (@cache at: s) at: c@idx put: null.
       
       "debug feature"
-      console log: logIndent + 'FAIL  : ' + s.
+      @stackTrace +=  (logIndent + 'FAIL  : ' + s + '\n').
       @logNest -= 1.
       
       self noParse

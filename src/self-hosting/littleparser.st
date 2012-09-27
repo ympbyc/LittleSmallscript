@@ -30,7 +30,12 @@ LittleParser dot:#semicolon method:[
 ]
 .
 LittleParser dot:#assignmentArrow method:[
-  self cache: #assignmentArrow parser: [self string: ':=']
+  self cache: #assignmentArrow parser: [
+    self try_: #(
+      [self string: ':='],
+      [self string: '<-']
+    )
+  ]
 ]
 .
 LittleParser dot:#apostrophe method:[
@@ -64,7 +69,7 @@ LittleParser dot:#extendedVariable method:[
     v := self regex: (RegExp new: '^[a-zA-Z_$@][a-zA-Z0-9_$@]*').
     v === 'self' ifTrue: ['this']
     ifFalse: [
-      (v at: 0) === '@' ifTrue: [v := 'this.'+(v sub:0 string:1)]. "@foo -> thos.foo"
+      (v at: 0) === '@' ifTrue: [v := 'this.'+(v substring:1)]. "@foo -> this.foo"
       v rep:</@/g> lace:'.' "foo@bar -> foo.bar"
     ]
   ]
@@ -113,6 +118,7 @@ LittleParser dot:#literal method:[
       @stringLiteral,
       @symbolLiteral,
       @arrayLiteral,
+      @hashLiteral,
       @block
     )
   ]
@@ -157,6 +163,7 @@ LittleParser dot:#arrayLiteral method:[|args|
 .
 LittleParser dot:#hashLiteral method:[
   self cache:#hashLiteral parser:[| ret |
+    ret := ''.
     self hashStart.
     ret += '{'.
     ret += ((self many: [| key val |
@@ -168,7 +175,7 @@ LittleParser dot:#hashLiteral method:[
       val := self expression.
       self skipSpace.
       self optional: [self chr: ','].
-      key + ':' + val + ','
+      key + ': ' + val + ','
     ]) sli: 0 ce:-1).
     self skipSpace.
     self hashEnd.

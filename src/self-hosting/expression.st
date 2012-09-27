@@ -61,7 +61,6 @@ Expression dot:#simpleExpression method:[:allowedParsers |
       "optimize if optimization is available"
       (optimization@optimizationAvailable value: mes@methodName)
         ifTrue: [
-          console log: 'bbb'.
           injection := optimization@optimize value: injection value: mes@methodName value: mes@args
         ]
         ifFalse:[

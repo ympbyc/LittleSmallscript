@@ -27,19 +27,21 @@ Statement@prototype do:[:item:key|
   LittleSmallscript@prototype at:key put:item
 ]
 .
-LittleSmallscript dot:#init method:[:input|
+LittleSmallscript dot:#init method:[:input :options|
   @input := input.
   @index := 0.
-  @cache := #{}
+  @cache := #{}.
+  @options := options
 ]
 .
 LittleSmallscript dot:#onError method:[:err| | line rest token |
-  console log: @maxIndex.
   [line := ((@input sub:0 string:@maxIndex) match:</\n/g>) size + 1]
   tryCatch: [line := 0].
   rest := @input substring:@maxIndex.
   token := rest sub:0 string:(rest search:</[\.\s\t\n]|$/>).
-  console log: 'Parse error on line '+line+'. Unexpected '+token+'.'
+  console log: 'Parse error on line '+line+'. Unexpected '+token+'.'.
+  console log: '===================================================='.
+  console log: (@stackTrace)
 ]
 .
 LittleSmallscript dot:#toJS method:[| wrapTmpl js beautifyOption |
@@ -54,7 +56,9 @@ LittleSmallscript dot:#toJS method:[| wrapTmpl js beautifyOption |
     #indent_char: ' '
     #jslint_happy: true
   }.
-  <require('../../lib/beautify.js')> js_: js beautify: beautifyOption 
+  @options && @options@prettyprint ifTrue: [
+    <require('../../lib/beautify.js')> js_: js beautify: beautifyOption
+  ] ifFalse: [js]
 ]
 .
 exports@LittleSmallscript := LittleSmallscript
