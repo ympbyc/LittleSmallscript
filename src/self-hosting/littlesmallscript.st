@@ -1,4 +1,4 @@
-| Packrat LittleParser BlockParser Expression Statement LittleSmallscript mp |
+| Packrat LittleParser BlockParser Expression Statement Class LittleSmallscript mp |
 Packrat := <require('./packrat')> dot: #Packrat
 .
 LittleParser := <require('./littleparser')> dot: #LittleParser
@@ -8,6 +8,8 @@ BlockParser := <require('./blockparser')> dot: #BlockParser
 Expression := <require('./expression')> dot: #Expression
 .
 Statement := <require('./statement')> dot: #Statement
+.
+Class := <require('./class')> dot: #Class
 .
 LittleSmallscript := Packrat subclass
 .
@@ -27,11 +29,16 @@ Statement@prototype do:[:item:key|
   LittleSmallscript@prototype at:key put:item
 ]
 .
+Class@prototype do:[:item:key|
+  LittleSmallscript@prototype at:key put:item
+]
+.
 LittleSmallscript dot:#init method:[:input :options|
   @input := input.
   @index := 0.
   @cache := #{}.
-  @options := options
+  @options := options.
+  @instanceVariables := #{}
 ]
 .
 LittleSmallscript dot:#onError method:[:err| | line rest token |

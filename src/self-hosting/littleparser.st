@@ -47,7 +47,7 @@ LittleParser dot:#arrayStart method: [
 ]
 .
 LittleParser dot:#closeParen method: [
-  self cache: #closeParen parser: [self string: ')']
+  self cache: #closeParen parser: [self chr: ')']
 ]
 .
 LittleParser dot:#hashStart method:[
@@ -55,7 +55,11 @@ LittleParser dot:#hashStart method:[
 ]
 .
 LittleParser dot:#hashEnd method: [
-  self cache: #hashEnd parser: [self string: '}']
+  self cache: #hashEnd parser: [self chr: '}']
+]
+.
+LittleParser dot:#exclamation method:[
+  self cache:#exclamation parser:[self chr: '!']
 ]
 .
 LittleParser dot:#variable method:[

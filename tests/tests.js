@@ -7,7 +7,7 @@
   errors = [];
   test = function (result, expected, mes) {
     if (result !== expected) {
-      log(mes + '\n\tEXPECTED:' + expected + '\n\tPASSED  :' + result)
+      return log(mes + '\n\tEXPECTED:' + expected + '\n\tPASSED  :' + result)
     }
     console.log('\u001b[32m' + 'GREEN:\t' + mes + '\u001b[0m');
     return true;
@@ -244,7 +244,7 @@
 
   console.log("=========Statement=========");
 
-  //Expression
+  //Statement
   (function () {
     var a;
     
@@ -256,6 +256,26 @@
 
     //variableDeclaration
     test(lss("| foo bar baz |").variableDeclaration(), "var foo, bar, baz; ", "variableDeclaration01");
+
+  })();
+
+  console.log("=========Class=========");
+
+  //Class
+  (function () {
+    //classHeader
+    test(
+      lss('Animal subclass: #Snake variables: #(#name #color)').classHeader(),
+      'Snake = function () { this.name = null; this.color = null; };\nSnake.prototype = new Animal()',
+      'classHeader01'
+    );
+
+    //instanceMethod
+    test(
+      lss('!Snake setName: name| myName := name. name!').instanceMethod(),
+      'Snake.prototype.setName = function (name) { myName = name; return name; };',
+      'instanceMethod01'
+    );
 
   })();
 
