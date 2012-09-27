@@ -5,12 +5,12 @@ Lets imitate the Little Smalltalk v5's syntax for class definition.
 
 ```smalltalk
 
-Animal subclass: #Snake variables: #(#name #color #awake).
+Animal subclass: #Snake variables: #(#name #colour #awake).
 
 !Snake
-initWithName: itsName color: itsColor |
+initWithName: itsName color: itsColour |
   name := itsName.
-  color := itsColor.
+  colour := itsColour.
   awake := true
 !
 
@@ -21,7 +21,7 @@ getName
 
 !Snake
 move: metre |
-  awake ifFalse [^ null].
+  awake ifFalse: [^ null].
   ^ name , ' the python moved ' , metre , 'm.'
 !
 
