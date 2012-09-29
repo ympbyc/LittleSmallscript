@@ -87,10 +87,16 @@
         }, function () {
           var conti;
           conti =  _this.many(function () {
+            var mes;
             _this.skipSpace();
             _this.semicolon();
             _this.skipSpace();
-            return "_receiver" + _this.continuation().toJS() + ";";
+            mes = _this.continuation();
+            //optimize if optimization is available
+            if (optimization.optimizationAvailable(mes.methodName)) {
+              return optimization.optimize("_receiver", mes.methodName, mes.args) + ';';
+            }
+            return "_receiver" + mes.toJS() + ";";
           });
           return __template(tmpl, {simpleExpression: se, body: conti});
         });
@@ -217,7 +223,9 @@
           function () {
             var ret;
             _this.chr("(");
+            _this.skipSpace();
             ret = _this.cascade();
+            _this.skipSpace();
             _this.chr(")");
             return ret;
           }
