@@ -12,19 +12,29 @@ Statement dot:#statement method:[
 
     self skipSpace.
     ret += (self many: [| a |
-      a := self expression.
+      a := self statementable.
       self skipSpace.
       self chr: '.'.
       self skipSpace.
-      self followedBy: @expression.
+      self followedBy: @statementable.
 
       a + '; '
     ]).
-    ret := ret + 'return ' + self expression + ';'.
+    ret := ret + 'return ' + self statementable + ';'.
     self skipSpace.
     self optional: [ self chr: '.' ]. "allow tail period"
 
     ret
+  ]
+]
+.
+Statement dot:#statementable method:[
+  self cache:#statementable parser:[
+    self try_: #(
+      @classHeader,
+      @instanceMethod,
+      @expression
+    )
   ]
 ]
 .

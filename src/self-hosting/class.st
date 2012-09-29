@@ -66,17 +66,19 @@ setName: name |
 !
 "
 Class dot:#instanceMethod method: [| method_tmpl |
-  method_tmpl := '%className%.prototype.%methodName% = function (%args%) { %methodBody% };'.
+  method_tmpl := '%className%.prototype.%methodName% = function (%args%) { var _this = this; %methodBody% }'.
   self cache:#instanceMethod parser:[| className methodHead methodBody |
     self exclamation.
     self skipSpace.
     className := self variable.
     self skipSpace.
-    methodHead := self methodHead.
+    methodHead := self methodHead. "#{}"
     self skipSpace.
     self optional: @verticalBar.
     self skipSpace.
+    self setCurrentClass: className. "set the current class"
     methodBody := self statement. "change me"
+    self setCurrentClass: null. "empty the current class"
     self skipSpace.
     self exclamation.
     self template: method_tmpl apply: #{
@@ -91,21 +93,34 @@ Class dot:#instanceMethod method: [| method_tmpl |
 Class dot:#methodHead method:[
   self cache:#methodHead parser:[| methodName args |
     methodName := ''.
-    args := ''.
+    args := #().
     self try_: #([
       self many1: [
         methodName += (self keywordSelector sli: 0 ce: -1). "remove colon"
         self skipSpace.
-        args += self variable
+        args push: self variable.
+        self skipSpace
       ]
     ],[
       methodName := self unarySelector
     ]).
     #{
       #name: methodName
-      #args: args
+      #args: args join: ', '
     }
   ]
+]
+.
+Class dot:#setCurrentClass method:[:className |
+  @currentClass := className.
+  console log: @currentClass + ',' + (@instanceVariables at: @currentClass).
+  className
+]
+.
+Class dot:#instanceVariableP method:[:variableName | |v|
+  (@currentClass !== null) 
+  && ((@instanceVariables at: @currentClass) !== undefined)
+  && (((@instanceVariables at: @currentClass) indexOf: variableName) > -1)
 ]
 .
 exports@Class := Class

@@ -70,11 +70,12 @@ LittleParser dot:#variable method:[
 .
 LittleParser dot:#extendedVariable method:[
   self cache: #extendedVariable parser:[| v |
-    v := self regex: (RegExp new: '^[a-zA-Z_$@][a-zA-Z0-9_$@]*').
+    v := self regex: (RegExp new: '^[a-zA-Z_$][a-zA-Z0-9_$]*').
     v === 'self' ifTrue: ['this']
     ifFalse: [
-      (v at: 0) === '@' ifTrue: [v := 'this.'+(v substring:1)]. "@foo -> this.foo"
-      v rep:</@/g> lace:'.' "foo@bar -> foo.bar"
+      "if it is instance variable, prefix it with 'this'"
+      (self instanceVariableP: v) ifTrue: [v := 'this.'+v]. 
+      v
     ]
   ]
 ]

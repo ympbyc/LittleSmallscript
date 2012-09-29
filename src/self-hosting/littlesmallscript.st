@@ -38,7 +38,8 @@ LittleSmallscript dot:#init method:[:input :options|
   @index := 0.
   @cache := #{}.
   @options := options.
-  @instanceVariables := #{}
+  @instanceVariables := #{}.
+  @currentClass := null
 ]
 .
 LittleSmallscript dot:#onError method:[:err| | line rest token |
@@ -47,8 +48,8 @@ LittleSmallscript dot:#onError method:[:err| | line rest token |
   rest := @input substring:@maxIndex.
   token := rest sub:0 string:(rest search:</[\.\s\t\n]|$/>).
   console log: 'Parse error on line '+line+'. Unexpected '+token+'.'.
-  console log: '===================================================='.
-  console log: (@stackTrace)
+  console log: '===================================================='
+  "console log: (@stackTrace)"
 ]
 .
 LittleSmallscript dot:#toJS method:[| wrapTmpl js beautifyOption |

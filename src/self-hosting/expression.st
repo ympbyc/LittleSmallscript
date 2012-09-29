@@ -46,7 +46,8 @@ Expression dot:#cascade method:[| tmpl |
         '_receiver' + (self continuation at: #js) + ';'
       ].
       self template: tmpl apply: #{
-        #simpleExpression:se #body:conti
+        #simpleExpression:se 
+        #body:conti
       }
     ])
   ]
