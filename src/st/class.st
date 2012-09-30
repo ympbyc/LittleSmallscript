@@ -43,6 +43,9 @@ Class dot:#instanceVariableArray method:[
       self skipSpace.
       v := self variablableStringContent.
       variables push: v.
+      self skipSpace.
+      self optional: [self chr: ','].
+      self skipSpace.
       v
     ].
     self closeParen.

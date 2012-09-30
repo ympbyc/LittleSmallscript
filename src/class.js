@@ -51,6 +51,9 @@
         _this.skipSpace();
         v = _this.variablableStringContent();
         variables.push(v);
+        _this.skipSpace();
+        _this.optional(function () { return _this.chr(','); });
+        _this.skipSpace();
         return v;
       });
       _this.closeParen();
