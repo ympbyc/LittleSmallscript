@@ -13,7 +13,7 @@
   Class.prototype.classHeader = function () {
     var _this = this;
     var dst_tmpl;
-    dst_tmpl = "%className% = function () { %variableInitialization%};\n%className%.prototype = new %superClass%();";
+    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%};\n%className%.prototype = new %superClass%();";
     return _this.cacheparser("classHeader", function () {
       var className, superClass, variables, v_init;
       _this.optional(function () {

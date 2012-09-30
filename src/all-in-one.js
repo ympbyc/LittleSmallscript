@@ -1189,10 +1189,10 @@ require.define("/src/littleparser.js",function(require,module,exports,__dirname,
       var v;
       v = _this.regex(new RegExp("^[a-zA-Z_$][a-zA-Z0-9_$]*"));
       return (v === "self") ? ((function () {
-        return "this";
+        return "_this";
       }))() : (function () {
         _this.instanceVariableP(v) ? (function () {
-          return v = ("this." + v);
+          return v = ("_this." + v);
         })() : void 0;
         return v;
       })();
@@ -1766,7 +1766,7 @@ require.define("/src/class.js",function(require,module,exports,__dirname,__filen
   Class.prototype.classHeader = function () {
     var _this = this;
     var dst_tmpl;
-    dst_tmpl = "%className% = function () { %variableInitialization%};\n%className%.prototype = new %superClass%();";
+    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%};\n%className%.prototype = new %superClass%();";
     return _this.cacheparser("classHeader", function () {
       var className, superClass, variables, v_init;
       _this.optional(function () {
@@ -3264,7 +3264,7 @@ require.define("/src/littlesmallscript.js",function(require,module,exports,__dir
   LittleSmallscript.prototype.toJS = function () {
     var _this = this;
     var wrapTmpl, js, beautifyOption;
-    wrapTmpl = "(function () { \"use strict\"; %statement% }).call(this)";
+    wrapTmpl = "(function () { \"use strict\"; %statement% }).call(this);";
     (function () {
       return js = _this.templateapply(wrapTmpl, {
         "statement": _this.statement()

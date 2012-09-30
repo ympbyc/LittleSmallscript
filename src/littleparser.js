@@ -104,10 +104,10 @@
       var v;
       v = _this.regex(new RegExp("^[a-zA-Z_$][a-zA-Z0-9_$]*"));
       return (v === "self") ? ((function () {
-        return "this";
+        return "_this";
       }))() : (function () {
         _this.instanceVariableP(v) ? (function () {
-          return v = ("this." + v);
+          return v = ("_this." + v);
         })() : void 0;
         return v;
       })();

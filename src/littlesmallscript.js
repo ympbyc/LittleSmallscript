@@ -55,7 +55,7 @@
   LittleSmallscript.prototype.toJS = function () {
     var _this = this;
     var wrapTmpl, js, beautifyOption;
-    wrapTmpl = "(function () { \"use strict\"; %statement% }).call(this)";
+    wrapTmpl = "(function () { \"use strict\"; %statement% }).call(this);";
     (function () {
       return js = _this.templateapply(wrapTmpl, {
         "statement": _this.statement()

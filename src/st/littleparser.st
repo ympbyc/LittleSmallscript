@@ -71,10 +71,10 @@ LittleParser dot:#variable method:[
 LittleParser dot:#extendedVariable method:[
   self cache: #extendedVariable parser:[| v |
     v := self regex: (RegExp new: '^[a-zA-Z_$][a-zA-Z0-9_$]*').
-    v === 'self' ifTrue: ['this']
+    v === 'self' ifTrue: ['_this']
     ifFalse: [
       "if it is instance variable, prefix it with 'this'"
-      (self instanceVariableP: v) ifTrue: [v := 'this.'+v]. 
+      (self instanceVariableP: v) ifTrue: [v := '_this.'+v]. 
       v
     ]
   ]

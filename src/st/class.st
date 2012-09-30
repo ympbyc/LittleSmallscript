@@ -7,7 +7,8 @@ Class := Packrat subclass
 "Animal subclass: #Snake variables: #(#name #colour #awake)"
 Class dot:#classHeader method: [| dst_tmpl |
   dst_tmpl := 
-'%className% = function () { %variableInitialization%};
+'var %className%;
+%className% = function () { %variableInitialization%};
 %className%.prototype = new %superClass%();'.
   self cache: #classHeader parser: [| className superClass variables v_init |
     self optional: [self chr: '+']. "LSt compatibility"

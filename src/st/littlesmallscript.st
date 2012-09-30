@@ -53,7 +53,7 @@ LittleSmallscript dot:#onError method:[:err| | line rest token |
 ]
 .
 LittleSmallscript dot:#toJS method:[| wrapTmpl js beautifyOption |
-  wrapTmpl := '(function () { \"use strict\"; %statement% }).call(this)'.
+  wrapTmpl := '(function () { \"use strict\"; %statement% }).call(this);'.
   [
     js := self template: wrapTmpl apply: #{#statement: self statement}
   ] tryCatch: [self onError].
