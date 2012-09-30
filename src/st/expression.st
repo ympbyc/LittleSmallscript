@@ -39,11 +39,16 @@ Expression dot:#cascade method:[| tmpl |
       self notFollowedBy: @semicolon.
       se
     ], [| conti |
-      conti := self many: [
+      conti := self many: [| mes |
         self skipSpace.
         self semicolon.
         self skipSpace.
-        '_receiver' + (self continuation at: #js) + ';'
+        mes := self continuation.
+        (optimization@optimizationAvailable value: mes@methodName)
+        ifTrue:[
+          optimization@optimize value: '_receiver' value: mes@methodName value: mes@args
+        ]
+        ifFalse: ['_receiver' + (mes at: #js) + ';']
       ].
       self template: tmpl apply: #{
         #simpleExpression:se 
@@ -142,8 +147,8 @@ Expression dot:#primary method:[
       @literal,
       @block,
       @primitive,
-      [self between: [self chr: '(']
-        and: [self chr: ')']
+      [self between: [self chr: '('. self skipSpace]
+        and: [self skipSpace. self chr: ')']
         accept: @cascade
       ]
     )

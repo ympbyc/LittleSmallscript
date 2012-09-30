@@ -239,6 +239,13 @@
     test(lss("[] tryCatch: []").primaryReceiver(), "(function () {  })", "primaryReceiver04");
     //primitive
     test(lss("<alert(1)>").primaryReceiver(), "alert(1)", "primitive01");
+
+    //optimization in cascade
+    test(
+      lss("Object new ; at:#a put:1 ; at:#b put: 2").cascade(),
+      "(function () { var _receiver = new Object(); _receiver.a = 1;_receiver.b = 2; return _receiver;  })()",
+      "cascade optimization"
+    );
     
   })();
 
