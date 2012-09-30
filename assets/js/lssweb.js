@@ -53,7 +53,7 @@ $(function () {
       js = new LittleSmallscript(txt, {prettyprint: true, optimization: true}).toJS();
     } catch (err) {
       $errorWrp.show();
-      $error.text(err.message||err.type||"Error");
+      $error.text((err.message||err.type||"Error").slice(0,30));
       if (err.partialjs) jQ.text(err.partialjs);
     }
     jQ.text(js);
