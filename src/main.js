@@ -3,7 +3,7 @@
 (function () {
   'use strict';
 
-  var LittleSmallscript, fs, optimist, argv, readline, rl;
+  var LittleSmallscript, fs, optimist, argv, readline, rl, help;
   
   LittleSmallscript = require("./littlesmallscript").LittleSmallscript;
   
@@ -12,6 +12,8 @@
   optimist = require('optimist');
   argv = optimist
       .usage('node littlesmallscript')
+      .alias('h', 'help')
+      .describe('h', 'show help message')
       .alias('c', 'compile')
       .describe('c', 'compile to JavaScript and save as .js files')
       .alias('i', 'interactive')
@@ -43,11 +45,22 @@
     });
   }
 
+  help = 
+"\n \
+Usage: littlesmallscript [options] path/to/script.st\n\n \
+-c, --compile      compile to JavaScript and save as .js files\n \
+-i, --interactive  run an interactive LittleSmallscript REPL\n \
+-h, --help         display this help message\n \
+-p, --print        print out the compiled JavaScript\n \
+";
+
+  if (argv.h) return console.log(help);
+
   if (argv.i) return interactiveShell();
   
   return (function () {
     var fileName = argv.c || argv.p;
-    if (! fileName) return console.log("file name have to be specified with -c or -p");
+    if (! fileName) return console.log(help);
     return fs.readFile(fileName, 'utf8', function (err, lssString) {
       if (err) throw err;
       try {
