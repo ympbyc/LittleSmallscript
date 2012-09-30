@@ -319,9 +319,9 @@ Object new ; at: 'a' put: 1 ; at: 'b' put: 2 ; at: 'c' put: 3
             <pre class="prettyprint lang-js">
 (function () {
   var _receiver = new Object();
-  _receiver.atput("a", 1);
-  _receiver.atput("b", 2);
-  _receiver.atput("c", 3);
+  _receiver.a = 1;
+  _receiver.b = 2;
+  _receiver.c = 3;
   return _receiver;
 })();
             </pre>
