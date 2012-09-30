@@ -1,24 +1,25 @@
-| Packrat optimization Expression |
-Packrat := <require('./packrat')> dot: #Packrat
+| Packrat optimization |
+Packrat := <require('./packrat')> at: #Packrat
 .
 optimization := <require('./optimization')>
 .
-Expression := Packrat subclass
+Packrat subclass:#Expression variables:#()
 .
-Expression dot:#expression method:[| tmpl |
+!Expression
+expression | tmpl |
   tmpl := '%assignments%%cascade%'.
-  self cache:#expression parser:[
+  self cache:#expression aParser:[
     | assignments cascade |
-    assignments := self optional: @assignments.
+    assignments := self optional: [self assignments].
     cascade := self cascade.
     self template: tmpl apply: #{
       #assignments:assignments #cascade:cascade
     }
   ]
-]
-.
-Expression dot:#assignments method:[
-  self cache:#assignments parser:[
+!.
+!Expression
+assignments 
+  self cache:#assignments aParser:[
     self many: [| variable |
       variable := self extendedVariable.
       self skipSpace.
@@ -27,16 +28,16 @@ Expression dot:#assignments method:[
       variable + ' = '
     ]
   ]
-]
-.
-Expression dot:#cascade method:[| tmpl |
+!.
+!Expression
+cascade | tmpl |
   tmpl := 
     '(function () { var _receiver = %simpleExpression%; %body% return _receiver;  })()'.
-  self cache:#cascade parser:[| se |
+  self cache:#cascade aParser:[| se |
     se := self simpleExpression.
     self try_: #([
       self skipSpace.
-      self notFollowedBy: @semicolon.
+      self notFollowedBy: [self semicolon].
       se
     ], [| conti |
       conti := self many: [| mes |
@@ -44,9 +45,9 @@ Expression dot:#cascade method:[| tmpl |
         self semicolon.
         self skipSpace.
         mes := self continuation.
-        (optimization@optimizationAvailable value: mes@methodName)
+        (optimization optimizationAvailable: (mes at:#methodName))
         ifTrue:[
-          optimization@optimize value: '_receiver' value: mes@methodName value: mes@args
+          optimization op: '_receiver' ti: (mes at:#methodName) mize: (mes at:#args)
         ]
         ifFalse: ['_receiver' + (mes at: #js) + ';']
       ].
@@ -56,42 +57,41 @@ Expression dot:#cascade method:[| tmpl |
       }
     ])
   ]
-]
-.
-Expression dot:#simpleExpression method:[:allowedParsers |
-  self cache:#simpleExpression parser:[| receiver injection |
+!.
+!Expression
+simpleExpression: allowedParsers
+  self cache:#simpleExpression aParser:[| receiver injection |
     receiver := injection := self primaryReceiver.
     self many:[| mes ret |
       mes := self continuation: allowedParsers.
 
       "optimize if optimization is available"
-      (optimization@optimizationAvailable value: mes@methodName)
+      (optimization optimizationAvailable: (mes at:#methodName))
         ifTrue: [
-          injection := optimization@optimize value: injection value: mes@methodName value: mes@args
+          injection := optimization op: injection ti: (mes at:#methodName) mize: (mes at:#args)
         ]
         ifFalse:[
-          mes@wrapMe 
-            ifTrue: [injection := '(' + injection + mes@js + ')']
-            ifFalse: [injection += mes@js]
+          (mes at:#wrapMe)
+            ifTrue: [injection := '(' + injection + (mes at:#js) + ')']
+            ifFalse: [injection += (mes at:#js)]
         ]
     ].
     injection
   ]
-]
-.
-Expression dot:#continuation method:[:allowedParsers |
-  self cache:#continuation parser:[
+!.
+!Expression
+continuation: allowedParsers
+  self cache:#continuation aParser:[
     allowedParsers === undefined ifTrue: [
-      allowedParsers := #(
-        @keywordMessage,
-        @binaryMessage,
-        @unaryMessage)].
+      allowedParsers := #([self keywordMessage],
+        [self binaryMessage],
+        [self unaryMessage])].
     self try_: allowedParsers
   ]
-]
-.
-Expression dot:#keywordMessage method:[
-  self cache:#keywordMessage parser:[| methodName args |
+!.
+!Expression
+keywordMessage 
+  self cache:#keywordMessage aParser:[| methodName args |
     methodName := ''.
     args := #().
     self many1: [
@@ -99,7 +99,7 @@ Expression dot:#keywordMessage method:[
       methodName += (self keywordSelector rep:':' lace:'').
       self skipSpace.
       "unary and binary messages are ranked higher"
-      args push: (self simpleExpression: #(@binaryMessage, @unaryMessage)).
+      args push: (self simpleExpression: #([self binaryMessage], [self unaryMessage])).
       self skipSpace
     ].
     #{
@@ -109,15 +109,15 @@ Expression dot:#keywordMessage method:[
       #args: args
     }
   ]
-]
-.
-Expression dot:#binaryMessage method:[
-  self cache:#binaryMessage parser:[| operator argument |
+!.
+!Expression
+binaryMessage 
+  self cache:#binaryMessage aParser:[| operator argument |
     self skipSpace.
     operator := self operator.
     self skipSpace.
     "unary messages are ranked higher"
-    argument := self simpleExpression: #(@unaryMessage).
+    argument := self simpleExpression: #([self unaryMessage]).
     #{
       #js: ' ' + operator + ' ' + argument,
       #wrapMe: true,
@@ -125,10 +125,10 @@ Expression dot:#binaryMessage method:[
       #args: #(argument)
     }
   ]
-]
-.
-Expression dot:#unaryMessage method:[
-  self cache:#unaryMessage parser:[| unarySelector |
+!.
+!Expression
+unaryMessage 
+  self cache:#unaryMessage aParser:[| unarySelector |
     self skipSpace.
     unarySelector := self unarySelector.
     #{
@@ -138,45 +138,45 @@ Expression dot:#unaryMessage method:[
       #args: #()
     }
   ]
-]
-.
-Expression dot:#primary method:[
-  self cache:#primary parser:[
+!.
+!Expression
+primary 
+  self cache:#primary aParser:[
     self try_: #(
-      @extendedVariable,
-      @literal,
-      @block,
-      @primitive,
+      [self extendedVariable],
+      [self literal],
+      [self block],
+      [self primitive],
       [self between: [self chr: '('. self skipSpace]
         and: [self skipSpace. self chr: ')']
-        accept: @cascade
+        accept: [self cascade]
       ]
     )
   ]
-]
-.
-Expression dot:#primaryReceiver method:[
-  self cache:#primaryReceiver parser:[
+!.
+!Expression
+primaryReceiver 
+  self cache:#primaryReceiver aParser:[
     self try_: #([| num |
       num := self numberLiteral.
       self followedBy: [
-        self try_: #(@keywordMessage, @unaryMessage)
+        self try_: #([self keywordMessage], [self unaryMessage])
       ].
       '(' + num + ')'
     ], [
       self followedBy: [
         self block.
         self skipSpace.
-        self try_: #(@keywordMessage, @unaryMessage)
+        self try_: #([self keywordMessage], [self unaryMessage])
       ].
       '(' + self block + ')'
     ],
-    @primary)
+    [self primary])
   ]
-]
-.
-Expression dot:#primitive method:[
-  self cache:#primitive parser:[
+!.
+!Expression
+primitive 
+  self cache:#primitive aParser:[
     self skipSpace.
     self between: [
       self chr: '<'.
@@ -184,13 +184,13 @@ Expression dot:#primitive method:[
       '<'
     ] and: [
       self chr: '>'
-    ] accept: @anyChar
+    ] accept: [self anyChar]
   ]
-]
-.
-Expression dot:#operator method:[| p |
+!.
+!Expression
+operator | p |
   p := [:str | [self string: str]].
-  self cache:#operator parser:[| op |
+  self cache:#operator aParser:[| op |
     self skipSpace.
     op := self try_: #(
       p value: '+=',
@@ -213,8 +213,7 @@ Expression dot:#operator method:[| p |
       p value: '||'
     )
   ]
-]
-.
-exports dot: #Expression put: Expression
+!.
+exports at: #Expression put: Expression
 .
 Expression

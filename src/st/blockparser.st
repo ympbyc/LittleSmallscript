@@ -1,37 +1,46 @@
-| Packrat BlockParser |
-Packrat := <require('./packrat')> dot: #Packrat
+| Packrat |
+Packrat := <require('./packrat')> at: #Packrat
 .
-BlockParser := Packrat subclass
+Packrat 
+  subclass:#Block 
+  variables:#()
 .
-BlockParser dot:#block method: [| dst_tmpl |
+!Block
+block | dst_tmpl |
   dst_tmpl := 'function (%parameters%) { %body% }'.
-  self cache: #block parser: [| parameters body |
+  self cache: #block aParser: [| parameters body |
     self blockStart.
     parameters := self blockHead.
-    body := self optional: @statement.
+    body := self optional: [self statement].
     self blockEnd.
-    self template: dst_tmpl apply: #{#parameters:parameters #body:body}]]
-.
-BlockParser dot: #blockParameters method: [
-  self cache: #blockParameters parser: [| vars |
+    self template: dst_tmpl apply: #{#parameters:parameters #body:body}
+  ]
+!.
+!Block
+blockParameters
+  self cache: #blockParameters aParser: [| vars |
     vars := ''.
     self skipSpace.
     self many: [
       self colon.
       vars += (self variable + ', ').
-      self skipSpace].
-    vars@slice value: 0 value: -2]]
-.
-BlockParser dot: #blockHead method: [
-  self cache: #blockHead parser: [
+      self skipSpace
+    ].
+    vars sli: 0 ce: -2
+  ]
+!.
+!Block
+blockHead
+  self cache: #blockHead aParser: [
     self optional: [|params|
       self skipSpace.
       params := self blockParameters.
-      params@length > 0 ifTrue: [
-        self verticalBar].
+      params size > 0 ifTrue: [ self verticalBar ].
       self skipSpace.
-      params]]]
-.
-exports dot: #BlockParser put: BlockParser
+      params
+    ]
+  ]
+!.
+exports at: #BlockParser put: BlockParser
 .
 BlockParser

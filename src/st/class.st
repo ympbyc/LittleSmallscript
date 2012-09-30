@@ -1,16 +1,22 @@
 "class definition syntax"
-| Packrat Class |
-Packrat := <require('./packrat')> dot: #Packrat
+| Packrat |
+Packrat := <require('./packrat')> at: #Packrat
 .
-Class := Packrat subclass
+Packrat 
+  subclass: #Class
+  variables: #(
+    #instanceVariables
+    #currentClass
+)
 .
 "Animal subclass: #Snake variables: #(#name #colour #awake)"
-Class dot:#classHeader method: [| dst_tmpl |
+!Class
+classHeader | dst_tmpl |
   dst_tmpl := 
 'var %className%;
 %className% = function () { %variableInitialization%};
 %className%.prototype = new %superClass%();'.
-  self cache: #classHeader parser: [| className superClass variables v_init |
+  self cache: #classHeader aParser: [| className superClass variables v_init |
     self optional: [self chr: '+']. "LSt compatibility"
     superClass := self variable.
     self skipSpace.
@@ -21,9 +27,9 @@ Class dot:#classHeader method: [| dst_tmpl |
     self string: 'variables:'.
     self skipSpace.
     variables := self instanceVariableArray.
-    @instanceVariables at: className put: #(). "save variables for this class"
+    instanceVariables at: className put: #(). "save variables for this class"
     v_init := variables inject: '' into: [:a :b |
-      (@instanceVariables at: className) push: a.
+      (instanceVariables at: className) push: a.
       b + 'this.' + a + ' = null; '
     ].
     self template: dst_tmpl apply: #{
@@ -32,11 +38,11 @@ Class dot:#classHeader method: [| dst_tmpl |
       #variableInitialization: v_init
     }
   ]
-]
-.
+!.
 "#(#a #b) -> ['a', 'b']"
-Class dot:#instanceVariableArray method:[
-  self cache:#instanceVariableArray parser:[| variables |
+!Class
+instanceVariableArray 
+  self cache:#instanceVariableArray aParser:[| variables |
     variables := #().
     self arrayStart.
     self many: [| v |
@@ -51,17 +57,16 @@ Class dot:#instanceVariableArray method:[
     self closeParen.
     variables
   ]
-]
-.
-Class dot:#variablableStringContent method:[
-  self cache:#variablableStringContent parser:[
+!.
+!Class
+variablableStringContent 
+  self cache:#variablableStringContent aParser:[
     self try_: #(
       [self chr: '#'. self variable],
-      [self between: @apostrophe and: @apostrophe accept: @variable]
+      [self between: [self apostrophe] and: [self apostrophe] accept: [self variable]]
     )
   ]
-]
-.
+!.
 "
 !Snake
 setName: name |
@@ -69,9 +74,10 @@ setName: name |
   ^ name
 !
 "
-Class dot:#instanceMethod method: [| method_tmpl |
+!Class
+instanceMethod | method_tmpl |
   method_tmpl := '%className%.prototype.%methodName% = function (%args%) { var _this = this; %methodBody% }'.
-  self cache:#instanceMethod parser:[| className methodHead methodBody |
+  self cache:#instanceMethod aParser:[| className methodHead methodBody |
     self exclamation.
     self skipSpace.
     className := self variable.
@@ -85,15 +91,15 @@ Class dot:#instanceMethod method: [| method_tmpl |
     self exclamation.
     self template: method_tmpl apply: #{
       #className: className
-      #methodName: methodHead@name
-      #args: methodHead@args
+      #methodName: methodHead at:#name
+      #args: methodHead at:#args
       #methodBody: methodBody
     }
   ]
-]
-.
-Class dot:#methodHead method:[
-  self cache:#methodHead parser:[| methodName args |
+!.
+!Class
+methodHead 
+  self cache:#methodHead aParser:[| methodName args |
     methodName := ''.
     args := #().
     self try_: #([
@@ -111,19 +117,18 @@ Class dot:#methodHead method:[
       #args: args join: ', '
     }
   ]
-]
-.
-Class dot:#setCurrentClass method:[:className |
-  @currentClass := className.
+!.
+!Class
+setCurrentClass: className
+  currentClass := className.
   className
-]
-.
-Class dot:#instanceVariableP method:[:variableName | |v|
-  (@currentClass !== null) 
-  && ((@instanceVariables at: @currentClass) !== undefined)
-  && (((@instanceVariables at: @currentClass) indexOf: variableName) > -1)
-]
-.
-exports@Class := Class
+!.
+!Class
+instanceVariableP: variableName |v|
+  (currentClass !== null) 
+  && ((instanceVariables at: currentClass) !== undefined)
+  && (((instanceVariables at: currentClass) indexOf: variableName) > -1)
+!.
+exports at:#Class put:Class
 .
 Class

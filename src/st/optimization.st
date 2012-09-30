@@ -1,5 +1,5 @@
 | LP template optimTmpl optimize canUseDotNotation optimizationAvailable |
-LP := <require('./littleparser')> dot: #LittleParser
+LP := <require('./littleparser')> at: #LittleParser
 .
 template := [:template :hashmap | | dest_str |
   dest_str := template.
@@ -36,7 +36,7 @@ optimTmpl := #{
 canUseDotNotation := [:str| | v identifier |
   v := LP new: str.
   [
-    identifier := v between: [v chr: '\"'] and: [v chr: '\"'] accept: v@variable
+    identifier := v between: [v chr: '\"'] and: [v chr: '\"'] accept: v at:#variable
   ] tryCatch: [].
   v getIndex === v getInputLength ifTrue: [identifier] ifFalse: [null]
 ]
@@ -72,5 +72,5 @@ optimizationAvailable := [:methodName |
   optimTmpl hasOwnProperty: methodName
 ]
 .
-exports@optimize := optimize.
-exports@optimizationAvailable := optimizationAvailable
+exports at:#optimize put:optimize.
+exports at:#optimizationAvailable put:optimizationAvailable
