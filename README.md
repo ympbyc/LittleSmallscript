@@ -12,59 +12,61 @@ MIT
 
 Direction:
 ----------
-* Support only the Javascript's primary classes like Array and String. 
-  * We will not build-in Little Smalltalk unique classes such as Bag, List, Bytearray, etc.
-* <del>The first version will not perform any optimization.</del> first version is complete.
+* The goal is to write Javascript in Smalltalk's syntax.
+* No class browser and stuff.
 * Some expressions are converted to javascripts syntax, for efficiency and readability.
-  * "(1 === 1) ifTrue: ['yay']" -> "(1 === 1).ifTrue(function () {return 'yay';})" -> "if (1 === 1) { 'yay'; }"
+  * "(1 === 1) ifTrue: ['yay']" -> "(1 === 1).ifTrue(function () {return 'yay';})" -> "(1 === 1) ? (function { 'yay'; })()"
   * #(1 2 3) at: 0 -> [1,2,3].at(0) -> [1,2,3][0]
 * Other message expressions are translated into method calling expression.
-  * reference: https://github.com/ympbyc/LittleSmallscript/blob/master/src/littlesmallmethods.js
   * "obj unary" becomes "obj.unary()". "array at: 1 put: 2" becomes "array.atput(1, 2)".
   * binary messages take js operators as selectors: ((x % 2) === 0)
 
 ToDo:
 -----
-* Self hosting
-  * v0.1.0 will be self-hosted.
-  * This is what I'm working on right now.
-* Class definition syntax
-  * v0.1.0 might have one or perhaps not
-* Error messages
-  * Accurate line number
-  * Failed token
-  * Stack traces
+* Error messages enhancement
+* Bundle standard methods into compiled js (issue#3)
+* !!!<strong>DOCUMENTS<strong>!!!
+* ^ syntax
 
 Current working example:
 ------------------------
 The language is changing every second so do example codes. Here's what works at least for now.
 
 ```smalltalk
-| Animal Snake sam |
-
-Animal := Object subclass.
-
-Animal method: [:name | 
-  this at: #name put: name
-] at: #init.
-
-Animal method: [:metres |
-  window alert: (@name + 'moved ' + metres + 'm.')
-] at: #move.
-
-Snake := Animal subclass.
-Snake method: [
-  "'super' is not supported yet"
+Object subclass:#Animal variables:#(#name)
+.
+!Animal
+move: metre
+  window alert: name + ' moved ' + metre + 'm.'
+!.
+Animal subclass:#Snake variables:#(#name)
+.
+!Snake
+init: aName
+  name := aName.
+  self
+!.
+!Snake
+crawl
   window alert: 'Slithering...'.
   self move: 5
-] at: #crawl.
-
-sam := Snake new: 'Sammy the Python'.
-sam crawl
+!.
+Snake new
+; init: 'Sammy the Python'
+; crawl
 ```
 
-Milestones:
+Versions:
 ----------
+
+23pm 30 Sep 2012
+
+v1.0.0  
+The first major version!  
+Every parser is now written in LittleSmallscript itself.  
+v1 is not backward compatible with v0.  
+Syntax for accessing instance variables has changed.  
+Class definition syntax has been added.  
 
 23pm 20 Sep 2012
 
