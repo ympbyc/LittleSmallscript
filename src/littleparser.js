@@ -65,7 +65,8 @@
   LittleParser.prototype.arrayStart = function () {
     var _this = this;
     return _this.cacheparser("arrayStart", function () {
-      return _this.string("#(");
+      _this.string("#(");
+      return _this.skipSpace();
     });
   };
   LittleParser.prototype.closeParen = function () {

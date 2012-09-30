@@ -1,74 +1,77 @@
 | Packrat LittleParser BlockParser Expression Statement Class LittleSmallscript mp |
-Packrat := <require('./packrat')> dot: #Packrat
+Packrat := <require('./packrat')> at: #Packrat
 .
-LittleParser := <require('./littleparser')> dot: #LittleParser
+LittleParser := <require('./littleparser')> at: #LittleParser
 .
-BlockParser := <require('./blockparser')> dot: #BlockParser
+BlockParser := <require('./blockparser')> at: #BlockParser
 .
-Expression := <require('./expression')> dot: #Expression
+Expression := <require('./expression')> at: #Expression
 .
-Statement := <require('./statement')> dot: #Statement
+Statement := <require('./statement')> at: #Statement
 .
 Class := <require('./class')> dot: #Class
 .
-LittleSmallscript := Packrat subclass
+Packrat 
+  subclass:#LittleSmallscript
+  variables:#(
+    #input
+    #index
+    #maxIndex
+    #options
+    #stackTrace
+)
 .
-LittleParser@prototype do:[:item:key|
-  LittleSmallscript@prototype at:key put:item
-]
-.
-BlockParser@prototype do:[:item:key|
-  LittleSmallscript@prototype at:key put:item
-]
-.
-Expression@prototype do:[:item:key|
-  LittleSmallscript@prototype at:key put:item
-]
-.
-Statement@prototype do:[:item:key|
-  LittleSmallscript@prototype at:key put:item
-]
-.
-Class@prototype do:[:item:key|
-  LittleSmallscript@prototype at:key put:item
-]
-.
-LittleSmallscript dot:#init method:[:input :options|
-  @input := input.
-  @index := 0.
-  @cache := #{}.
-  @options := options.
-  @instanceVariables := #{}.
-  @currentClass := null
-]
-.
-LittleSmallscript dot:#onError method:[:err| | line rest token |
-  [line := ((@input sub:0 string:@maxIndex) match:</\n/g>) size + 1]
+(LittleParser at:#prototype) do:[:item:key|
+  (LittleSmallscript at:#prototype) at:key put:item
+].
+(BlockParser at:#prototype) do:[:item:key|
+  (LittleSmallscript at:#prototype) at:key put:item
+].
+(Expression at:#prototype) do:[:item:key|
+  (LittleSmallscript at:#prototype) at:key put:item
+].
+(Statement at:#prototype) do:[:item:key|
+  (LittleSmallscript at:#prototype) at:key put:item
+].
+(Class at:#prototype) do:[:item:key|
+  (LittleSmallscript at:#prototype) at:key put:item
+].
+!LittleSmallscript
+initWithInput:text andOptions:opt
+  input := text.
+  index := 0.
+  cache := #{}.
+  options := opt.
+  instanceVariables := #{}.
+  currentClass := null
+!.
+!LittleSmallscript
+onError:err | line rest token |
+  [line := ((input sub:0 string:maxIndex) match:</\n/g>) size + 1]
   tryCatch: [line := 0].
-  rest := @input substring:@maxIndex.
+  rest := input substring:maxIndex.
   token := rest sub:0 string:(rest search:</[\.\s\t\n]|$/>).
   console log: 'Parse error on line '+line+'. Unexpected '+token+'.'.
   console log: '===================================================='
-  "console log: (@stackTrace)"
-]
-.
-LittleSmallscript dot:#toJS method:[| wrapTmpl js beautifyOption |
+  "console log: (stackTrace)"
+!.
+!LittleSmallscript
+toJS | wrapTmpl js beautifyOption |
   wrapTmpl := '(function () { \"use strict\"; %statement% }).call(this);'.
   [
     js := self template: wrapTmpl apply: #{#statement: self statement}
   ] tryCatch: [self onError].
-  @index < @input@length ifTrue: [@onError value: #{}].
+  index < input size ifTrue: [self onError: #{}].
   
   beautifyOption := #{
     #indent_size: 2
     #indent_char: ' '
     #jslint_happy: true
   }.
-  @options && @options@prettyprint ifTrue: [
+  options && (options at:#prettyprint) ifTrue: [
     <require('../../lib/beautify.js')> js_: js beautify: beautifyOption
   ] ifFalse: [js]
-]
-.
-exports@LittleSmallscript := LittleSmallscript
+!.
+exports at:#LittleSmallscript put:LittleSmallscript
 .
 LittleSmallscript

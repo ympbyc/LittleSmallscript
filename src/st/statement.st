@@ -1,13 +1,14 @@
-| Packrat Statement |
-Packrat := <require('./packrat')> dot: #Packrat
+| Packrat |
+Packrat := <require('./packrat')> at: #Packrat
 .
-Statement := Packrat subclass
+Packrat subclass: #Statement variables: #()
 .
-Statement dot:#statement method:[
-  self cache:#statement parser:[| ret vd |
+!Statement
+statement
+  self cache:#statement aParser:[| ret vd |
     ret := ''.
     self skipSpace.
-    vd := self optional: @variableDeclaration.
+    vd := self optional: [self variableDeclaration].
     vd !== null ifTrue:[ ret += vd ].
 
     self skipSpace.
@@ -16,7 +17,7 @@ Statement dot:#statement method:[
       self skipSpace.
       self chr: '.'.
       self skipSpace.
-      self followedBy: @statementable.
+      self followedBy: [self statementable].
 
       a + '; '
     ]).
@@ -26,20 +27,20 @@ Statement dot:#statement method:[
 
     ret
   ]
-]
-.
-Statement dot:#statementable method:[
-  self cache:#statementable parser:[
+!.
+!Statement
+statementable 
+  self cache:#statementable aParser:[
     self try_: #(
-      @classHeader,
-      @instanceMethod,
-      @expression
+      [self classHeader],
+      [self instanceMethod],
+      [self expression]
     )
   ]
-]
-.
-Statement dot:#variableDeclaration method:[
-  self cache:#variableDeclaration parser:[| ret |
+!.
+!Statement
+variableDeclaration 
+  self cache:#variableDeclaration aParser:[| ret |
     ret := 'var '.
     self skipSpace.
     self verticalBar.
@@ -51,8 +52,7 @@ Statement dot:#variableDeclaration method:[
     self verticalBar.
     ret
   ]
-]
-.
-exports dot:#Statement put: Statement
+!.
+exports at:#Statement put: Statement
 .
 Statement

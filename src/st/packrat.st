@@ -1,94 +1,105 @@
-| Packrat |
 <require('../littlesmallmethods')>
 .
-Number dot:#timesString method: [:str | | ret |
+!Number
+timesString: str | ret |
   ret := ''.
   self timesRepeat:[:i| ret += str].
   ret
-]
+!.
+Object 
+  subclass: #Packrat
+  variables: #(
+    #input
+    #index
+    #cache
+    #maxIndex
+    #logNest
+    #stackTrace
+  )
 .
-Packrat := Object subclass
-.
-Packrat dot:#init method:[:input |
-  @input := input.
-  @index := 0.
-  @cache := #{}.
-  @maxIndex := 0.
-  @logNest := -1.
-  @stackTrace := ''
-]
-.
-Packrat dot:#getIndex method:[
-  @index
-]
-.
-Packrat dot:#getInputLength method:[
-  @input@length
-]
-.
-"cache:parser:"
-Packrat dot:#cacheparser method:[:s :fn| | c slot logIndent |
-  fn := fn || [].
-  c := #{}.
-  
+!Packrat
+init: text
+  input      := text.
+  index      := 0.
+  cache      := #{}.
+  maxIndex   := 0.
+  logNest    := -1.
+  stackTrace := ''
+!.
+!Packrat
+getIndex
+  index
+!.
+!Packrat
+getInputLength
+  input size
+!.
+!Packrat
+cache: s aParser: fn | c slot logIndent |
+  "Save results of parsing at the index for efficiency"
+  fn := (fn !== undefined) ifTrue:[fn] ifFalse:[[]].
+  c  := #{}.
+
   "debug feature"
-  @logNest += 1.
-  logIndent := @logNest timesString: '  '.
-  @stackTrace += (logIndent + 'ENTER : ' + s + ' : ' + (@input substring: @index) + '\n').
+  logNest += 1.
+  logIndent := logNest timesString: '  '.
+  stackTrace += (logIndent + 'ENTER : ' + s + ' : ' + (input substring: index) + '\n').
   
-  [(@cache at: s) === undefined ifTrue: (@cache at: s put: #{})]tryCatch:[
-    @cache at: s put: #{}
+  [(cache at: s) === undefined ifTrue: (cache at: s put: #{})]tryCatch:[
+    cache at: s put: #{}
   ].
-  slot := (@cache at: s) at: @index.
+  slot := (cache at: s) at: index.
   (slot !== undefined) && (slot !== null) ifTrue: [
     c := slot.
-    @index := c@idx.
+    index := c at: #idx.
 
     "debug feature"
-    @index > @maxIndex ifTrue: [@maxIndex := @index]. "save max index for error message"
-    @stackTrace +=  (logIndent + 'CACHED: ' + s + ' : ' + c@fn + '\n').
-    @logNest -= 1.
+    index > maxIndex ifTrue: [maxIndex := index]. "save max index for error message"
+    stackTrace +=  (logIndent + 'CACHED: ' + s + ' : ' + c at: #fn + '\n').
+    logNest -= 1.
     
-    c@fn
+    c at: #fn
   ] ifFalse: [
     [
-      c@idx := @index.
-      c@fn := fn call: self.
-      (@cache at: s) at: c@idx put: #{#fn: c@fn, #idx: @index}.
+      c at:#idx put:index.
+      c at:#fn  put:(fn call: self).
+      (cache at: s) at: (c at:#idx) put: #{#fn: c at:#fn, #idx: index}.
       
       "debug feature"
-      @index > @maxIndex ifTrue: [@maxIndex := @index]. "save max index for error message"
-      @stackTrace += (logIndent + 'PASS  : ' + s + ' : ' + c@fn + '\n').
-      @logNest -= 1.
+      index > maxIndex ifTrue: [maxIndex := index]. "save max index for error message"
+      stackTrace += (logIndent + 'PASS  : ' + s + ' : ' + c at:#fn + '\n').
+      logNest -= 1.
 
-      c@fn
+      c at:#fn
     ] tryCatch: [:err|
-      (@cache at: s) at: c@idx put: null.
+      (cache at: s) at: (c at:#idx) put: null.
       
       "debug feature"
-      @stackTrace +=  (logIndent + 'FAIL  : ' + s + '\n').
-      @logNest -= 1.
+      stackTrace +=  (logIndent + 'FAIL  : ' + s + '\n').
+      logNest -= 1.
       
       self noParse
     ]
   ]
-]
-.
-Packrat dot:#noParse method:[
-  self error: ('Parse error at:' + @index)
-]
-.
-"one-of"
-Packrat dot:#try_ method:[:parsers| | ret i |
-  i := @index.
+!.
+!Packrat
+noParse
+  "throw an exception"
+  self error: ('Parse error at:' + index)
+!.
+!Packrat 
+try_: parsers | ret i |
+  "OK if one of the parser matches. Returns the first match."
+  i := index.
   parsers do: [:parser |
     ret === undefined ifTrue: [
-      [ret := parser call: self] tryCatch: [ @index := i ]]].
-  ret !== undefined ifTrue: [ret] ifFalse: [self noParse: #try_]
-]
-.
-Packrat dot:#sequence method:[:parsers| | ret i fail |
-  i := @index.
+      [ret := parser call: self] tryCatch: [ index := i ]]].
+  ret !== undefined ifTrue: [ret] ifFalse: [self noParse]
+!.
+!Packrat 
+sequence: parsers | ret i fail |
+  "OK if all the parsers match in order."
+  i := index.
   ret := ''.
   fail := false.
   parsers do: [:parser |
@@ -96,47 +107,52 @@ Packrat dot:#sequence method:[:parsers| | ret i fail |
       [
         ret += (parser call: self)
       ] tryCatch: [:err |
-        @index := i. "backtrack"
+        index := i. "backtrack"
         fail := true.
         self noParse
       ]]].
   fail ifFalse: [ret] ifTrue: [self noParse]
-]
-.
-Packrat dot:#optional method:[:parser | | ret i |
-  i := @index.
-  [ parser call: self ] tryCatch: [ @index := i. null ]
-]
-.
-Packrat dot:#followedBy method:[:parser| | f i |
-  f := true. i := @index.
+!.
+!Packrat
+optional: parser | ret i |
+  "Never fails. When not matched return an empty string."
+  i := index.
+  [ parser call: self ] tryCatch: [ index := i. null ]
+!.
+!Packrat
+followedBy: parser | f i |
+  "OK if the parser matches."
+  f := true. i := index.
   [ parser call: self. f := false ] tryCatch: [].
-  @index := i. "this method does not consume the input"
+  index := i. "this method does not consume the input"
   f ifTrue: [self noParse] ifFalse: [null]
-]
-.
-Packrat dot:#notFollowedBy method:[:parser| | f i |
-  f := false. i := @index.
+!.
+!Packrat
+notFollowedBy: parser | f i |
+  "OK if the parser does not match"
+  f := false. i := index.
   [ parser call: self. f := true ] tryCatch: [].
-  @index := i. "this method does not consume the input"
+  index := i. "this method does not consume the input"
   f ifTrue: [self noParse] ifFalse: [null]
-]
-.
-Packrat dot:#many method:[:parser | |a|
+!.
+!Packrat
+many: parser |a|
+  "Repeat until the parser fails. Return an empty string if no-match"
   self try_: #(
     [ self many1: [parser call: self] ],
     ['']
   )
-]
-.
-Packrat dot:#many1 method:[:parser | | v vs  |
+!.
+!Packrat
+many1: parser | v vs  |
+  "Same as many butrequires one or more matches"
   v := parser call: self.
   vs := self many: [ parser call: self ].
   v + vs
-]
-.
-"between:and:accept"
-Packrat dot:#betweenandaccept method:[:start :end :inbetween | | ret | 
+!.
+!Packrat
+between: start and: end accept: inbetween | ret |
+  "Match 'inbetween' wrapped with 'start' and 'end'"
   self sequence: #(
     start,
     [ret := self many: [
@@ -146,50 +162,57 @@ Packrat dot:#betweenandaccept method:[:start :end :inbetween | | ret |
     end
   ).
   ret
-]
-.
-Packrat dot:#anyChar method:[| c |
-  c := @input at: @index.
-  @index += 1.
+!.
+!Packrat
+anyChar | c |
+  "Any character"
+  c := input at: index.
+  index += 1.
   c !== undefined ifTrue: [c] ifFalse: [self noParse]
-]
-.
-Packrat dot:#satisfyChar method:[:fn | | c |
+!.
+!Packrat 
+satisfyChar: fn | c |
+  "Character that satisfies the parser given"
   c := self anyChar.
   ((fn value: c) !== undefined) ifTrue: [c] ifFalse: [self noParse]
-]
-.
-Packrat dot:#chr method:[:ch | | c |
+!.
+!Packrat
+chr: ch | c |
+  "Matches the given character"
   c := self anyChar.
   c === ch ifTrue: [c] ifFalse: [self noParse]
-]
-.
-Packrat dot:#string method:[:str |
-  (@input sub: @index string: (@index+str@length))
-    === str ifTrue: [@index += str@length. str] ifFalse: [self noParse]
-]
-.
-Packrat dot:#regex method:[:regex| | rc match |
-  rc := regex exec: (@input substring: @index).
+!.
+!Packrat
+string: str
+  "Matches the given string"
+  (input sub: index string: (index + str size))
+    === str ifTrue: [index += str size. str] ifFalse: [self noParse]
+!.
+!Packrat
+regex: regex | rc match |
+  "Matches the given regex"
+  rc := regex exec: (input substring: index).
   (rc isKindOf: Array) ifTrue: [
     match := rc at: 0 .
-    @index += match size.
+    index += match size.
     match
   ] ifFalse: [
     console log: #regexFalse.
     self noParse: #regex
   ]
-]
-.
-Packrat dot:#toParser method:[:str|
+!.
+!Packrat
+toParser: str
+  "Turn the string into parser"
   [self string: str]
-]
+!
 .
-Packrat dot:#p method:[:s |
+!Packrat
+p: s
+  "p"
   console log: s.
   s
-]
-.
-exports@Packrat := Packrat
+!.
+exports at: #Packrat put: Packrat
 .
 Packrat

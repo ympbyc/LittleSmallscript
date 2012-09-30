@@ -1,75 +1,82 @@
-| Packrat LittleParser |
-Packrat := <require('./packrat')> dot: #Packrat
+| Packrat |
+Packrat := <require('./packrat')> at: #Packrat
 .
-LittleParser := Packrat subclass
+Packrat 
+  subclass:#LittleParser
+  variables:#()
 .
-LittleParser dot:#space method:[
-  self cache: #space parser: [
+!LittleParser
+space
+  self cache: #space aParser: [
     self regex: (RegExp new: '^[\\s\\n\\t]+')
   ]
-]
-.
-LittleParser dot:#blockStart method: [
-  self cache: #blockStart parser: [self chr: '[']
-]
-.
-LittleParser dot:#blockEnd method:[
-  self cache: #blockEnd parser: [self chr: ']']
-]
-.
-LittleParser dot:#verticalBar method:[
-  self cache: #verticalBar parser: [self chr: '|']
-]
-.
-LittleParser dot:#colon method:[
-  self cache: #colon parser: [self chr: ':']
-]
-.
-LittleParser dot:#semicolon method:[
-  self cache: #semicolon parser: [self chr: ';']
-]
-.
-LittleParser dot:#assignmentArrow method:[
-  self cache: #assignmentArrow parser: [
+!.
+!LittleParser
+blockStart
+  self cache: #blockStart aParser: [self chr: '[']
+!.
+!LittleParser
+blockEnd
+  self cache: #blockEnd aParser: [self chr: ']']
+!.
+!LittleParser
+verticalBar
+  self cache: #verticalBar aParser: [self chr: '|']
+!.
+!LittleParser
+colon
+  self cache: #colon aParser: [self chr: ':']
+!.
+!LittleParser 
+semicolon
+  self cache: #semicolon aParser: [self chr: ';']
+!.
+!LittleParser
+assignmentArrow
+  self cache: #assignmentArrow aParser: [
     self try_: #(
       [self string: ':='],
       [self string: '<-']
     )
   ]
-]
-.
-LittleParser dot:#apostrophe method:[
-  self cache: #apostrophe parser: [self chr: <"'">]
-]
-.
-LittleParser dot:#arrayStart method: [
-  self cache: #arrayStart parser: [self string: '#(']
-]
-.
-LittleParser dot:#closeParen method: [
-  self cache: #closeParen parser: [self chr: ')']
-]
-.
-LittleParser dot:#hashStart method:[
-  self cache:#hashStart parser:[self string: '#{']
-]
-.
-LittleParser dot:#hashEnd method: [
-  self cache: #hashEnd parser: [self chr: '}']
-]
-.
-LittleParser dot:#exclamation method:[
-  self cache:#exclamation parser:[self chr: '!']
-]
-.
-LittleParser dot:#variable method:[
-  self cache: #variable parser: [
+!.
+!LittleParser
+apostrophe
+  self cache: #apostrophe aParser: [self chr: <"'">]
+!.
+!LittleParser
+arrayStart
+  self cache: #arrayStart aParser: [
+    self string: '#('.
+    self skipSpace
+  ]
+!.
+!LittleParser
+closeParen
+  self cache: #closeParen aParser: [self chr: ')']
+!.
+!LittleParser
+hashStart
+  self cache: #hashStart aParser:[self string: '#{']
+!.
+!LittleParser
+hashEnd
+  self cache: #hashEnd aParser: [self chr: '}']
+!.
+!LittleParser
+exclamation
+  self cache:#exclamation aParser:[self chr: '!']
+!.
+!LittleParser
+variable
+  self cache: #variable aParser: [
     self regex: (RegExp new: '^[a-zA-Z_$][a-zA-Z0-9_$]*')
   ]
-]
+!
 .
-LittleParser dot:#extendedVariable method:[
-  self cache: #extendedVariable parser:[| v |
+!LittleParser
+extendedVariable
+  self cache: #extendedVariable aParser:[| v |
     v := self regex: (RegExp new: '^[a-zA-Z_$][a-zA-Z0-9_$]*').
     v === 'self' ifTrue: ['_this']
     ifFalse: [
@@ -78,81 +85,81 @@ LittleParser dot:#extendedVariable method:[
       v
     ]
   ]
-]
-.
-LittleParser dot:#keywordSelector method:[
-  self cache:#keywordSelector parser:[
-    self sequence: #(@variable, @colon)
+!.
+!LittleParser
+keywordSelector
+  self cache:#keywordSelector aParser:[
+    self sequence: #([self variable], [self colon])
   ]
-]
-.
-LittleParser dot:#unarySelector method:[
-  self cache:#unarySelector parser:[| sel |
-    sel := self sequence: #(@variable).
-    self notFollowedBy: @colon.
+!.
+!LittleParser
+unarySelector
+  self cache:#unarySelector aParser:[| sel |
+    sel := self sequence: #([self variable]).
+    self notFollowedBy: [self colon].
     sel
   ]
-]
-.
-LittleParser dot:#explicitReturn method:[
-  self cache:#explicitReturn parser:[
+!.
+!LittleParser
+explicitReturn
+  self cache:#explicitReturn aParser:[
     self chr: '^'
   ]
-]
-.
-LittleParser dot:#commentQuote method:[
-  self cache: #commentQuote parser:[
+!.
+!LittleParser
+commentQuote
+  self cache: #commentQuote aParser:[
     self chr: '\"'
   ]
-]
-.
-LittleParser dot:#skipSpace method:[
-  self cache:#skipSpace parser:[
-    self optional: @space.
+!.
+!LittleParser
+skipSpace
+  self cache:#skipSpace aParser:[
+    self optional: [self space].
     self many: [
-      self between: @commentQuote and: @commentQuote accept: @anyChar.
-      self optional: @space
+      self between: [self commentQuote] and: [self commentQuote] accept: [self anyChar].
+      self optional: [self space]
     ]
   ]
-]
-.
-LittleParser dot:#literal method:[
-  self cache: #literal parser: [
+!.
+!LittleParser
+literal
+  self cache: #literal aParser: [
     self try_: #(
-      @numberLiteral,
-      @stringLiteral,
-      @symbolLiteral,
-      @arrayLiteral,
-      @hashLiteral,
-      @block
+      [self numberLiteral],
+      [self stringLiteral],
+      [self symbolLiteral],
+      [self arrayLiteral],
+      [self hashLiteral],
+      [self block]
     )
   ]
-]
-.
-LittleParser dot:#numberLiteral method:[
-  self cache: #numberLiteral parser: [
+!.
+!LittleParser
+numberLiteral
+  self cache: #numberLiteral aParser: [
     self regex: (RegExp new: '^-?[0-9]+(\\.?[0-9]+)?')
   ]
-]
-.
-LittleParser dot:#stringLiteral method:[
-  self cache: #stringLiteral parser: [
+!.
+!LittleParser
+stringLiteral
+  self cache: #stringLiteral aParser: [
     '\"' + (self 
-          between: @apostrophe
-          and: @apostrophe 
-          accept: @anyChar) + '\"'
+          between: [self apostrophe]
+          and: [self apostrophe] 
+          accept: [self anyChar]) + '\"'
   ]
-]
-.
-LittleParser dot:#symbolLiteral method:[
-  self cache: #symbolLiteral parser:[
+!.
+!LittleParser
+symbolLiteral
+  self cache: #symbolLiteral aParser:[
     self chr: '#'.
     '\"' + self variable + '\"'
   ]
-]
-.
-LittleParser dot:#arrayLiteral method:[|args|
-  self cache:#arrayLiteral parser:[
+!.
+!LittleParser
+arrayLiteral |args|
+  self cache:#arrayLiteral aParser:[
     args := #().
     self arrayStart.
     self many: [
@@ -164,16 +171,16 @@ LittleParser dot:#arrayLiteral method:[|args|
     self closeParen.
     '[' + (args join: ', ') + ']'
   ]
-]
-.
-LittleParser dot:#hashLiteral method:[
-  self cache:#hashLiteral parser:[| ret |
+!.
+!LittleParser
+hashLiteral
+  self cache:#hashLiteral aParser:[| ret |
     ret := ''.
     self hashStart.
     ret += '{'.
     ret += ((self many: [| key val |
       self skipSpace.
-      key := self try_: #(@stringLiteral, @numberLiteral, @symbolLiteral).
+      key := self try_: #([self stringLiteral], [self numberLiteral], [self symbolLiteral]).
       self skipSpace.
       self colon.
       self skipSpace.
@@ -187,17 +194,16 @@ LittleParser dot:#hashLiteral method:[
     ret += '}'.
     ret
   ]
-]
-.
-LittleParser dot:#templateapply method:[:template :hashmap | | dest_str |
+!.
+!LittleParser
+template: template apply: hashmap | dest_str |
   dest_str := template.
   hashmap do: [:it :key |
     (it === null) || (it === undefined) ifTrue: [it := ''].
     dest_str := dest_str rep: (RegExp ne: '%'+key+'%' w: 'g') lace: it
   ].
   dest_str
-]
-.
-exports@LittleParser := LittleParser
+!.
+exports at: #LittleParser put: LittleParser
 .
 LittleParser
