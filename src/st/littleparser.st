@@ -43,7 +43,10 @@ LittleParser dot:#apostrophe method:[
 ]
 .
 LittleParser dot:#arrayStart method: [
-  self cache: #arrayStart parser: [self string: '#(']
+  self cache: #arrayStart parser: [
+    self string: '#('.
+    self skipSpace.
+  ]
 ]
 .
 LittleParser dot:#closeParen method: [
