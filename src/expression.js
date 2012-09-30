@@ -52,10 +52,16 @@
       }, function () {
         var conti;
         conti = _this.many(function () {
+          var mes;
           _this.skipSpace();
           _this.semicolon();
           _this.skipSpace();
-          return (("_receiver" + _this.continuation()["js"]) + ";");
+          mes = _this.continuation();
+          //optimize if optimization is available
+          if (optimization.optimizationAvailable(mes.methodName)) {
+            return optimization.optimize("_receiver", mes.methodName, mes.args) + ';';
+          }
+          return (("_receiver" + mes["js"]) + ";");
         });
         return _this.templateapply(tmpl, {
           "simpleExpression": se,
@@ -150,8 +156,10 @@
     return _this.cacheparser("primary", function () {
       return _this.try_([_this.extendedVariable, _this.literal, _this.block, _this.primitive, function () {
         return _this.betweenandaccept((function () {
-          return _this.chr("(");
+          _this.chr("(");
+          return _this.skipSpace();
         }), (function () {
+          _this.skipSpace();
           return _this.chr(")");
         }), _this.cascade);
       }]);
