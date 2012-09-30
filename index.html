@@ -146,31 +146,28 @@ cubes := list collect: [:num | math cube: num]
           </div>
           <div class="compare-right">
             <pre class="prettyprint lang-js">
-(function () {
-  "use strict";
-  var number, opposite, square, list, math, cubes;
-  number = 42;
-  opposite = true;
-  number = 42;
-  opposite = true;
-  number = opposite ? (function () {
-    return -42;
-  })() : void 0;
-  square = function (x) {
-    return (x * x);
-  };
-  list = [1, 2, 3, 4, 5];
-  math = {
-    "root": Math[sqrt],
-    "square": square,
-    "cube": function (x) {
-      return (square(x) * x);
-    }
-  };
-  return cubes = list.collect(function (num) {
-    return math.cube(num);
-  });
-}).call(this)
+var number, opposite, square, list, math, cubes;
+number = 42;
+opposite = true;
+number = 42;
+opposite = true;
+number = opposite ? (function () {
+  return -42;
+})() : void 0;
+square = function (x) {
+  return (x * x);
+};
+list = [1, 2, 3, 4, 5];
+math = {
+  "root": Math[sqrt],
+  "square": square,
+  "cube": function (x) {
+    return (square(x) * x);
+  }
+};
+cubes = list.collect(function (num) {
+  return math.cube(num);
+});
             </pre>
           </div>
         </div><!-- /compare-codes -->
@@ -579,7 +576,6 @@ counter = 0;
         <div class="compare-codes">
           <div class="compare-left">
             <pre class="prettyprint">
-| Animal Snake |
 Object subclass:#Animal variables:#(#name)
 .
 !Animal
@@ -605,38 +601,36 @@ Snake new
           </div>
           <div class="compare-right">
             <pre class="prettyprint lang-js">
+var Animal;
+Animal = function () {
+  this.name = null;
+};
+Animal.prototype = new Object();;
+Animal.prototype.move = function (metre) {
+  var _this = this;
+  return window.alert((((_this.name + " moved ") + metre) + "m."));
+};
+var Snake;
+Snake = function () {
+  this.name = null;
+};
+Snake.prototype = new Animal();;
+Snake.prototype.init = function (aName) {
+  var _this = this;
+  _this.name = aName;
+  return _this;
+};
+Snake.prototype.crawl = function () {
+  var _this = this;
+  window.alert("Slithering...");
+  return _this.move(5);
+};
 (function () {
-  "use strict";
-  var Animal, Snake;
-  Animal = function () {
-    this.name = null;
-  };
-  Animal.prototype = new Object();;
-  Animal.prototype.move = function (metre) {
-    var _this = this;
-    return window.alert((((this.name + " moved ") + metre) + "m."));
-  };
-  Snake = function () {
-    this.name = null;
-  };
-  Snake.prototype = new Animal();;
-  Snake.prototype.init = function (aName) {
-    var _this = this;
-    this.name = aName;
-    return this;
-  };
-  Snake.prototype.crawl = function () {
-    var _this = this;
-    window.alert("Slithering...");
-    return this.move(5);
-  };
-  return (function () {
-    var _receiver = new Snake();
-    _receiver.init("Sammy the Python");
-    _receiver.crawl();
-    return _receiver;
-  })();
-}).call(this);
+  var _receiver = new Snake();
+  _receiver.init("Sammy the Python");
+  _receiver.crawl();
+  return _receiver;
+})();
             </pre>
           </div>
         </div><!-- /compare-codes -->
