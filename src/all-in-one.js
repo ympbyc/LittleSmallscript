@@ -3287,6 +3287,7 @@ require.define("/src/littlesmallscript.js",function(require,module,exports,__dir
     })();
   };
   exports.LittleSmallscript = LittleSmallscript;
+  window.LittleSmallscript = LittleSmallscript;
   return LittleSmallscript;
 }).call(this);
 });
