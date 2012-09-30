@@ -1,0 +1,27 @@
+{
+  "name": "littlesmallscript",
+  "preferGlobal": "true",
+  "version": "1.0.0",
+  "author": "Minori Yamashita <ympbyc@gmail.com>",
+  "description": "A simple Smalltalk to js translator.",
+  "bin" : { 
+    "littlesmallscript" : "./src/main.js" 
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ympbyc/LittleSmallscript"
+  },
+  "keywords": [
+    "smalltalk",
+    "compiler",
+    "littlesmallscript",
+    "little"
+  ],
+  "dependencies": {
+    "optimist": "0.3.x"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.6"
+  }
+}
