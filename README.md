@@ -15,11 +15,11 @@ Direction:
 * The goal is to write Javascript in Smalltalk's syntax.
 * No class browser and stuff.
 * Some expressions are converted to javascripts syntax, for efficiency and readability.
-  * "(1 === 1) ifTrue: ['yay']" -> "(1 === 1).ifTrue(function () {return 'yay';})" -> "(1 === 1) ? (function { 'yay'; })()"
+  * "(1 === 1) ifTrue: ['yay']" -> "(1 === 1).ifTrue(function () {return 'yay';})" -> "(1 === 1) ? (function { 'yay'; })() : void 0;"
   * #(1 2 3) at: 0 -> [1,2,3].at(0) -> [1,2,3][0]
 * Other message expressions are translated into method calling expression.
-  * "obj unary" becomes "obj.unary()". "array at: 1 put: 2" becomes "array.atput(1, 2)".
-  * binary messages take js operators as selectors: ((x % 2) === 0)
+  * "obj unary" becomes "obj.unary()". "array inject:1 into:[]" becomes "array.injectinto(1, function () {})".
+  * binary messages take js operators as selectors: x % 2 === 0
 
 ToDo:
 -----
