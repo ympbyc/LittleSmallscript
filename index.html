@@ -176,29 +176,32 @@ cubes = list.collect(function (num) {
       
       <div id="installation">
         <h2>Installation</h2>
-        <p>Clone the repository and all the sources are in the /src directory.</p>
+        <p>Type the following sequence of commands in your terminal.</p>
         <pre class="prettyprint">
 git clone https://github.com/ympbyc/LittleSmallscript.git
+
+cd LittleSmallscript/
+
+npm install -g
         </pre>
       </div>
       
       <div id="usage">
         <h2>Usage</h2>
-        <p>There is a command line tool available as /src/main.js<br />
-          You need to "npm install optimist" before using this tool
+        <p>When you 'npm install -g', a command line tool named 'littlesmallscript' gets installed.
         </p>
         <pre class="prettyprint">
 #compile a file to JavaScript and save as .js file
-node main.js -c from.st
-node main.js --compile from.st
+littlesmallscript -c from.st
+littlesmallscript --compile from.st
 
 #print out the compiled JavaScript
-node main.js -p from.st
-node main.js --print from.st
+littlesmallscript -p from.st
+littlesmallscript --print from.st
 
 #run an interactive LittleSmallscript
-node main.js -i
-node main.js --interactive
+littlesmallscript -i
+littlesmallscript --interactive
         </pre>
       </div>
       
