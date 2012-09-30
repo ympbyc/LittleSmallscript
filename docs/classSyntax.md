@@ -8,7 +8,7 @@ Lets imitate the Little Smalltalk v5's syntax for class definition.
 Animal subclass: #Snake variables: #(#name #colour #awake).
 
 !Snake
-initWithName: itsName color: itsColour |
+initWithName: itsName color: itsColour
   name := itsName.
   colour := itsColour.
   awake := true
@@ -20,7 +20,7 @@ getName
 !
 
 !Snake
-move: metre |
+move: metre
   awake ifFalse: [^ null].
   ^ name , ' the python moved ' , metre , 'm.'
 !
@@ -28,3 +28,8 @@ move: metre |
 (Snake new ; initWithName: 'Sammy' color: 'green') move: 5
 ```
 
+Indentations and new-lines are not required, so you could do something like
+
+```smalltalk
+!Snake move: metre awake ifFalse: [^ null]. ^ name , '...'!
+```

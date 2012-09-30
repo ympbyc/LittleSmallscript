@@ -74,8 +74,6 @@ Class dot:#instanceMethod method: [| method_tmpl |
     self skipSpace.
     methodHead := self methodHead. "#{}"
     self skipSpace.
-    self optional: @verticalBar.
-    self skipSpace.
     self setCurrentClass: className. "set the current class"
     methodBody := self statement. "change me"
     self setCurrentClass: null. "empty the current class"
@@ -113,7 +111,6 @@ Class dot:#methodHead method:[
 .
 Class dot:#setCurrentClass method:[:className |
   @currentClass := className.
-  console log: @currentClass + ',' + (@instanceVariables at: @currentClass).
   className
 ]
 .

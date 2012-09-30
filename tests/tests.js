@@ -2,7 +2,7 @@
   'use strict';
 
   var LittleSmallscript, errors, test, log, lss, p;
-  LittleSmallscript = require("../src/self-hosting/littlesmallscript").LittleSmallscript;
+  LittleSmallscript = require("../src/littlesmallscript").LittleSmallscript;
 
   errors = [];
   test = function (result, expected, mes) {
@@ -266,14 +266,14 @@
     //classHeader
     test(
       lss('Animal subclass: #Snake variables: #(#name #color)').classHeader(),
-      'Snake = function () { this.name = null; this.color = null; };\nSnake.prototype = new Animal()',
+      'Snake = function () { this.name = null; this.color = null; };\nSnake.prototype = new Animal();',
       'classHeader01'
     );
 
     //instanceMethod
     test(
-      lss('!Snake setName: name| myName := name. name!').instanceMethod(),
-      'Snake.prototype.setName = function (name) { myName = name; return name; };',
+      lss('!Snake setName: name myName := name. name!').instanceMethod(),
+      'Snake.prototype.setName = function (name) { var _this = this; myName = name; return name; }',
       'instanceMethod01'
     );
 
@@ -283,7 +283,7 @@
 
   //LittleSmallscript
   (function () {
-    test(lss("1").toJS({prettyprint:false}), "(function () { 'use strict'; return 1; }).call(this)", "toJS01");
+    test(lss("1").toJS({prettyprint:false}), '(function () { "use strict"; return 1; }).call(this)', "toJS01");
 
   })();
 
