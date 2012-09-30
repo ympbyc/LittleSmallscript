@@ -10,6 +10,22 @@ LICENCE:
 --------
 MIT
 
+INSTALLATION:
+-------------
+
+```shell
+$ git clone https://github.com/ympbyc/LittleSmallscript.git
+$ cd LittleSmallscript
+$ npm install -g
+```
+
+USAGE:
+------
+
+```shell
+$ littlesmallscript --help
+```
+
 Direction:
 ----------
 * The goal is to write Javascript in Smalltalk's syntax.
