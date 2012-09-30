@@ -1,44 +1,50 @@
-"AutoTyper automates your live-coding"
-"jQuery is required"
-
-| AutoTyper autotyper |
-AutoTyper := Object subclass
+"
+  AutoTyper automates your live coding.
+  AutoTyper author: 'Minori Yamashita' Email: 'ympbyc@gmail.com'
+"
+Object subclass: #AutoTyper variables: #(#input #index #interval #console)
 .
-AutoTyper method: [:input |
-  @input := input.
-  @index := 0.
-  @interval := 0.
-  @console := $ value: 'body'
-] dot: #init
+!AutoTyper
+init: text
+  input <- text.
+  index <- 0.
+  interval <- 0.
+  console <- $ value: 'body'
+!
 .
-AutoTyper method: [:selector |
-  @console := $ value: selector
-] dot: #setConsole
+!AutoTyper
+setConsole: selector
+  console <- $ value: selector
+!
 .
-AutoTyper method: [:interval |
-  @interval := interval
-] dot: #setInterval
+!AutoTyper
+setInterval: num
+  interval <- num
+!
 .
-AutoTyper method: [
-  @console text: ''
-] dot: #first
+!AutoTyper
+first
+  console text: ''
+!
 .
-AutoTyper method: [
-  @index > (@input dot: length - 1) ifFalse: [
-    @console text: (@console text + (@input at: @index)).
-    @index += 1
+!AutoTyper
+next
+  index > (input size - 1) ifFalse: [
+    console text: (console text + (input at: index)).
+    index += 1
   ] ifTrue: [null]
-] dot: #next
+!
 .
-AutoTyper method: [| interval |
+!AutoTyper
+start | interval |
   self first.
-  interval := [window set: [
-    self next !== null ifFalse: [window clearInterval: interval]
-  ] Interval: @interval] value
-] dot: #start
+  interval <- [window set:[
+    (self next === null) ifTrue: [window clearInterval: interval]
+  ] Interval: interval] value
+!
 .
-
-AutoTyper new: 'Hello, world!'
+AutoTyper new
+; init: 'Hello, world!'
 ; setConsole: '#js-source'
 ; setInterval: 50
 ; start
