@@ -118,8 +118,11 @@ The golden rule of LittleSmallscript is: <em>"It's just JavaScript"</em>. The co
 | number opposite square list math cubes |
 
 "Assignment:"
-number   := 42.
+number   := 42. 
 opposite := true.
+"or"
+number   &lt;- 42.
+opposite &lt;- true.
 
 "Conditions:"
 number := opposite ifTrue: [-42].
@@ -143,33 +146,7 @@ cubes := list collect: [:num | math cube: num]
           </div>
           <div class="compare-right">
             <pre class="prettyprint lang-js">
-var number, opposite, square, list, math, cubes;
-
-number = 42;
-
-opposite = true;
-
-number = opposite ? (function () {
-  return -42;
-})() : void 0;
-
-square = function (x) {
-  return (x * x);
-};
-
-list = [1, 2, 3, 4, 5];
-
-math = {
-  "root": Math[sqrt],
-  "square": square,
-  "cube": function (x) {
-    return (square(x) * x);
-  }
-};
-
-cubes = list.collect(function (num) {
-  return math.cube(num);
-});
+//updating
             </pre>
           </div>
         </div><!-- /compare-codes -->
@@ -187,7 +164,7 @@ git clone https://github.com/ympbyc/LittleSmallscript.git
       <div id="usage">
         <h2>Usage</h2>
         <p>There is a command line tool available as /src/main.js<br />
-          You need to run "npm install optimist" before using this tool
+          You need to "npm install optimist" before using this tool
         </p>
         <pre class="prettyprint">
 #compile a file to JavaScript and save as .js file
@@ -332,7 +309,7 @@ Object new ; at: 'a' put: 1 ; at: 'b' put: 2 ; at: 'c' put: 3
 
         <h3>Function</h3>
         <p>
-          Functions are defined by an open bracket, optional list of parameters followed by a vertical bar, the function body, and the closing bracket. The empty function looks like this: <span class="whiteback">[]</span>
+          Functions are defined by an open square bracket, optional list of parameters followed by a vertical bar, the function body, and the closing square bracket. The empty function looks like this: <span class="whiteback">[]</span>
         </p>
         <div class="compare-codes">
           <div class="compare-left">
@@ -501,25 +478,17 @@ foo := x ifTrue: [1] ifFalse: [2]
           </div>
           <div class="compare-right">
             <pre class="prettyprint lang-js">
-/* When optimization is enabled */
 1 ? (function () { return '1 is true'; })() : void 0;
 0 ? void 0 : (function () { return '0 is false'; })();
 foo = x ? (function () { return 1; })() : (function () { return 2; })();
-              
-/* When optimization is disabled */
-(1).ifTrue(function () { return '1 is true'; });
-(0).ifFalse(function () { return '0 is false' });
-foo = x.ifTrueifFalse(function () { return 1; }, function () { return 2; });
             </pre>
           </div>
         </div><!-- /compare-codes -->
-        <p>When optimization is enabled, ifTrue and ifFalse are compiled into conditional expressions for efficiency.</p>
-        <br class="clear">
 
         <h3>Iteration Over Objects and Arrays</h3>
         <p>
-          Various iteration methods are provided via the prelude module.
-          The most basic one is "do" and "collect" (they are identical to Array.forEach and Array.map in JS)
+          Various iteration methods are provided via the prelude module (/src/littlesmallmethods.js (not tested fully)).
+          The most basic ones are "do" and "collect" (they are identical to Array.forEach and Array.map in JS)
         </p>
         <div class="compare-codes">
           <div class="compare-left">
@@ -580,69 +549,41 @@ counter = 0;
         
         <h3>Classes and Inheritance</h3>
         <p>
-          Little `Smalltalk' and other Smalltalk dialects have special syntax for defining classes; LittleSmallscript doesn't.<br>
-          Since classes are first class objects, they are capable of handling messages. New class is created by passing "subclass" message to an existing class, and methods are attached to it with "method:at:" or "method:withKeywords:".
+          LittleSmallscript has a class definition syntax that is an imitation of Little Smalltalk v5's.<br />
+          A class definition is composed of two parts, a class header and method definition. Methods can be added anywhere in the code.
         </p>
         <div class="compare-codes">
           <div class="compare-left">
             <pre class="prettyprint">
-| Animal Snake sam |
-
-Animal := Object subclass.
-
-Animal method: [:name | 
-  @name := name
-] dot: #init.
-
-Animal method: [:metres |
-  window alert: (@name + ' moved ' + metres + 'm.')
-] dot: #move.
-
-Snake := Animal subclass.
-Snake method: [
-  "'super' is not supported yet"
+| sam |
+Object subclass: #Animal variables: #(#name)
+.
+!Animal
+init: aName
+  name := aName
+!
+.
+!Animal
+move: metres
+  window alert: (name + ' moved ' + metres + 'm.')
+!
+.
+Animal subclass: #Snake variables: #(name)
+.
+"super isn't supported yet"
+!Snake
+crawl
   window alert: 'Slithering...'.
   self move: 5
-] dot: #crawl.
-
+!
+.
 sam := Snake new: 'Sammy the Python'.
 sam crawl
             </pre>
           </div>
           <div class="compare-right">
             <pre class="prettyprint lang-js">
-var Animal, Snake, sam;
-Animal = (function (_super) {
-  var _Constructor;
-  _Constructor = function ( /* &rest arguments */ ) {
-    if (this.init) this.init.apply(this, arguments);
-  };
-  _Constructor.prototype = new _super();
-  return _Constructor;
-})(Object);
-Animal.prototype.init = (function (name) {
-  var _this = this;
-  return _this.name = name;
-});
-Animal.prototype.move = (function (metres) {
-  var _this = this;
-  return window.alert((((_this.name + " moved ") + metres) + "m."));
-});
-Snake = (function (_super) {
-  var _Constructor;
-  _Constructor = function ( /* &rest arguments */ ) {
-    if (this.init) this.init.apply(this, arguments);
-  };
-  _Constructor.prototype = new _super();
-  return _Constructor;
-})(Animal);
-Snake.prototype.crawl = (function () {
-  var _this = this;
-  window.alert("Slithering...");
-  return _this.move(5);
-});
-sam = new Snake("Sammy the Python");
-sam.crawl();
+//updating
             </pre>
           </div>
         </div><!-- /compare-codes -->
@@ -671,7 +612,7 @@ hi = function () {
         <br class="clear">
 
         <h3>Try/Catch/Finally</h3>
-        <p>tryCatch: and tryCatch:finally: are instance methods of Function</p>
+        <p>tryCatch: and tryCatch:finally: are instance methods of Function defined in littlesmallmethods.</p>
         <div class="compare-codes">
           <div class="compare-left">
             <pre class="prettyprint">
@@ -705,6 +646,16 @@ hi = function () {
       
       <div id="changelog">
         <h2>Change Log</h2>
+        
+        <span class="idle"><a href="https://github.com/ympbyc/LittleSmallscript/tree/self-hosting"><strong>v1.0.0</strong></a></span><span> - Sep 30, 2012</span>
+        <p>
+          The first major version!<br />
+          Every parser is now written in LittleSmallscript itself.<br />
+          v1 is not backward compatible with v0.<br />
+          Syntax for accessing instance variables has changed.<br />
+          Class definition syntax has been added.
+        </p>
+
         <span class="idle"><a href="https://github.com/ympbyc/LittleSmallscript/tree/v0.0.3">v0.0.4</a></span><span> - Sep 20, 2012</span>
         <p>
           Binary selectors are now bare js operators. (e.g: before: 1 <+> 1 now: 1 + 1)<br />
@@ -729,12 +680,13 @@ hi = function () {
     <script src="assets/js/prettify.js">
     </script>
 
-    <script src="https://raw.github.com/ympbyc/LittleSmallscript/master/src/packratparser.js"></script>
-    <script src="https://raw.github.com/ympbyc/LittleSmallscript/master/src/littleparsers.js"></script>
+    <script src="https://raw.github.com/ympbyc/LittleSmallscript/master/src/packrat.js"></script>
+    <script src="https://raw.github.com/ympbyc/LittleSmallscript/master/src/littleparser.js"></script>
     <script src="https://raw.github.com/ympbyc/LittleSmallscript/master/src/blockparser.js"></script>
     <script src="https://raw.github.com/ympbyc/LittleSmallscript/master/src/optimization.js"></script>
-    <script src="https://raw.github.com/ympbyc/LittleSmallscript/master/src/expressionparser.js"></script>
-    <script src="https://raw.github.com/ympbyc/LittleSmallscript/master/src/statementparser.js"></script>
+    <script src="https://raw.github.com/ympbyc/LittleSmallscript/master/src/expression.js"></script>
+    <script src="https://raw.github.com/ympbyc/LittleSmallscript/master/src/statement.js"></script>
+    <script src="https://raw.github.com/ympbyc/LittleSmallscript/master/src/class.js"></script>
     <script src="https://raw.github.com/ympbyc/LittleSmallscript/master/src/littlesmallscript.js"></script>
     <script src="https://raw.github.com/ympbyc/LittleSmallscript/master/src/littlesmallmethods.js"></script>
     <script src="assets/js/beautify.js"></script>
