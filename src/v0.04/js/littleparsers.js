@@ -180,9 +180,10 @@
     LittleParsers.prototype.variable = function () {
       var _this = this;
       return this.cacheDo("variable", function () {
-        var v = _this.regex(/^[a-zA-Z_$@][a-zA-Z0-9_$]*/);
+        var v = _this.regex(/^[a-zA-Z_$@][a-zA-Z0-9_$@]*/);
         if (v === 'self') return 'this';
-        if (v[0] === '@') return 'this.'+v.substring(1); //@foo -> this.foo
+        if (v[0] === '@') v = 'this.'+v.substring(1); //@foo -> this.foo
+        v = v.replace(/@/g, '.'); //foo@bar -> foo.bar
         return v;
       });
     };

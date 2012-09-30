@@ -1,98 +1,60 @@
-/*
- * Copyright (c) 2012 Minori Yamashita <ympbyc@gmail.com>
- * See LICENCE.txt
- */
-/* 
- * BlockParser
- * convert smalltalk style block to javascript's closure
- */
 (function () {
   'use strict';
-
-  var LittleParsers, BlockParser, 
-  __each = function (obj, fn) {
-    for (var key in obj)
-      if (obj.hasOwnProperty(key))
-        fn(obj[key], key);
-    return;
-  },
-  __template = function (template, hashmap) {
-    var dest_str = template;
-    __each(hashmap, function (it, key) {
-      dest_str = dest_str.replace(new RegExp('%'+key+'%', 'g'), it || "");
+  var Packrat, BlockParser;
+  Packrat = require('./packrat').Packrat;
+  BlockParser = (function (_super) {
+    var _Constructor;
+    _Constructor = function ( /* &rest arguments */ ) {
+      if (this.init) this.init.apply(this, arguments);
+    };
+    _Constructor.prototype = new _super();
+    return _Constructor;
+  })(Packrat);
+  BlockParser.prototype.block = function () {
+    var _this = this;
+    var dst_tmpl;
+    dst_tmpl = "function (%parameters%) { %body% }";
+    return _this.cacheparser("block", function () {
+      var parameters, body;
+      _this.blockStart();
+      parameters = _this.blockHead();
+      body = _this.optional(_this.statement);
+      _this.blockEnd();
+      return _this.templateapply(dst_tmpl, {
+        "parameters": parameters,
+        "body": body
+      });
     });
-    return dest_str;
   };
-
-  try {
-    LittleParsers = require('./littleparsers').LittleParsers;
-  } catch (err) {
-    if ( ! (LittleParsers = window.LittleParsers)) throw "littleparsers.js is required";
-  }
-
-  BlockParser = (function () {
-    var BlockParser;
-
-    BlockParser = function (input) {
-      this.cache = {};
-      this.input = input;
-    };
-    BlockParser.prototype = new LittleParsers("");
-
-    /* [             statement ] *
-     *   parameters              */
-    BlockParser.prototype.block = function () {
-      var _this = this,
-          destinationTemplate = "function (%parameters%) { %body% }";
-      return this.cacheDo("block", function () {
-        var parameters, body;
-        _this.blockStart();
-        parameters = _this.blockHead();
-        body = _this.optional(_this.statement);
-        _this.blockEnd();
-        return __template(destinationTemplate, {parameters:parameters, body:body});
+  BlockParser.prototype.blockParameters = function () {
+    var _this = this;
+    return _this.cacheparser("blockParameters", function () {
+      var vars;
+      vars = "";
+      _this.skipSpace();
+      _this.many(function () {
+        _this.colon();
+        (vars += (_this.variable() + ", "));
+        return _this.skipSpace();
       });
-    };
-
-    /* space-separated sequence of parameters
-     * ":foo :bar" -> "foo, bar" */
-    BlockParser.prototype.blockParameters = function () {
-      var _this = this;
-      return this.cacheDo("blockParameters", function () {
-        var vars = "";
+      return vars.slice((0), - 2);
+    });
+  };
+  BlockParser.prototype.blockHead = function () {
+    var _this = this;
+    return _this.cacheparser("blockHead", function () {
+      return _this.optional(function () {
+        var params;
         _this.skipSpace();
-        _this.many(function () {
-          _this.colon();
-          vars += _this.variable() + ", ";
-          _this.skipSpace();
-        });
-        return vars.slice(0, -2);
+        params = _this.blockParameters();
+        (params.length > (0)) ? (function () {
+          return _this.verticalBar();
+        })() : void 0;
+        _this.skipSpace();
+        return params;
       });
-    };
-
-    /* consume parameter sequence and return js style parameters
-     * ":foo :bar|" -> blockParameters */
-    BlockParser.prototype.blockHead = function () {
-      var _this = this;
-      return this.cacheDo("blockHead", function () {
-        return _this.optional(function () {
-          var params;
-          _this.skipSpace();
-          params = _this.blockParameters();
-          if (params && params.length) _this.verticalBar();
-          return params;
-        });
-      });
-    };
-
-    return BlockParser;
-  })();
-
-  try {
-    exports.BlockParser = BlockParser;
-  } catch (err) {}
-  try{
-    window.BlockParser = BlockParser;
-  } catch (err) {}
-  
+    });
+  };
+  exports.BlockParser = BlockParser;
+  return BlockParser;
 }).call(this);

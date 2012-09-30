@@ -364,6 +364,7 @@
   Array.prototype.withdo = function (col, fn) {
     if (this.length !== col.length) throw "Array.withDo: first argument has to be an array that have the same length as the receiver";
   };
+  Array.prototype.size = function () { return this.length };
 
   String.prototype.at = function (idx) { return this[idx]; };
 
