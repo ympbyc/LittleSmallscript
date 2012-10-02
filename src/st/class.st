@@ -1,20 +1,25 @@
 "class definition syntax"
-| Packrat |
-Packrat := <require('./packrat')> at: #Packrat
+| Block |
+Block := <require('./block')> at: #Block
 .
-Packrat 
+Block
   subclass: #Class
   variables: #(
     #instanceVariables
     #currentClass
-)
+  )
 .
+!Class
+init
+  instanceVariables := #{}.
+  currentClass := null
+!.
 "Animal subclass: #Snake variables: #(#name #colour #awake)"
 !Class
 classHeader | dst_tmpl |
   dst_tmpl := 
 'var %className%;
-%className% = function () { %variableInitialization%};
+%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };
 %className%.prototype = new %superClass%();'.
   self cache: #classHeader aParser: [| className superClass variables v_init |
     self optional: [self chr: '+']. "LSt compatibility"
@@ -69,9 +74,9 @@ variablableStringContent
 !.
 "
 !Snake
-setName: name |
-  _name := name.
-  ^ name
+setName: aname
+  name := aname.
+  name
 !
 "
 !Class

@@ -1,3 +1,6 @@
+"
+  Small parsers that are used to implement the greater parsers
+"
 | Packrat |
 Packrat := <require('./packrat')> at: #Packrat
 .
@@ -95,7 +98,7 @@ keywordSelector
 !LittleParser
 unarySelector
   self cache:#unarySelector aParser:[| sel |
-    sel := self sequence: #([self variable]).
+    sel := self variable.
     self notFollowedBy: [self colon].
     sel
   ]
@@ -144,10 +147,10 @@ numberLiteral
 !LittleParser
 stringLiteral
   self cache: #stringLiteral aParser: [
-    '\"' + (self 
+    '\"' + ((self 
           between: [self apostrophe]
           and: [self apostrophe] 
-          accept: [self anyChar]) + '\"'
+          accept: [self anyChar]) rep:</\n/g> lace:'\\n') + '\"'
   ]
 !.
 !LittleParser

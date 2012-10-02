@@ -1,33 +1,57 @@
 (function () {
-  'use strict';
-  var Packrat, optimization, Expression;
-  Packrat = require('./packrat').Packrat;
+  "use strict";
+  var LittleParser, optimization;
+  LittleParser = require('./littleparser').LittleParser;
   optimization = require('./optimization');
-  Expression = (function (_super) {
-    var _Constructor;
-    _Constructor = function ( /* &rest arguments */ ) {
-      if (this.init) this.init.apply(this, arguments);
-    };
-    _Constructor.prototype = new _super();
-    return _Constructor;
-  })(Packrat);
+  var Expression;
+  Expression = function () {
+    this.bundledMethods = null;
+    if (this.init) {
+      this.init.apply(this, arguments);
+    }
+  };
+  Expression.prototype = new LittleParser();;
+  Expression.prototype.init = function () {
+    var _this = this;
+    return _this.bundledMethods = [];
+  };
+  Expression.prototype.bundleAMethodIfAvailable = function (methodName) {
+    var _this = this;
+    return ((_this.bundledMethods.indexOf(methodName) > -1) && bundlableMethods.bundlable(methodName)) ? (function () {
+      return _this.bundledMethods.push(bundlableMethods.bundle(methodName));
+    })() : void 0;
+  };
   Expression.prototype.expression = function () {
     var _this = this;
     var tmpl;
     tmpl = "%assignments%%cascade%";
-    return _this.cacheparser("expression", function () {
+    return _this.cacheaParser("expression", function () {
       var assignments, cascade;
-      assignments = _this.optional(_this.assignments);
-      cascade = _this.cascade();
-      return _this.templateapply(tmpl, {
-        "assignments": assignments,
-        "cascade": cascade
+      assignments = _this.optional(function () {
+        return _this.assignments();
       });
+      cascade = _this.cascade();
+      return (function () {
+        var _ret;
+        try {
+          _ret = (function () {
+            return _this.templateapply(tmpl, {
+              "assignments": assignments,
+              "cascade": cascade
+            });
+          })();
+        } catch (err) {
+          _ret = function (e) {
+            return console.log(e);
+          }(err);
+        }
+        return _ret;
+      })();
     });
   };
   Expression.prototype.assignments = function () {
     var _this = this;
-    return _this.cacheparser("assignments", function () {
+    return _this.cacheaParser("assignments", function () {
       return _this.many(function () {
         var variable;
         variable = _this.extendedVariable();
@@ -42,12 +66,14 @@
     var _this = this;
     var tmpl;
     tmpl = "(function () { var _receiver = %simpleExpression%; %body% return _receiver;  })()";
-    return _this.cacheparser("cascade", function () {
+    return _this.cacheaParser("cascade", function () {
       var se;
       se = _this.simpleExpression();
       return _this.try_([function () {
         _this.skipSpace();
-        _this.notFollowedBy(_this.semicolon);
+        _this.notFollowedBy(function () {
+          return _this.semicolon();
+        });
         return se;
       }, function () {
         var conti;
@@ -57,11 +83,11 @@
           _this.semicolon();
           _this.skipSpace();
           mes = _this.continuation();
-          //optimize if optimization is available
-          if (optimization.optimizationAvailable(mes.methodName)) {
-            return optimization.optimize("_receiver", mes.methodName, mes.args) + ';';
-          }
-          return (("_receiver" + mes["js"]) + ";");
+          return optimization.optimizationAvailable(mes.methodName) ? ((function () {
+            return (optimization.optimize("_receiver", mes.methodName, mes.args) + ";");
+          }))() : (function () {
+            return (("_receiver" + mes.js) + ";");
+          })();
         });
         return _this.templateapply(tmpl, {
           "simpleExpression": se,
@@ -72,7 +98,7 @@
   };
   Expression.prototype.simpleExpression = function (allowedParsers) {
     var _this = this;
-    return _this.cacheparser("simpleExpression", function () {
+    return _this.cacheaParser("simpleExpression", function () {
       var receiver, injection;
       receiver = injection = _this.primaryReceiver();
       _this.many(function () {
@@ -93,16 +119,22 @@
   };
   Expression.prototype.continuation = function (allowedParsers) {
     var _this = this;
-    return _this.cacheparser("continuation", function () {
+    return _this.cacheaParser("continuation", function () {
       (allowedParsers === undefined) ? (function () {
-        return allowedParsers = [_this.keywordMessage, _this.binaryMessage, _this.unaryMessage];
+        return allowedParsers = [function () {
+          return _this.keywordMessage();
+        }, function () {
+          return _this.binaryMessage();
+        }, function () {
+          return _this.unaryMessage();
+        }];
       })() : void 0;
       return _this.try_(allowedParsers);
     });
   };
   Expression.prototype.keywordMessage = function () {
     var _this = this;
-    return _this.cacheparser("keywordMessage", function () {
+    return _this.cacheaParser("keywordMessage", function () {
       var methodName, args;
       methodName = "";
       args = [];
@@ -110,7 +142,11 @@
         _this.skipSpace();
         (methodName += _this.keywordSelector().replace(":", ""));
         _this.skipSpace();
-        args.push(_this.simpleExpression([_this.binaryMessage, _this.unaryMessage]));
+        args.push(_this.simpleExpression([function () {
+          return _this.binaryMessage();
+        }, function () {
+          return _this.unaryMessage();
+        }]));
         return _this.skipSpace();
       });
       return {
@@ -123,12 +159,14 @@
   };
   Expression.prototype.binaryMessage = function () {
     var _this = this;
-    return _this.cacheparser("binaryMessage", function () {
+    return _this.cacheaParser("binaryMessage", function () {
       var operator, argument;
       _this.skipSpace();
       operator = _this.operator();
       _this.skipSpace();
-      argument = _this.simpleExpression([_this.unaryMessage]);
+      argument = _this.simpleExpression([function () {
+        return _this.unaryMessage();
+      }]);
       return {
         "js": (((" " + operator) + " ") + argument),
         "wrapMe": true,
@@ -139,7 +177,7 @@
   };
   Expression.prototype.unaryMessage = function () {
     var _this = this;
-    return _this.cacheparser("unaryMessage", function () {
+    return _this.cacheaParser("unaryMessage", function () {
       var unarySelector;
       _this.skipSpace();
       unarySelector = _this.unarySelector();
@@ -153,42 +191,61 @@
   };
   Expression.prototype.primary = function () {
     var _this = this;
-    return _this.cacheparser("primary", function () {
-      return _this.try_([_this.extendedVariable, _this.literal, _this.block, _this.primitive, function () {
+    return _this.cacheaParser("primary", function () {
+      return _this.try_([function () {
+        return _this.extendedVariable();
+      }, function () {
+        return _this.literal();
+      }, function () {
+        return _this.block();
+      }, function () {
+        return _this.primitive();
+      }, function () {
         return _this.betweenandaccept((function () {
           _this.chr("(");
           return _this.skipSpace();
         }), (function () {
           _this.skipSpace();
           return _this.chr(")");
-        }), _this.cascade);
+        }), function () {
+          return _this.cascade();
+        });
       }]);
     });
   };
   Expression.prototype.primaryReceiver = function () {
     var _this = this;
-    return _this.cacheparser("primaryReceiver", function () {
+    return _this.cacheaParser("primaryReceiver", function () {
       return _this.try_([function () {
         var num;
         num = _this.numberLiteral();
         _this.followedBy(function () {
-          return _this.try_([_this.keywordMessage, _this.unaryMessage]);
+          return _this.try_([function () {
+            return _this.keywordMessage();
+          }, function () {
+            return _this.unaryMessage();
+          }]);
         });
         return (("(" + num) + ")");
       }, function () {
         _this.followedBy(function () {
           _this.block();
           _this.skipSpace();
-          return _this.try_([_this.keywordMessage, _this.unaryMessage]);
+          return _this.try_([function () {
+            return _this.keywordMessage();
+          }, function () {
+            return _this.unaryMessage();
+          }]);
         });
         return (("(" + _this.block()) + ")");
-      },
-      _this.primary]);
+      }, function () {
+        return _this.primary();
+      }]);
     });
   };
   Expression.prototype.primitive = function () {
     var _this = this;
-    return _this.cacheparser("primitive", function () {
+    return _this.cacheaParser("primitive", function () {
       _this.skipSpace();
       return _this.betweenandaccept((function () {
         _this.chr("<");
@@ -198,7 +255,9 @@
         return "<";
       }), (function () {
         return _this.chr(">");
-      }), _this.anyChar);
+      }), function () {
+        return _this.anyChar();
+      });
     });
   };
   Expression.prototype.operator = function () {
@@ -209,7 +268,7 @@
         return _this.string(str);
       };
     };
-    return _this.cacheparser("operator", function () {
+    return _this.cacheaParser("operator", function () {
       var op;
       _this.skipSpace();
       return op = _this.try_([p("+="), p("-="), p("*="), p("/="), p("+"), p("-"), p("*"), p("/"), p("%"), p("==="), p("!=="), p("<="), p(">="), p("<"), p(">"), p("^"), p("&&"), p("||")]);

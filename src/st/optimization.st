@@ -25,18 +25,17 @@ optimTmpl := #{
   'ifFalse' : '%receiver% ? void 0 : (%arg1%)()',
   'ifTrueifFalse' : '%receiver% ? (%arg1%)() : (%arg2%)()',
   'ifFalseifTrue' : '%receiver% ? (%arg2%)() : (%arg1%)()',
-  'and' : '%receiver% && %arg1%()',
-  'or'  : '%receiver% || %arg1%()',
-  'eqv' : '%receiver% === %arg1%()',
-  'xor' : '(%receiver% && !%arg1%()) || (!%receiver% && %arg1%())',
-  'not' : '! %receiver%',
+  'tryCatch' : 
+    '(function () { var _ret; try { _ret = %receiver%(); } catch (err) { _ret = %arg1%(err); } return _ret; })()',
+  'tryCatchFinally' : 
+    '(function () { var _ret; try { _ret = %receiver%(); } catch (err) { _ret = %arg1%(err); } finally { _ret = %arg2%(); } return _ret; })()',
   'new' : 'new %receiver%(%args%)',
 }
 .
 canUseDotNotation := [:str| | v identifier |
   v := LP new: str.
   [
-    identifier := v between: [v chr: '\"'] and: [v chr: '\"'] accept: v at:#variable
+    identifier := v between: [v chr: '\"'] and: [v chr: '\"'] accept: (v at:#variable)
   ] tryCatch: [].
   v getIndex === v getInputLength ifTrue: [identifier] ifFalse: [null]
 ]

@@ -1,0 +1,10 @@
+Development cycle
+-----------------
+
+```zsh
+cd src/st/
+edit one of the *.st files
+./run.sh
+node ../../tests/tests-dev.js
+node ../main-dev.js -i
+```

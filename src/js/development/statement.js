@@ -1,22 +1,23 @@
 (function () {
-  'use strict';
-  var Packrat, Statement;
-  Packrat = require('./packrat').Packrat;
-  Statement = (function (_super) {
-    var _Constructor;
-    _Constructor = function ( /* &rest arguments */ ) {
-      if (this.init) this.init.apply(this, arguments);
-    };
-    _Constructor.prototype = new _super();
-    return _Constructor;
-  })(Packrat);
+  "use strict";
+  var Class;
+  Class = require('./class').Class;
+  var Statement;
+  Statement = function () {
+    if (this.init) {
+      this.init.apply(this, arguments);
+    }
+  };
+  Statement.prototype = new Class();;
   Statement.prototype.statement = function () {
     var _this = this;
-    return _this.cacheparser("statement", function () {
+    return _this.cacheaParser("statement", function () {
       var ret, vd;
       ret = "";
       _this.skipSpace();
-      vd = _this.optional(_this.variableDeclaration);
+      vd = _this.optional(function () {
+        return _this.variableDeclaration();
+      });
       (vd !== null) ? (function () {
         return (ret += vd);
       })() : void 0;
@@ -27,10 +28,12 @@
         _this.skipSpace();
         _this.chr(".");
         _this.skipSpace();
-        _this.followedBy(_this.statementable);
+        _this.followedBy(function () {
+          return _this.statementable();
+        });
         return (a + "; ");
       }));
-      ret = (((ret + "return ") + _this.statementable()) + ";");
+      ret = (((ret + "return ") + _this.expression()) + ";");
       _this.skipSpace();
       _this.optional(function () {
         return _this.chr(".");
@@ -40,13 +43,19 @@
   };
   Statement.prototype.statementable = function () {
     var _this = this;
-    return _this.cacheparser("statementable", function () {
-      return _this.try_([_this.classHeader, _this.instanceMethod, _this.expression]);
+    return _this.cacheaParser("statementable", function () {
+      return _this.try_([function () {
+        return _this.classHeader();
+      }, function () {
+        return _this.instanceMethod();
+      }, function () {
+        return _this.expression();
+      }]);
     });
   };
   Statement.prototype.variableDeclaration = function () {
     var _this = this;
-    return _this.cacheparser("variableDeclaration", function () {
+    return _this.cacheaParser("variableDeclaration", function () {
       var ret;
       ret = "var ";
       _this.skipSpace();

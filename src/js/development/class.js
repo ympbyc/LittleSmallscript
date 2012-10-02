@@ -1,20 +1,26 @@
 (function () {
-  'use strict';
-  var Packrat, Class;
-  Packrat = require('./packrat').Packrat;
-  Class = (function (_super) {
-    var _Constructor;
-    _Constructor = function ( /* &rest arguments */ ) {
-      if (this.init) this.init.apply(this, arguments);
-    };
-    _Constructor.prototype = new _super();
-    return _Constructor;
-  })(Packrat);
+  "use strict";
+  var Block;
+  Block = require('./block').Block;
+  var Class;
+  Class = function () {
+    this.instanceVariables = null;
+    this.currentClass = null;
+    if (this.init) {
+      this.init.apply(this, arguments);
+    }
+  };
+  Class.prototype = new Block();;
+  Class.prototype.init = function () {
+    var _this = this;
+    _this.instanceVariables = {};
+    return _this.currentClass = null;
+  };
   Class.prototype.classHeader = function () {
     var _this = this;
     var dst_tmpl;
-    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%};\n%className%.prototype = new %superClass%();";
-    return _this.cacheparser("classHeader", function () {
+    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };\n%className%.prototype = new %superClass%();";
+    return _this.cacheaParser("classHeader", function () {
       var className, superClass, variables, v_init;
       _this.optional(function () {
         return _this.chr("+");
@@ -42,7 +48,7 @@
   };
   Class.prototype.instanceVariableArray = function () {
     var _this = this;
-    return _this.cacheparser("instanceVariableArray", function () {
+    return _this.cacheaParser("instanceVariableArray", function () {
       var variables;
       variables = [];
       _this.arrayStart();
@@ -52,7 +58,9 @@
         v = _this.variablableStringContent();
         variables.push(v);
         _this.skipSpace();
-        _this.optional(function () { return _this.chr(','); });
+        _this.optional(function () {
+          return _this.chr(",");
+        });
         _this.skipSpace();
         return v;
       });
@@ -62,12 +70,18 @@
   };
   Class.prototype.variablableStringContent = function () {
     var _this = this;
-    return _this.cacheparser("variablableStringContent", function () {
+    return _this.cacheaParser("variablableStringContent", function () {
       return _this.try_([function () {
         _this.chr("#");
         return _this.variable();
       }, function () {
-        return _this.betweenandaccept(_this.apostrophe, _this.apostrophe, _this.variable);
+        return _this.betweenandaccept((function () {
+          return _this.apostrophe();
+        }), (function () {
+          return _this.apostrophe();
+        }), function () {
+          return _this.variable();
+        });
       }]);
     });
   };
@@ -75,7 +89,7 @@
     var _this = this;
     var method_tmpl;
     method_tmpl = "%className%.prototype.%methodName% = function (%args%) { var _this = this; %methodBody% }";
-    return _this.cacheparser("instanceMethod", function () {
+    return _this.cacheaParser("instanceMethod", function () {
       var className, methodHead, methodBody;
       _this.exclamation();
       _this.skipSpace();
@@ -98,7 +112,7 @@
   };
   Class.prototype.methodHead = function () {
     var _this = this;
-    return _this.cacheparser("methodHead", function () {
+    return _this.cacheaParser("methodHead", function () {
       var methodName, args;
       methodName = "";
       args = [];

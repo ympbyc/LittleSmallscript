@@ -11,30 +11,6 @@
   'use strict';
   var __hasProp = {}.hasOwnProperty;
   
-  Function.prototype.subclass = function () {
-    var Sc = function () {};
-    Sc = function () {};
-    Sc.prototype = new this();
-    Sc.prototype.init = function () {}; // gets called immidiately after new
-    Sc.prototype.__init = function () {}; //internal use only
-    return Sc;
-  };
-  Function.prototype.new_ = function () {
-    var newInstance = new this();
-    if (newInstance.__init) newInstance.__init.call(newInstance);
-    if (newInstance.init) newInstance.init.apply(newInstance, arguments);
-    return newInstance;
-  };
-  // method:at:
-  Function.prototype.methodat = function (fn, slot) {
-    return this.prototype[slot] = fn;
-  };
-  // method:withKeywords:
-  Function.prototype.methodwithKeywords = function (fn, arr) {
-    var methName = arr.injectinto('', function (a,b) { return b + a; });
-    return this.methodat(fn, methName);
-  };
-
   Object.prototype.asString = Object.prototype.toString;
   Object.prototype.class_ = function () { return this.constructor; };
   Object.prototype.copy = Object.prototype.shallowCopy = function () { return this; };
@@ -54,29 +30,9 @@
   Object.prototype.error = function (str) { throw str; };
   Object.prototype.isKindOf = function (Klass) { return this instanceof Klass; };
   Object.prototype.isMemberOf = function (Klass) { return this.class_() === Klass;  };
-  Object.prototype.isNil = function () { return this === null || this === undefined;  };
-  Object.prototype.notNil = function () { return this !== null && this !== undefined;  };
   Object.prototype.print = Object.printString = function () { return JSON ? JSON.stringify(this) : this.toString();  };
-  Object.prototype.respondsTo = function (name) { return this[name].notNil(); };
-  
-  Boolean.prototype.and = function (fn) { return this.valueOf() ? (fn.call(this) ? true : false) : false;  };
-  Boolean.prototype.or = function (fn) { return  this.valueOf() ? true : (fn.call(this) ? true : false); };
-  Boolean.prototype.eqv = function (bool) {
-    if (typeof bool !== 'boolean' && ! bool instanceof Boolean) throw 'Beelean.eqv expects parameter 1 to be bool.' + bool + 'given.'; 
-    return this.valueOf() === bool;
-  };
-  Boolean.prototype.xor = function (bool) {
-  if (typeof bool !== 'boolean' && ! bool instanceof Boolean) throw 'Beelean.xor expects parameter 1 to be bool.' + bool + 'given.'; 
-    return this.valueOf() !== bool;
-  };
-  Boolean.prototype.ifTrue = function (fn) { return this.valueOf() ? fn.call(this) : null;  };
-  Boolean.prototype.ifFalse = function (fn) { return this.valueOf() ? null : fn.call(this);  };
-  // ifTrue:ifFalse
-  Boolean.prototype.ifTrueifFalse = function (t, f) { return this.valueOf() ? t.call(this) : f.call(this); };
-  // ifFalse:ifTrue
-  Boolean.prototype.ifFalseifTrue = function (f, t) { return this.valueOf() ? t.call(this) : f.call(this); };
-  Boolean.prototype.not = function () { return ! this.valueOf(); };
-  
+  Object.prototype.respondsTo = function (name) { return this[name] !== undefined && this[name] !== null; };
+    
   Number.prototype.to = function (tonum) { 
     var i = this-1, 
     res = []; 
@@ -97,13 +53,6 @@
     return (0).to(this).do_(function (it) { return fn.call(_this, it); }); 
   };
   
-  Object.prototype.addAll = function (col) {
-    var _this = this;
-    col.do_(function (it, key) {
-      _this[key] = it;
-    });
-    return this;
-  };
   Object.prototype.asArray = function () {
     return this.collect(function (it) {return it});
   };
@@ -212,12 +161,6 @@
       return fn.call(this);
     }
   };
-  // atAll:put:
-  Object.prototype.atAllput = function (keys, item) {
-    var _this = this;
-    keys.do_(function (key) { return _this[key] = item;  });
-    return this;
-  };
   // at:put:
   Object.prototype.atput = function (key, item) {
     this[key] = item;
@@ -250,19 +193,7 @@
   Object.prototype.keySelect = function (fn) {
     return this.keys().select(fn);
   };
-  Object.prototype.removeKey = function (key) {
-    if (this[key].isNil()) throw "Object.removeKey: slot " + key + " not found";
-    return delete this[key];
-  };
-  // removeKey:ifAbsent:
-  Object.prototype.removeKeyifAbsent = function (key, fn) {
-    try {
-      return this.removeKey(key);
-    } catch (err) {
-      return fn.call(this);
-    }
-  };
-
+  
   Array.prototype.addLast = function (item) { this.push(item); return this; };  
   Array.prototype.do_ = Array.prototype.binaryDo = Array.prototype.forEach || Object.prototype.do_;
   Array.prototype.collect = Array.prototype.map || function (fn) {
