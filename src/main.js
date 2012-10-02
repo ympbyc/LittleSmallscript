@@ -24,7 +24,7 @@
       .argv;
 
   function interactiveShell () {
-    require('./littlesmallmethods'); //prototype extension
+    require('./prelude'); //prototype extension
 
     readline = require('readline'),
     rl = readline.createInterface(process.stdin, process.stdout);

@@ -3,8 +3,6 @@ LittleParser := <require('./littleparser')> at: #LittleParser
 .
 optimization := <require('./optimization')>
 .
-bundlableMethods := <require('./bundlableMethods')>
-.
 LittleParser subclass:#Expression 
             variables:#(#bundledMethods)
 .
@@ -57,7 +55,6 @@ cascade | tmpl |
         self semicolon.
         self skipSpace.
         mes := self continuation.
-        bundleAMethodIfAvailable: mes at:#methodName. "include standard methods"
         (optimization optimizationAvailable: (mes at:#methodName))
         ifTrue:[
           (optimization op: '_receiver' ti: (mes at:#methodName) mize: (mes at:#args)) + ';'
@@ -78,7 +75,6 @@ simpleExpression: allowedParsers
     self many:[| mes ret |
       mes := self continuation: allowedParsers.
 
-      bundleMethodIfAvailable: mes at:#methodName. "include standard methods"
       "optimize if optimization is available"
       (optimization optimizationAvailable: (mes at:#methodName))
         ifTrue: [

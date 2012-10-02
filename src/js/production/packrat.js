@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  require('../../littlesmallmethods');
+  require('../../prelude');
   Number.prototype.timesString = function (str) {
     var _this = this;
     var ret;
@@ -61,10 +61,18 @@
     logIndent = _this.logNest.timesString("  ");
     (_this.stackTrace += (((((logIndent + "ENTER : ") + s) + " : ") + _this.input.substring(_this.index)) + "\n"));
     (function () {
-      return (_this.cache[s] === undefined) ? (_this.cache[s] = {})() : void 0;
-    }).tryCatch(function () {
-      return _this.cache[s] = {};
-    });
+      var _ret;
+      try {
+        _ret = (function () {
+          return (_this.cache[s] === undefined) ? (_this.cache[s] = {})() : void 0;
+        })();
+      } catch (err) {
+        _ret = function () {
+          return _this.cache[s] = {};
+        }(err);
+      }
+      return _ret;
+    })();
     slot = _this.cache[s][_this.index];
     return ((slot !== undefined) && (slot !== null)) ? ((function () {
       c = slot;
@@ -77,24 +85,32 @@
       return c.fn;
     }))() : (function () {
       return (function () {
-        c.idx = _this.index;
-        c.fn = fn.call(_this);
-        _this.cache[s][c.idx] = {
-          "fn": c.fn,
-          "idx": _this.index
-        };
-        (_this.index > _this.maxIndex) ? (function () {
-          return _this.maxIndex = _this.index;
-        })() : void 0;
-        (_this.stackTrace += (((((logIndent + "PASS  : ") + s) + " : ") + c.fn) + "\n"));
-        (_this.logNest -= 1);
-        return c.fn;
-      }).tryCatch(function (err) {
-        _this.cache[s][c.idx] = null;
-        (_this.stackTrace += (((logIndent + "FAIL  : ") + s) + "\n"));
-        (_this.logNest -= 1);
-        return _this.noParse();
-      });
+        var _ret;
+        try {
+          _ret = (function () {
+            c.idx = _this.index;
+            c.fn = fn.call(_this);
+            _this.cache[s][c.idx] = {
+              "fn": c.fn,
+              "idx": _this.index
+            };
+            (_this.index > _this.maxIndex) ? (function () {
+              return _this.maxIndex = _this.index;
+            })() : void 0;
+            (_this.stackTrace += (((((logIndent + "PASS  : ") + s) + " : ") + c.fn) + "\n"));
+            (_this.logNest -= 1);
+            return c.fn;
+          })();
+        } catch (err) {
+          _ret = function (err) {
+            _this.cache[s][c.idx] = null;
+            (_this.stackTrace += (((logIndent + "FAIL  : ") + s) + "\n"));
+            (_this.logNest -= 1);
+            return _this.noParse();
+          }(err);
+        }
+        return _ret;
+      })();
     })();
   };
   Packrat.prototype.noParse = function () {
@@ -108,10 +124,18 @@
     parsers.do_(function (parser) {
       return (ret === undefined) ? (function () {
         return (function () {
-          return ret = parser.call(_this);
-        }).tryCatch(function () {
-          return _this.index = i;
-        });
+          var _ret;
+          try {
+            _ret = (function () {
+              return ret = parser.call(_this);
+            })();
+          } catch (err) {
+            _ret = function () {
+              return _this.index = i;
+            }(err);
+          }
+          return _ret;
+        })();
       })() : void 0;
     });
     return (ret !== undefined) ? ((function () {
@@ -129,12 +153,20 @@
     parsers.do_(function (parser) {
       return fail ? void 0 : (function () {
         return (function () {
-          return (ret += parser.call(_this));
-        }).tryCatch(function (err) {
-          _this.index = i;
-          fail = true;
-          return _this.noParse();
-        });
+          var _ret;
+          try {
+            _ret = (function () {
+              return (ret += parser.call(_this));
+            })();
+          } catch (err) {
+            _ret = function (err) {
+              _this.index = i;
+              fail = true;
+              return _this.noParse();
+            }(err);
+          }
+          return _ret;
+        })();
       })();
     });
     return fail ? (function () {
@@ -148,11 +180,19 @@
     var ret, i;
     i = _this.index;
     return (function () {
-      return parser.call(_this);
-    }).tryCatch(function () {
-      _this.index = i;
-      return null;
-    });
+      var _ret;
+      try {
+        _ret = (function () {
+          return parser.call(_this);
+        })();
+      } catch (err) {
+        _ret = function () {
+          _this.index = i;
+          return null;
+        }(err);
+      }
+      return _ret;
+    })();
   };
   Packrat.prototype.followedBy = function (parser) {
     var _this = this;
@@ -160,9 +200,17 @@
     f = true;
     i = _this.index;
     (function () {
-      parser.call(_this);
-      return f = false;
-    }).tryCatch(function () {});
+      var _ret;
+      try {
+        _ret = (function () {
+          parser.call(_this);
+          return f = false;
+        })();
+      } catch (err) {
+        _ret = function () {}(err);
+      }
+      return _ret;
+    })();
     _this.index = i;
     return f ? ((function () {
       return _this.noParse();
@@ -176,9 +224,17 @@
     f = false;
     i = _this.index;
     (function () {
-      parser.call(_this);
-      return f = true;
-    }).tryCatch(function () {});
+      var _ret;
+      try {
+        _ret = (function () {
+          parser.call(_this);
+          return f = true;
+        })();
+      } catch (err) {
+        _ret = function () {}(err);
+      }
+      return _ret;
+    })();
     _this.index = i;
     return f ? ((function () {
       return _this.noParse();

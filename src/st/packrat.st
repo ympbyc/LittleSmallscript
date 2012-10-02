@@ -1,4 +1,4 @@
-<require('../../littlesmallmethods')>
+<require('../../prelude')>
 .
 !Number
 timesString: str | ret |

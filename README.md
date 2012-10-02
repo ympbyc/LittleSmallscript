@@ -104,7 +104,7 @@ Statement parser is coplete.
 Consequently, temporary variable declaration is now supported. | foo bar | compiles to var foo, bar;.  
 Inline javascript as primary values. obj method: <function () {}>  
 Binary messages with javascript operators. 1 <+> 1;  
-Much of Little Smalltalk's built-in methods are provided via the library: LittleSmallmethods.js.  
+Much of Little Smalltalk's built-in methods are provided via the library: prelude.js.  
 Prettyprint using beautify.js.  
 
 5am 10 Sep 2012  

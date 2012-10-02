@@ -5,11 +5,22 @@
   optimization = require('./optimization');
   var Expression;
   Expression = function () {
+    this.bundledMethods = null;
     if (this.init) {
       this.init.apply(this, arguments);
     }
   };
   Expression.prototype = new LittleParser();;
+  Expression.prototype.init = function () {
+    var _this = this;
+    return _this.bundledMethods = [];
+  };
+  Expression.prototype.bundleAMethodIfAvailable = function (methodName) {
+    var _this = this;
+    return ((_this.bundledMethods.indexOf(methodName) > -1) && bundlableMethods.bundlable(methodName)) ? (function () {
+      return _this.bundledMethods.push(bundlableMethods.bundle(methodName));
+    })() : void 0;
+  };
   Expression.prototype.expression = function () {
     var _this = this;
     var tmpl;

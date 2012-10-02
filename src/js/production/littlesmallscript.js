@@ -29,10 +29,18 @@
     var _this = this;
     var line, rest, token;
     line = (function () {
-      return (_this.input.substring((0), _this.getMaxIndex()).match(/\n/g).size() + 1);
-    }).tryCatch(function () {
-      return 0;
-    });
+      var _ret;
+      try {
+        _ret = (function () {
+          return (_this.input.substring((0), _this.getMaxIndex()).match(/\n/g).size() + 1);
+        })();
+      } catch (err) {
+        _ret = function () {
+          return 0;
+        }(err);
+      }
+      return _ret;
+    })();
     rest = _this.input.substring(_this.getMaxIndex());
     token = rest.substring((0), rest.search(/[\.\s\t\n]|$/));
     console.log((((("Parse error on line " + line) + ". Unexpected ") + token) + "."));
@@ -45,23 +53,33 @@
     err = false;
     wrapTmpl = "(function () { \"use strict\"; %statement% }).call(this);";
     (function () {
-      return js = _this.templateapply(wrapTmpl, {
-        "statement": _this.statement()
-      });
-    }).tryCatch(function () {
-      err = true;
-      return _this.onError();
-    });
+      var _ret;
+      try {
+        _ret = (function () {
+          return js = _this.templateapply(wrapTmpl, {
+            "statement": _this.statement()
+          });
+        })();
+      } catch (err) {
+        _ret = function () {
+          err = true;
+          return _this.onError();
+        }(err);
+      }
+      return _ret;
+    })();
     err ? void 0 : (function () {
       return (_this.getIndex() < _this.input.size()) ? (function () {
         err = true;
         return _this.onError(null);
       })() : void 0;
     })();
-    return (_this.options && _this.options.prettyprint) ? ((function () {
-      return require('../../../lib/beautify.js').js_beautify(js, _this.beautifyOption);
-    }))() : (function () {
-      return js;
+    return err ? void 0 : (function () {
+      return (_this.options && _this.options.prettyprint) ? ((function () {
+        return require('../../../lib/beautify.js').js_beautify(js, _this.beautifyOption);
+      }))() : (function () {
+        return js;
+      })();
     })();
   };
   exports.LittleSmallscript = LittleSmallscript;

@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  require('../../littlesmallmethods');
+  require('../../prelude');
   Number.prototype.timesString = function (str) {
     var _this = this;
     var ret;
