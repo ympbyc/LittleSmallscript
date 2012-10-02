@@ -1,10 +1,22 @@
-| Packrat optimization |
-Packrat := <require('./packrat')> at: #Packrat
+| LittleParser optimization |
+LittleParser := <require('./littleparser')> at: #LittleParser
 .
 optimization := <require('./optimization')>
 .
-Packrat subclass:#Expression variables:#()
+bundlableMethods := <require('./bundlableMethods')>
 .
+LittleParser subclass:#Expression 
+            variables:#(#bundledMethods)
+.
+!Expression
+init
+  bundledMethods := #()
+!.
+!Expression
+bundleAMethodIfAvailable: methodName
+  (bundledMethods indexOf: methodName) > -1 && (bundlableMethods bundlable:methodName)
+  ifTrue: [bundledMethods push: (bundlableMethods bundle:methodName)]
+!.
 !Expression
 expression | tmpl |
   tmpl := '%assignments%%cascade%'.
@@ -12,9 +24,9 @@ expression | tmpl |
     | assignments cascade |
     assignments := self optional: [self assignments].
     cascade := self cascade.
-    self template: tmpl apply: #{
+    [self template: tmpl apply: #{
       #assignments:assignments #cascade:cascade
-    }
+    }] tryCatch: [:e|console log: e]
   ]
 !.
 !Expression
@@ -45,9 +57,10 @@ cascade | tmpl |
         self semicolon.
         self skipSpace.
         mes := self continuation.
+        bundleAMethodIfAvailable: mes at:#methodName. "include standard methods"
         (optimization optimizationAvailable: (mes at:#methodName))
         ifTrue:[
-          optimization op: '_receiver' ti: (mes at:#methodName) mize: (mes at:#args)
+          (optimization op: '_receiver' ti: (mes at:#methodName) mize: (mes at:#args)) + ';'
         ]
         ifFalse: ['_receiver' + (mes at: #js) + ';']
       ].
@@ -65,6 +78,7 @@ simpleExpression: allowedParsers
     self many:[| mes ret |
       mes := self continuation: allowedParsers.
 
+      bundleMethodIfAvailable: mes at:#methodName. "include standard methods"
       "optimize if optimization is available"
       (optimization optimizationAvailable: (mes at:#methodName))
         ifTrue: [

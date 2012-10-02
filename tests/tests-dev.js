@@ -2,7 +2,7 @@
   'use strict';
 
   var LittleSmallscript, errors, test, log, lss, p;
-  LittleSmallscript = require("../src/js/production/littlesmallscript").LittleSmallscript;
+  LittleSmallscript = require("../src/js/development/littlesmallscript").LittleSmallscript;
 
   errors = [];
   test = function (result, expected, mes) {

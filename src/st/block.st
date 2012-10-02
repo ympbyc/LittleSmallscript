@@ -1,7 +1,10 @@
-| Packrat |
-Packrat := <require('./packrat')> at: #Packrat
+"
+  parse and compile lexical block
+"
+| Expression |
+Expression := <require('./expression')> at: #Expression
 .
-Packrat 
+Expression 
   subclass:#Block 
   variables:#()
 .
@@ -41,6 +44,6 @@ blockHead
     ]
   ]
 !.
-exports at: #BlockParser put: BlockParser
+exports at: #Block put: Block
 .
-BlockParser
+Block

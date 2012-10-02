@@ -1,4 +1,4 @@
-<require('../littlesmallmethods')>
+<require('../../littlesmallmethods')>
 .
 !Number
 timesString: str | ret |
@@ -31,8 +31,16 @@ getIndex
   index
 !.
 !Packrat
+getMaxIndex
+  maxIndex
+!.
+!Packrat
 getInputLength
   input size
+!.
+!Packrat
+getStackTrace
+  stackTrace
 !.
 !Packrat
 cache: s aParser: fn | c slot logIndent |
@@ -55,7 +63,7 @@ cache: s aParser: fn | c slot logIndent |
 
     "debug feature"
     index > maxIndex ifTrue: [maxIndex := index]. "save max index for error message"
-    stackTrace +=  (logIndent + 'CACHED: ' + s + ' : ' + c at: #fn + '\n').
+    stackTrace +=  (logIndent + 'CACHED: ' + s + ' : ' + (c at: #fn) + '\n').
     logNest -= 1.
     
     c at: #fn
@@ -67,7 +75,7 @@ cache: s aParser: fn | c slot logIndent |
       
       "debug feature"
       index > maxIndex ifTrue: [maxIndex := index]. "save max index for error message"
-      stackTrace += (logIndent + 'PASS  : ' + s + ' : ' + c at:#fn + '\n').
+      stackTrace += (logIndent + 'PASS  : ' + s + ' : ' + (c at:#fn) + '\n').
       logNest -= 1.
 
       c at:#fn

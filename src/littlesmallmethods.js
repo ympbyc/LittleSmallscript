@@ -1,40 +1,11 @@
 /*
- * Copyright (c) 2012 Minori Yamashita <ympbyc@gmail.com>
- * See LICENCE.txt
- */
-/* 
- * Little Smallmethods
- * Define Little Smalltalk's built-in methods for JS primitive objects.
- * This library adds methods to basic objects' prototype if you like it or not.
+ * This file is deprecated.
+ * it will be replaced with prelude.js when it's ready
  */
 (function () {
   'use strict';
   var __hasProp = {}.hasOwnProperty;
   
-  Function.prototype.subclass = function () {
-    var Sc = function () {};
-    Sc = function () {};
-    Sc.prototype = new this();
-    Sc.prototype.init = function () {}; // gets called immidiately after new
-    Sc.prototype.__init = function () {}; //internal use only
-    return Sc;
-  };
-  Function.prototype.new_ = function () {
-    var newInstance = new this();
-    if (newInstance.__init) newInstance.__init.call(newInstance);
-    if (newInstance.init) newInstance.init.apply(newInstance, arguments);
-    return newInstance;
-  };
-  // method:at:
-  Function.prototype.methodat = function (fn, slot) {
-    return this.prototype[slot] = fn;
-  };
-  // method:withKeywords:
-  Function.prototype.methodwithKeywords = function (fn, arr) {
-    var methName = arr.injectinto('', function (a,b) { return b + a; });
-    return this.methodat(fn, methName);
-  };
-
   Object.prototype.asString = Object.prototype.toString;
   Object.prototype.class_ = function () { return this.constructor; };
   Object.prototype.copy = Object.prototype.shallowCopy = function () { return this; };
@@ -54,10 +25,8 @@
   Object.prototype.error = function (str) { throw str; };
   Object.prototype.isKindOf = function (Klass) { return this instanceof Klass; };
   Object.prototype.isMemberOf = function (Klass) { return this.class_() === Klass;  };
-  Object.prototype.isNil = function () { return this === null || this === undefined;  };
-  Object.prototype.notNil = function () { return this !== null && this !== undefined;  };
   Object.prototype.print = Object.printString = function () { return JSON ? JSON.stringify(this) : this.toString();  };
-  Object.prototype.respondsTo = function (name) { return this[name].notNil(); };
+  Object.prototype.respondsTo = function (name) { return this[name] && (typeOf this[name] === 'function'); };
   
   Boolean.prototype.and = function (fn) { return this.valueOf() ? (fn.call(this) ? true : false) : false;  };
   Boolean.prototype.or = function (fn) { return  this.valueOf() ? true : (fn.call(this) ? true : false); };
@@ -69,12 +38,6 @@
   if (typeof bool !== 'boolean' && ! bool instanceof Boolean) throw 'Beelean.xor expects parameter 1 to be bool.' + bool + 'given.'; 
     return this.valueOf() !== bool;
   };
-  Boolean.prototype.ifTrue = function (fn) { return this.valueOf() ? fn.call(this) : null;  };
-  Boolean.prototype.ifFalse = function (fn) { return this.valueOf() ? null : fn.call(this);  };
-  // ifTrue:ifFalse
-  Boolean.prototype.ifTrueifFalse = function (t, f) { return this.valueOf() ? t.call(this) : f.call(this); };
-  // ifFalse:ifTrue
-  Boolean.prototype.ifFalseifTrue = function (f, t) { return this.valueOf() ? t.call(this) : f.call(this); };
   Boolean.prototype.not = function () { return ! this.valueOf(); };
   
   Number.prototype.to = function (tonum) { 

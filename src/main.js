@@ -5,7 +5,7 @@
 
   var LittleSmallscript, fs, optimist, argv, readline, rl, help;
   
-  LittleSmallscript = require("./littlesmallscript").LittleSmallscript;
+  LittleSmallscript = require("./js/production/littlesmallscript").LittleSmallscript;
   
   fs = require('fs');
 
@@ -34,7 +34,7 @@
     
     rl.on("line", function(input) {
       try {
-        var js = new LittleSmallscript(input, {prettyprint:true}).toJS();
+        var js = new LittleSmallscript().initWithInputandOptions(input, {prettyprint:true}).toJS();
         console.log(js+'\n');
         console.log(eval(js)+'\n');
       } catch (err) {
@@ -64,7 +64,7 @@ Usage: littlesmallscript [options] path/to/script.st\n\n \
     return fs.readFile(fileName, 'utf8', function (err, lssString) {
       if (err) throw err;
       try {
-        var js = new LittleSmallscript(lssString, {prettyprint: true}).toJS();
+        var js = new LittleSmallscript().initWithInputandOptions(lssString, {prettyprint: true}).toJS();
         if (argv.p) return console.log(js);
         fs.writeFile(argv.c.replace(/\.([^\.])+$/, '.js'), js, function (err) {
           if (err) throw err;
