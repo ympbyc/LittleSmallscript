@@ -1,9 +1,0 @@
-{
-  "name": "littlesmallscript",
-  "version": "0.0.3",
-  "engines": "0.9.1",
-  "author": "Minori Yamashita",
-  "dependencies": {
-    "optimist": "0.3.4"
-  }
-}

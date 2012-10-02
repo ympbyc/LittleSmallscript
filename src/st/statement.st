@@ -1,7 +1,7 @@
-| Packrat |
-Packrat := <require('./packrat')> at: #Packrat
+| Class |
+Class := <require('./class')> at: #Class
 .
-Packrat subclass: #Statement variables: #()
+Class subclass: #Statement variables: #()
 .
 !Statement
 statement
@@ -21,7 +21,7 @@ statement
 
       a + '; '
     ]).
-    ret := ret + 'return ' + self statementable + ';'.
+    ret := ret + 'return ' + self expression + ';'.
     self skipSpace.
     self optional: [ self chr: '.' ]. "allow tail period"
 
