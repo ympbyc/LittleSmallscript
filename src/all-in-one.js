@@ -391,13 +391,857 @@ process.binding = function (name) {
 
 });
 
-require.define("/src/package.json",function(require,module,exports,__dirname,__filename,process,global){module.exports = {}
+require.define("/src/js/production/statement.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
+  "use strict";
+  var Class;
+  Class = require('./class').Class;
+  var Statement;
+  Statement = function () {
+    if (this.init) {
+      this.init.apply(this, arguments);
+    }
+  };
+  Statement.prototype = new Class();;
+  Statement.prototype.statement = function () {
+    var _this = this;
+    return _this.cacheaParser("statement", function () {
+      var ret, vd;
+      ret = "";
+      _this.skipSpace();
+      vd = _this.optional(function () {
+        return _this.variableDeclaration();
+      });
+      (vd !== null) ? (function () {
+        return (ret += vd);
+      })() : void 0;
+      _this.skipSpace();
+      (ret += _this.many(function () {
+        var a;
+        a = _this.statementable();
+        _this.skipSpace();
+        _this.chr(".");
+        _this.skipSpace();
+        _this.followedBy(function () {
+          return _this.statementable();
+        });
+        return (a + "; ");
+      }));
+      ret = (((ret + "return ") + _this.expression()) + ";");
+      _this.skipSpace();
+      _this.optional(function () {
+        return _this.chr(".");
+      });
+      return ret;
+    });
+  };
+  Statement.prototype.statementable = function () {
+    var _this = this;
+    return _this.cacheaParser("statementable", function () {
+      return _this.try_([function () {
+        return _this.classHeader();
+      }, function () {
+        return _this.instanceMethod();
+      }, function () {
+        return _this.expression();
+      }]);
+    });
+  };
+  Statement.prototype.variableDeclaration = function () {
+    var _this = this;
+    return _this.cacheaParser("variableDeclaration", function () {
+      var ret;
+      ret = "var ";
+      _this.skipSpace();
+      _this.verticalBar();
+      (ret += _this.many1(function () {
+        _this.skipSpace();
+        return (_this.variable() + ", ");
+      }).replace(/,\s$/, "; "));
+      _this.skipSpace();
+      _this.verticalBar();
+      return ret;
+    });
+  };
+  exports.Statement = Statement;
+  return Statement;
+}).call(this);
 });
 
-require.define("/src/packrat.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
-  'use strict';
+require.define("/src/js/production/class.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
+  "use strict";
+  var Block;
+  Block = require('./block').Block;
+  var Class;
+  Class = function () {
+    this.instanceVariables = null;
+    this.currentClass = null;
+    if (this.init) {
+      this.init.apply(this, arguments);
+    }
+  };
+  Class.prototype = new Block();;
+  Class.prototype.init = function () {
+    var _this = this;
+    _this.instanceVariables = {};
+    return _this.currentClass = null;
+  };
+  Class.prototype.classHeader = function () {
+    var _this = this;
+    var dst_tmpl;
+    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };\n%className%.prototype = new %superClass%();";
+    return _this.cacheaParser("classHeader", function () {
+      var className, superClass, variables, v_init;
+      _this.optional(function () {
+        return _this.chr("+");
+      });
+      superClass = _this.variable();
+      _this.skipSpace();
+      _this.string("subclass:");
+      _this.skipSpace();
+      className = _this.variablableStringContent();
+      _this.skipSpace();
+      _this.string("variables:");
+      _this.skipSpace();
+      variables = _this.instanceVariableArray();
+      _this.instanceVariables[className] = [];
+      v_init = variables.injectinto("", function (a, b) {
+        _this.instanceVariables[className].push(a);
+        return (((b + "this.") + a) + " = null; ");
+      });
+      return _this.templateapply(dst_tmpl, {
+        "className": className,
+        "superClass": superClass,
+        "variableInitialization": v_init
+      });
+    });
+  };
+  Class.prototype.instanceVariableArray = function () {
+    var _this = this;
+    return _this.cacheaParser("instanceVariableArray", function () {
+      var variables;
+      variables = [];
+      _this.arrayStart();
+      _this.many(function () {
+        var v;
+        _this.skipSpace();
+        v = _this.variablableStringContent();
+        variables.push(v);
+        _this.skipSpace();
+        _this.optional(function () {
+          return _this.chr(",");
+        });
+        _this.skipSpace();
+        return v;
+      });
+      _this.closeParen();
+      return variables;
+    });
+  };
+  Class.prototype.variablableStringContent = function () {
+    var _this = this;
+    return _this.cacheaParser("variablableStringContent", function () {
+      return _this.try_([function () {
+        _this.chr("#");
+        return _this.variable();
+      }, function () {
+        return _this.betweenandaccept((function () {
+          return _this.apostrophe();
+        }), (function () {
+          return _this.apostrophe();
+        }), function () {
+          return _this.variable();
+        });
+      }]);
+    });
+  };
+  Class.prototype.instanceMethod = function () {
+    var _this = this;
+    var method_tmpl;
+    method_tmpl = "%className%.prototype.%methodName% = function (%args%) { var _this = this; %methodBody% }";
+    return _this.cacheaParser("instanceMethod", function () {
+      var className, methodHead, methodBody;
+      _this.exclamation();
+      _this.skipSpace();
+      className = _this.variable();
+      _this.skipSpace();
+      methodHead = _this.methodHead();
+      _this.skipSpace();
+      _this.setCurrentClass(className);
+      methodBody = _this.statement();
+      _this.setCurrentClass(null);
+      _this.skipSpace();
+      _this.exclamation();
+      return _this.templateapply(method_tmpl, {
+        "className": className,
+        "methodName": methodHead.name,
+        "args": methodHead.args,
+        "methodBody": methodBody
+      });
+    });
+  };
+  Class.prototype.methodHead = function () {
+    var _this = this;
+    return _this.cacheaParser("methodHead", function () {
+      var methodName, args;
+      methodName = "";
+      args = [];
+      _this.try_([function () {
+        return _this.many1(function () {
+          (methodName += _this.keywordSelector().slice((0), - 1));
+          _this.skipSpace();
+          args.push(_this.variable());
+          return _this.skipSpace();
+        });
+      }, function () {
+        return methodName = _this.unarySelector();
+      }]);
+      return {
+        "name": methodName,
+        "args": args.join(", ")
+      };
+    });
+  };
+  Class.prototype.setCurrentClass = function (className) {
+    var _this = this;
+    _this.currentClass = className;
+    return className;
+  };
+  Class.prototype.instanceVariableP = function (variableName) {
+    var _this = this;
+    var v;
+    return (((_this.currentClass !== null) && (_this.instanceVariables[_this.currentClass] !== undefined)) && (_this.instanceVariables[_this.currentClass].indexOf(variableName) > -1));
+  };
+  exports.Class = Class;
+  return Class;
+}).call(this);
+});
+
+require.define("/src/js/production/block.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
+  "use strict";
+  var Expression;
+  Expression = require('./expression').Expression;
+  var Block;
+  Block = function () {
+    if (this.init) {
+      this.init.apply(this, arguments);
+    }
+  };
+  Block.prototype = new Expression();;
+  Block.prototype.block = function () {
+    var _this = this;
+    var dst_tmpl;
+    dst_tmpl = "function (%parameters%) { %body% }";
+    return _this.cacheaParser("block", function () {
+      var parameters, body;
+      _this.blockStart();
+      parameters = _this.blockHead();
+      body = _this.optional(function () {
+        return _this.statement();
+      });
+      _this.blockEnd();
+      return _this.templateapply(dst_tmpl, {
+        "parameters": parameters,
+        "body": body
+      });
+    });
+  };
+  Block.prototype.blockParameters = function () {
+    var _this = this;
+    return _this.cacheaParser("blockParameters", function () {
+      var vars;
+      vars = "";
+      _this.skipSpace();
+      _this.many(function () {
+        _this.colon();
+        (vars += (_this.variable() + ", "));
+        return _this.skipSpace();
+      });
+      return vars.slice((0), - 2);
+    });
+  };
+  Block.prototype.blockHead = function () {
+    var _this = this;
+    return _this.cacheaParser("blockHead", function () {
+      return _this.optional(function () {
+        var params;
+        _this.skipSpace();
+        params = _this.blockParameters();
+        (params.size() > (0)) ? (function () {
+          return _this.verticalBar();
+        })() : void 0;
+        _this.skipSpace();
+        return params;
+      });
+    });
+  };
+  exports.Block = Block;
+  return Block;
+}).call(this);
+});
+
+require.define("/src/js/production/expression.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
+  "use strict";
+  var LittleParser, optimization;
+  LittleParser = require('./littleparser').LittleParser;
+  optimization = require('./optimization');
+  var Expression;
+  Expression = function () {
+    this.bundledMethods = null;
+    if (this.init) {
+      this.init.apply(this, arguments);
+    }
+  };
+  Expression.prototype = new LittleParser();;
+  Expression.prototype.init = function () {
+    var _this = this;
+    return _this.bundledMethods = [];
+  };
+  Expression.prototype.bundleAMethodIfAvailable = function (methodName) {
+    var _this = this;
+    return ((_this.bundledMethods.indexOf(methodName) > -1) && bundlableMethods.bundlable(methodName)) ? (function () {
+      return _this.bundledMethods.push(bundlableMethods.bundle(methodName));
+    })() : void 0;
+  };
+  Expression.prototype.expression = function () {
+    var _this = this;
+    var tmpl;
+    tmpl = "%assignments%%cascade%";
+    return _this.cacheaParser("expression", function () {
+      var assignments, cascade;
+      assignments = _this.optional(function () {
+        return _this.assignments();
+      });
+      cascade = _this.cascade();
+      return (function () {
+        var _ret;
+        try {
+          _ret = (function () {
+            return _this.templateapply(tmpl, {
+              "assignments": assignments,
+              "cascade": cascade
+            });
+          })();
+        } catch (err) {
+          _ret = function (e) {
+            return console.log(e);
+          }(err);
+        }
+        return _ret;
+      })();
+    });
+  };
+  Expression.prototype.assignments = function () {
+    var _this = this;
+    return _this.cacheaParser("assignments", function () {
+      return _this.many(function () {
+        var variable;
+        variable = _this.extendedVariable();
+        _this.skipSpace();
+        _this.assignmentArrow();
+        _this.skipSpace();
+        return (variable + " = ");
+      });
+    });
+  };
+  Expression.prototype.cascade = function () {
+    var _this = this;
+    var tmpl;
+    tmpl = "(function () { var _receiver = %simpleExpression%; %body% return _receiver;  })()";
+    return _this.cacheaParser("cascade", function () {
+      var se;
+      se = _this.simpleExpression();
+      return _this.try_([function () {
+        _this.skipSpace();
+        _this.notFollowedBy(function () {
+          return _this.semicolon();
+        });
+        return se;
+      }, function () {
+        var conti;
+        conti = _this.many(function () {
+          var mes;
+          _this.skipSpace();
+          _this.semicolon();
+          _this.skipSpace();
+          mes = _this.continuation();
+          return optimization.optimizationAvailable(mes.methodName) ? ((function () {
+            return (optimization.optimize("_receiver", mes.methodName, mes.args) + ";");
+          }))() : (function () {
+            return (("_receiver" + mes.js) + ";");
+          })();
+        });
+        return _this.templateapply(tmpl, {
+          "simpleExpression": se,
+          "body": conti
+        });
+      }]);
+    });
+  };
+  Expression.prototype.simpleExpression = function (allowedParsers) {
+    var _this = this;
+    return _this.cacheaParser("simpleExpression", function () {
+      var receiver, injection;
+      receiver = injection = _this.primaryReceiver();
+      _this.many(function () {
+        var mes, ret;
+        mes = _this.continuation(allowedParsers);
+        return optimization.optimizationAvailable(mes.methodName) ? ((function () {
+          return injection = optimization.optimize(injection, mes.methodName, mes.args);
+        }))() : (function () {
+          return mes.wrapMe ? ((function () {
+            return injection = ((("(" + injection) + mes.js) + ")");
+          }))() : (function () {
+            return (injection += mes.js);
+          })();
+        })();
+      });
+      return injection;
+    });
+  };
+  Expression.prototype.continuation = function (allowedParsers) {
+    var _this = this;
+    return _this.cacheaParser("continuation", function () {
+      (allowedParsers === undefined) ? (function () {
+        return allowedParsers = [function () {
+          return _this.keywordMessage();
+        }, function () {
+          return _this.binaryMessage();
+        }, function () {
+          return _this.unaryMessage();
+        }];
+      })() : void 0;
+      return _this.try_(allowedParsers);
+    });
+  };
+  Expression.prototype.keywordMessage = function () {
+    var _this = this;
+    return _this.cacheaParser("keywordMessage", function () {
+      var methodName, args;
+      methodName = "";
+      args = [];
+      _this.many1(function () {
+        _this.skipSpace();
+        (methodName += _this.keywordSelector().replace(":", ""));
+        _this.skipSpace();
+        args.push(_this.simpleExpression([function () {
+          return _this.binaryMessage();
+        }, function () {
+          return _this.unaryMessage();
+        }]));
+        return _this.skipSpace();
+      });
+      return {
+        "js": (((("." + methodName) + "(") + args.join(", ")) + ")"),
+        "wrapMe": false,
+        "methodName": methodName,
+        "args": args
+      };
+    });
+  };
+  Expression.prototype.binaryMessage = function () {
+    var _this = this;
+    return _this.cacheaParser("binaryMessage", function () {
+      var operator, argument;
+      _this.skipSpace();
+      operator = _this.operator();
+      _this.skipSpace();
+      argument = _this.simpleExpression([function () {
+        return _this.unaryMessage();
+      }]);
+      return {
+        "js": (((" " + operator) + " ") + argument),
+        "wrapMe": true,
+        "methodName": operator,
+        "args": [argument]
+      };
+    });
+  };
+  Expression.prototype.unaryMessage = function () {
+    var _this = this;
+    return _this.cacheaParser("unaryMessage", function () {
+      var unarySelector;
+      _this.skipSpace();
+      unarySelector = _this.unarySelector();
+      return {
+        "js": (("." + unarySelector) + "()"),
+        "wrapMe": false,
+        "methodName": unarySelector,
+        "args": []
+      };
+    });
+  };
+  Expression.prototype.primary = function () {
+    var _this = this;
+    return _this.cacheaParser("primary", function () {
+      return _this.try_([function () {
+        return _this.extendedVariable();
+      }, function () {
+        return _this.literal();
+      }, function () {
+        return _this.block();
+      }, function () {
+        return _this.primitive();
+      }, function () {
+        return _this.betweenandaccept((function () {
+          _this.chr("(");
+          return _this.skipSpace();
+        }), (function () {
+          _this.skipSpace();
+          return _this.chr(")");
+        }), function () {
+          return _this.cascade();
+        });
+      }]);
+    });
+  };
+  Expression.prototype.primaryReceiver = function () {
+    var _this = this;
+    return _this.cacheaParser("primaryReceiver", function () {
+      return _this.try_([function () {
+        var num;
+        num = _this.numberLiteral();
+        _this.followedBy(function () {
+          return _this.try_([function () {
+            return _this.keywordMessage();
+          }, function () {
+            return _this.unaryMessage();
+          }]);
+        });
+        return (("(" + num) + ")");
+      }, function () {
+        _this.followedBy(function () {
+          _this.block();
+          _this.skipSpace();
+          return _this.try_([function () {
+            return _this.keywordMessage();
+          }, function () {
+            return _this.unaryMessage();
+          }]);
+        });
+        return (("(" + _this.block()) + ")");
+      }, function () {
+        return _this.primary();
+      }]);
+    });
+  };
+  Expression.prototype.primitive = function () {
+    var _this = this;
+    return _this.cacheaParser("primitive", function () {
+      _this.skipSpace();
+      return _this.betweenandaccept((function () {
+        _this.chr("<");
+        _this.notFollowedBy(function () {
+          return _this.chr("-");
+        });
+        return "<";
+      }), (function () {
+        return _this.chr(">");
+      }), function () {
+        return _this.anyChar();
+      });
+    });
+  };
+  Expression.prototype.operator = function () {
+    var _this = this;
+    var p;
+    p = function (str) {
+      return function () {
+        return _this.string(str);
+      };
+    };
+    return _this.cacheaParser("operator", function () {
+      var op;
+      _this.skipSpace();
+      return op = _this.try_([p("+="), p("-="), p("*="), p("/="), p("+"), p("-"), p("*"), p("/"), p("%"), p("==="), p("!=="), p("<="), p(">="), p("<"), p(">"), p("^"), p("&&"), p("||")]);
+    });
+  };
+  exports.Expression = Expression;
+  return Expression;
+}).call(this);
+});
+
+require.define("/src/js/production/littleparser.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
+  "use strict";
   var Packrat;
-  require('./littlesmallmethods');
+  Packrat = require('./packrat').Packrat;
+  var LittleParser;
+  LittleParser = function () {
+    if (this.init) {
+      this.init.apply(this, arguments);
+    }
+  };
+  LittleParser.prototype = new Packrat();;
+  LittleParser.prototype.space = function () {
+    var _this = this;
+    return _this.cacheaParser("space", function () {
+      return _this.regex(new RegExp("^[\\s\\n\\t]+"));
+    });
+  };
+  LittleParser.prototype.blockStart = function () {
+    var _this = this;
+    return _this.cacheaParser("blockStart", function () {
+      return _this.chr("[");
+    });
+  };
+  LittleParser.prototype.blockEnd = function () {
+    var _this = this;
+    return _this.cacheaParser("blockEnd", function () {
+      return _this.chr("]");
+    });
+  };
+  LittleParser.prototype.verticalBar = function () {
+    var _this = this;
+    return _this.cacheaParser("verticalBar", function () {
+      return _this.chr("|");
+    });
+  };
+  LittleParser.prototype.colon = function () {
+    var _this = this;
+    return _this.cacheaParser("colon", function () {
+      return _this.chr(":");
+    });
+  };
+  LittleParser.prototype.semicolon = function () {
+    var _this = this;
+    return _this.cacheaParser("semicolon", function () {
+      return _this.chr(";");
+    });
+  };
+  LittleParser.prototype.assignmentArrow = function () {
+    var _this = this;
+    return _this.cacheaParser("assignmentArrow", function () {
+      return _this.try_([function () {
+        return _this.string(":=");
+      }, function () {
+        return _this.string("<-");
+      }]);
+    });
+  };
+  LittleParser.prototype.apostrophe = function () {
+    var _this = this;
+    return _this.cacheaParser("apostrophe", function () {
+      return _this.chr("'");
+    });
+  };
+  LittleParser.prototype.arrayStart = function () {
+    var _this = this;
+    return _this.cacheaParser("arrayStart", function () {
+      _this.string("#(");
+      return _this.skipSpace();
+    });
+  };
+  LittleParser.prototype.closeParen = function () {
+    var _this = this;
+    return _this.cacheaParser("closeParen", function () {
+      return _this.chr(")");
+    });
+  };
+  LittleParser.prototype.hashStart = function () {
+    var _this = this;
+    return _this.cacheaParser("hashStart", function () {
+      return _this.string("#{");
+    });
+  };
+  LittleParser.prototype.hashEnd = function () {
+    var _this = this;
+    return _this.cacheaParser("hashEnd", function () {
+      return _this.chr("}");
+    });
+  };
+  LittleParser.prototype.exclamation = function () {
+    var _this = this;
+    return _this.cacheaParser("exclamation", function () {
+      return _this.chr("!");
+    });
+  };
+  LittleParser.prototype.variable = function () {
+    var _this = this;
+    return _this.cacheaParser("variable", function () {
+      return _this.regex(new RegExp("^[a-zA-Z_$][a-zA-Z0-9_$]*"));
+    });
+  };
+  LittleParser.prototype.extendedVariable = function () {
+    var _this = this;
+    return _this.cacheaParser("extendedVariable", function () {
+      var v;
+      v = _this.regex(new RegExp("^[a-zA-Z_$][a-zA-Z0-9_$]*"));
+      return (v === "self") ? ((function () {
+        return "_this";
+      }))() : (function () {
+        _this.instanceVariableP(v) ? (function () {
+          return v = ("_this." + v);
+        })() : void 0;
+        return v;
+      })();
+    });
+  };
+  LittleParser.prototype.keywordSelector = function () {
+    var _this = this;
+    return _this.cacheaParser("keywordSelector", function () {
+      return _this.sequence([function () {
+        return _this.variable();
+      }, function () {
+        return _this.colon();
+      }]);
+    });
+  };
+  LittleParser.prototype.unarySelector = function () {
+    var _this = this;
+    return _this.cacheaParser("unarySelector", function () {
+      var sel;
+      sel = _this.variable();
+      _this.notFollowedBy(function () {
+        return _this.colon();
+      });
+      return sel;
+    });
+  };
+  LittleParser.prototype.explicitReturn = function () {
+    var _this = this;
+    return _this.cacheaParser("explicitReturn", function () {
+      return _this.chr("^");
+    });
+  };
+  LittleParser.prototype.commentQuote = function () {
+    var _this = this;
+    return _this.cacheaParser("commentQuote", function () {
+      return _this.chr("\"");
+    });
+  };
+  LittleParser.prototype.skipSpace = function () {
+    var _this = this;
+    return _this.cacheaParser("skipSpace", function () {
+      _this.optional(function () {
+        return _this.space();
+      });
+      return _this.many(function () {
+        _this.betweenandaccept((function () {
+          return _this.commentQuote();
+        }), (function () {
+          return _this.commentQuote();
+        }), function () {
+          return _this.anyChar();
+        });
+        return _this.optional(function () {
+          return _this.space();
+        });
+      });
+    });
+  };
+  LittleParser.prototype.literal = function () {
+    var _this = this;
+    return _this.cacheaParser("literal", function () {
+      return _this.try_([function () {
+        return _this.numberLiteral();
+      }, function () {
+        return _this.stringLiteral();
+      }, function () {
+        return _this.symbolLiteral();
+      }, function () {
+        return _this.arrayLiteral();
+      }, function () {
+        return _this.hashLiteral();
+      }, function () {
+        return _this.block();
+      }]);
+    });
+  };
+  LittleParser.prototype.numberLiteral = function () {
+    var _this = this;
+    return _this.cacheaParser("numberLiteral", function () {
+      return _this.regex(new RegExp("^-?[0-9]+(\\.?[0-9]+)?"));
+    });
+  };
+  LittleParser.prototype.stringLiteral = function () {
+    var _this = this;
+    return _this.cacheaParser("stringLiteral", function () {
+      return (("\"" + _this.betweenandaccept((function () {
+        return _this.apostrophe();
+      }), (function () {
+        return _this.apostrophe();
+      }), function () {
+        return _this.anyChar();
+      }).replace(/\n/g, "\\n")) + "\"");
+    });
+  };
+  LittleParser.prototype.symbolLiteral = function () {
+    var _this = this;
+    return _this.cacheaParser("symbolLiteral", function () {
+      _this.chr("#");
+      return (("\"" + _this.variable()) + "\"");
+    });
+  };
+  LittleParser.prototype.arrayLiteral = function () {
+    var _this = this;
+    var args;
+    return _this.cacheaParser("arrayLiteral", function () {
+      args = [];
+      _this.arrayStart();
+      _this.many(function () {
+        args.push(_this.expression());
+        _this.skipSpace();
+        _this.optional(function () {
+          return _this.chr(",");
+        });
+        return _this.skipSpace();
+      });
+      _this.closeParen();
+      return (("[" + args.join(", ")) + "]");
+    });
+  };
+  LittleParser.prototype.hashLiteral = function () {
+    var _this = this;
+    return _this.cacheaParser("hashLiteral", function () {
+      var ret;
+      ret = "";
+      _this.hashStart();
+      (ret += "{");
+      (ret += _this.many(function () {
+        var key, val;
+        _this.skipSpace();
+        key = _this.try_([function () {
+          return _this.stringLiteral();
+        }, function () {
+          return _this.numberLiteral();
+        }, function () {
+          return _this.symbolLiteral();
+        }]);
+        _this.skipSpace();
+        _this.colon();
+        _this.skipSpace();
+        val = _this.expression();
+        _this.skipSpace();
+        _this.optional(function () {
+          return _this.chr(",");
+        });
+        return (((key + ": ") + val) + ",");
+      }).slice((0), - 1));
+      _this.skipSpace();
+      _this.hashEnd();
+      (ret += "}");
+      return ret;
+    });
+  };
+  LittleParser.prototype.templateapply = function (template, hashmap) {
+    var _this = this;
+    var dest_str;
+    dest_str = template;
+    hashmap.do_(function (it, key) {
+      ((it === null) || (it === undefined)) ? (function () {
+        return it = "";
+      })() : void 0;
+      return dest_str = dest_str.replace(new RegExp((("%" + key) + "%"), "g"), it);
+    });
+    return dest_str;
+  };
+  exports.LittleParser = LittleParser;
+  return LittleParser;
+}).call(this);
+});
+
+require.define("/src/js/production/packrat.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
+  "use strict";
+  require('../../prelude');
   Number.prototype.timesString = function (str) {
     var _this = this;
     var ret;
@@ -407,17 +1251,22 @@ require.define("/src/packrat.js",function(require,module,exports,__dirname,__fil
     });
     return ret;
   };
-  Packrat = (function (_super) {
-    var _Constructor;
-    _Constructor = function ( /* &rest arguments */ ) {
-      if (this.init) this.init.apply(this, arguments);
-    };
-    _Constructor.prototype = new _super();
-    return _Constructor;
-  })(Object);
-  Packrat.prototype.init = function (input) {
+  var Packrat;
+  Packrat = function () {
+    this.input = null;
+    this.index = null;
+    this.cache = null;
+    this.maxIndex = null;
+    this.logNest = null;
+    this.stackTrace = null;
+    if (this.init) {
+      this.init.apply(this, arguments);
+    }
+  };
+  Packrat.prototype = new Object();;
+  Packrat.prototype.init = function (text) {
     var _this = this;
-    _this.input = input;
+    _this.input = text;
     _this.index = 0;
     _this.cache = {};
     _this.maxIndex = 0;
@@ -428,23 +1277,43 @@ require.define("/src/packrat.js",function(require,module,exports,__dirname,__fil
     var _this = this;
     return _this.index;
   };
+  Packrat.prototype.getMaxIndex = function () {
+    var _this = this;
+    return _this.maxIndex;
+  };
   Packrat.prototype.getInputLength = function () {
     var _this = this;
-    return _this.input.length;
+    return _this.input.size();
   };
-  Packrat.prototype.cacheparser = function (s, fn) {
+  Packrat.prototype.getStackTrace = function () {
+    var _this = this;
+    return _this.stackTrace;
+  };
+  Packrat.prototype.cacheaParser = function (s, fn) {
     var _this = this;
     var c, slot, logIndent;
-    fn = (fn || function () {});
+    fn = (fn !== undefined) ? ((function () {
+      return fn;
+    }))() : (function () {
+      return function () {};
+    })();
     c = {};
     (_this.logNest += 1);
     logIndent = _this.logNest.timesString("  ");
     (_this.stackTrace += (((((logIndent + "ENTER : ") + s) + " : ") + _this.input.substring(_this.index)) + "\n"));
     (function () {
-      return (_this.cache[s] === undefined) ? (_this.cache[s] = {})() : void 0;
-    }).tryCatch(function () {
-      return _this.cache[s] = {};
-    });
+      var _ret;
+      try {
+        _ret = (function () {
+          return (_this.cache[s] === undefined) ? (_this.cache[s] = {})() : void 0;
+        })();
+      } catch (err) {
+        _ret = function () {
+          return _this.cache[s] = {};
+        }(err);
+      }
+      return _ret;
+    })();
     slot = _this.cache[s][_this.index];
     return ((slot !== undefined) && (slot !== null)) ? ((function () {
       c = slot;
@@ -457,24 +1326,32 @@ require.define("/src/packrat.js",function(require,module,exports,__dirname,__fil
       return c.fn;
     }))() : (function () {
       return (function () {
-        c.idx = _this.index;
-        c.fn = fn.call(_this);
-        _this.cache[s][c.idx] = {
-          "fn": c.fn,
-          "idx": _this.index
-        };
-        (_this.index > _this.maxIndex) ? (function () {
-          return _this.maxIndex = _this.index;
-        })() : void 0;
-        (_this.stackTrace += (((((logIndent + "PASS  : ") + s) + " : ") + c.fn) + "\n"));
-        (_this.logNest -= 1);
-        return c.fn;
-      }).tryCatch(function (err) {
-        _this.cache[s][c.idx] = null;
-        (_this.stackTrace += (((logIndent + "FAIL  : ") + s) + "\n"));
-        (_this.logNest -= 1);
-        return _this.noParse();
-      });
+        var _ret;
+        try {
+          _ret = (function () {
+            c.idx = _this.index;
+            c.fn = fn.call(_this);
+            _this.cache[s][c.idx] = {
+              "fn": c.fn,
+              "idx": _this.index
+            };
+            (_this.index > _this.maxIndex) ? (function () {
+              return _this.maxIndex = _this.index;
+            })() : void 0;
+            (_this.stackTrace += (((((logIndent + "PASS  : ") + s) + " : ") + c.fn) + "\n"));
+            (_this.logNest -= 1);
+            return c.fn;
+          })();
+        } catch (err) {
+          _ret = function (err) {
+            _this.cache[s][c.idx] = null;
+            (_this.stackTrace += (((logIndent + "FAIL  : ") + s) + "\n"));
+            (_this.logNest -= 1);
+            return _this.noParse();
+          }(err);
+        }
+        return _ret;
+      })();
     })();
   };
   Packrat.prototype.noParse = function () {
@@ -488,16 +1365,24 @@ require.define("/src/packrat.js",function(require,module,exports,__dirname,__fil
     parsers.do_(function (parser) {
       return (ret === undefined) ? (function () {
         return (function () {
-          return ret = parser.call(_this);
-        }).tryCatch(function () {
-          return _this.index = i;
-        });
+          var _ret;
+          try {
+            _ret = (function () {
+              return ret = parser.call(_this);
+            })();
+          } catch (err) {
+            _ret = function () {
+              return _this.index = i;
+            }(err);
+          }
+          return _ret;
+        })();
       })() : void 0;
     });
     return (ret !== undefined) ? ((function () {
       return ret;
     }))() : (function () {
-      return _this.noParse("try_");
+      return _this.noParse();
     })();
   };
   Packrat.prototype.sequence = function (parsers) {
@@ -509,12 +1394,20 @@ require.define("/src/packrat.js",function(require,module,exports,__dirname,__fil
     parsers.do_(function (parser) {
       return fail ? void 0 : (function () {
         return (function () {
-          return (ret += parser.call(_this));
-        }).tryCatch(function (err) {
-          _this.index = i;
-          fail = true;
-          return _this.noParse();
-        });
+          var _ret;
+          try {
+            _ret = (function () {
+              return (ret += parser.call(_this));
+            })();
+          } catch (err) {
+            _ret = function (err) {
+              _this.index = i;
+              fail = true;
+              return _this.noParse();
+            }(err);
+          }
+          return _ret;
+        })();
       })();
     });
     return fail ? (function () {
@@ -528,11 +1421,19 @@ require.define("/src/packrat.js",function(require,module,exports,__dirname,__fil
     var ret, i;
     i = _this.index;
     return (function () {
-      return parser.call(_this);
-    }).tryCatch(function () {
-      _this.index = i;
-      return null;
-    });
+      var _ret;
+      try {
+        _ret = (function () {
+          return parser.call(_this);
+        })();
+      } catch (err) {
+        _ret = function () {
+          _this.index = i;
+          return null;
+        }(err);
+      }
+      return _ret;
+    })();
   };
   Packrat.prototype.followedBy = function (parser) {
     var _this = this;
@@ -540,9 +1441,17 @@ require.define("/src/packrat.js",function(require,module,exports,__dirname,__fil
     f = true;
     i = _this.index;
     (function () {
-      parser.call(_this);
-      return f = false;
-    }).tryCatch(function () {});
+      var _ret;
+      try {
+        _ret = (function () {
+          parser.call(_this);
+          return f = false;
+        })();
+      } catch (err) {
+        _ret = function () {}(err);
+      }
+      return _ret;
+    })();
     _this.index = i;
     return f ? ((function () {
       return _this.noParse();
@@ -556,9 +1465,17 @@ require.define("/src/packrat.js",function(require,module,exports,__dirname,__fil
     f = false;
     i = _this.index;
     (function () {
-      parser.call(_this);
-      return f = true;
-    }).tryCatch(function () {});
+      var _ret;
+      try {
+        _ret = (function () {
+          parser.call(_this);
+          return f = true;
+        })();
+      } catch (err) {
+        _ret = function () {}(err);
+      }
+      return _ret;
+    })();
     _this.index = i;
     return f ? ((function () {
       return _this.noParse();
@@ -631,8 +1548,8 @@ require.define("/src/packrat.js",function(require,module,exports,__dirname,__fil
   };
   Packrat.prototype.string = function (str) {
     var _this = this;
-    return (_this.input.substring(_this.index, (_this.index + str.length)) === str) ? ((function () {
-      (_this.index += str.length);
+    return (_this.input.substring(_this.index, (_this.index + str.size())) === str) ? ((function () {
+      (_this.index += str.size());
       return str;
     }))() : (function () {
       return _this.noParse();
@@ -667,7 +1584,7 @@ require.define("/src/packrat.js",function(require,module,exports,__dirname,__fil
 }).call(this);
 });
 
-require.define("/src/littlesmallmethods.js",function(require,module,exports,__dirname,__filename,process,global){/*
+require.define("/src/prelude.js",function(require,module,exports,__dirname,__filename,process,global){/*
  * Copyright (c) 2012 Minori Yamashita <ympbyc@gmail.com>
  * See LICENCE.txt
  */
@@ -680,30 +1597,6 @@ require.define("/src/littlesmallmethods.js",function(require,module,exports,__di
   'use strict';
   var __hasProp = {}.hasOwnProperty;
   
-  Function.prototype.subclass = function () {
-    var Sc = function () {};
-    Sc = function () {};
-    Sc.prototype = new this();
-    Sc.prototype.init = function () {}; // gets called immidiately after new
-    Sc.prototype.__init = function () {}; //internal use only
-    return Sc;
-  };
-  Function.prototype.new_ = function () {
-    var newInstance = new this();
-    if (newInstance.__init) newInstance.__init.call(newInstance);
-    if (newInstance.init) newInstance.init.apply(newInstance, arguments);
-    return newInstance;
-  };
-  // method:at:
-  Function.prototype.methodat = function (fn, slot) {
-    return this.prototype[slot] = fn;
-  };
-  // method:withKeywords:
-  Function.prototype.methodwithKeywords = function (fn, arr) {
-    var methName = arr.injectinto('', function (a,b) { return b + a; });
-    return this.methodat(fn, methName);
-  };
-
   Object.prototype.asString = Object.prototype.toString;
   Object.prototype.class_ = function () { return this.constructor; };
   Object.prototype.copy = Object.prototype.shallowCopy = function () { return this; };
@@ -723,29 +1616,9 @@ require.define("/src/littlesmallmethods.js",function(require,module,exports,__di
   Object.prototype.error = function (str) { throw str; };
   Object.prototype.isKindOf = function (Klass) { return this instanceof Klass; };
   Object.prototype.isMemberOf = function (Klass) { return this.class_() === Klass;  };
-  Object.prototype.isNil = function () { return this === null || this === undefined;  };
-  Object.prototype.notNil = function () { return this !== null && this !== undefined;  };
   Object.prototype.print = Object.printString = function () { return JSON ? JSON.stringify(this) : this.toString();  };
-  Object.prototype.respondsTo = function (name) { return this[name].notNil(); };
-  
-  Boolean.prototype.and = function (fn) { return this.valueOf() ? (fn.call(this) ? true : false) : false;  };
-  Boolean.prototype.or = function (fn) { return  this.valueOf() ? true : (fn.call(this) ? true : false); };
-  Boolean.prototype.eqv = function (bool) {
-    if (typeof bool !== 'boolean' && ! bool instanceof Boolean) throw 'Beelean.eqv expects parameter 1 to be bool.' + bool + 'given.'; 
-    return this.valueOf() === bool;
-  };
-  Boolean.prototype.xor = function (bool) {
-  if (typeof bool !== 'boolean' && ! bool instanceof Boolean) throw 'Beelean.xor expects parameter 1 to be bool.' + bool + 'given.'; 
-    return this.valueOf() !== bool;
-  };
-  Boolean.prototype.ifTrue = function (fn) { return this.valueOf() ? fn.call(this) : null;  };
-  Boolean.prototype.ifFalse = function (fn) { return this.valueOf() ? null : fn.call(this);  };
-  // ifTrue:ifFalse
-  Boolean.prototype.ifTrueifFalse = function (t, f) { return this.valueOf() ? t.call(this) : f.call(this); };
-  // ifFalse:ifTrue
-  Boolean.prototype.ifFalseifTrue = function (f, t) { return this.valueOf() ? t.call(this) : f.call(this); };
-  Boolean.prototype.not = function () { return ! this.valueOf(); };
-  
+  Object.prototype.respondsTo = function (name) { return this[name] !== undefined && this[name] !== null; };
+    
   Number.prototype.to = function (tonum) { 
     var i = this-1, 
     res = []; 
@@ -766,13 +1639,6 @@ require.define("/src/littlesmallmethods.js",function(require,module,exports,__di
     return (0).to(this).do_(function (it) { return fn.call(_this, it); }); 
   };
   
-  Object.prototype.addAll = function (col) {
-    var _this = this;
-    col.do_(function (it, key) {
-      _this[key] = it;
-    });
-    return this;
-  };
   Object.prototype.asArray = function () {
     return this.collect(function (it) {return it});
   };
@@ -881,12 +1747,6 @@ require.define("/src/littlesmallmethods.js",function(require,module,exports,__di
       return fn.call(this);
     }
   };
-  // atAll:put:
-  Object.prototype.atAllput = function (keys, item) {
-    var _this = this;
-    keys.do_(function (key) { return _this[key] = item;  });
-    return this;
-  };
   // at:put:
   Object.prototype.atput = function (key, item) {
     this[key] = item;
@@ -919,19 +1779,7 @@ require.define("/src/littlesmallmethods.js",function(require,module,exports,__di
   Object.prototype.keySelect = function (fn) {
     return this.keys().select(fn);
   };
-  Object.prototype.removeKey = function (key) {
-    if (this[key].isNil()) throw "Object.removeKey: slot " + key + " not found";
-    return delete this[key];
-  };
-  // removeKey:ifAbsent:
-  Object.prototype.removeKeyifAbsent = function (key, fn) {
-    try {
-      return this.removeKey(key);
-    } catch (err) {
-      return fn.call(this);
-    }
-  };
-
+  
   Array.prototype.addLast = function (item) { this.push(item); return this; };  
   Array.prototype.do_ = Array.prototype.binaryDo = Array.prototype.forEach || Object.prototype.do_;
   Array.prototype.collect = Array.prototype.map || function (fn) {
@@ -1083,532 +1931,8 @@ require.define("/src/littlesmallmethods.js",function(require,module,exports,__di
 
 });
 
-require.define("/src/littleparser.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
-  'use strict';
-  var Packrat, LittleParser;
-  Packrat = require('./packrat').Packrat;
-  LittleParser = (function (_super) {
-    var _Constructor;
-    _Constructor = function ( /* &rest arguments */ ) {
-      if (this.init) this.init.apply(this, arguments);
-    };
-    _Constructor.prototype = new _super();
-    return _Constructor;
-  })(Packrat);
-  LittleParser.prototype.space = function () {
-    var _this = this;
-    return _this.cacheparser("space", function () {
-      return _this.regex(new RegExp("^[\\s\\n\\t]+"));
-    });
-  };
-  LittleParser.prototype.blockStart = function () {
-    var _this = this;
-    return _this.cacheparser("blockStart", function () {
-      return _this.chr("[");
-    });
-  };
-  LittleParser.prototype.blockEnd = function () {
-    var _this = this;
-    return _this.cacheparser("blockEnd", function () {
-      return _this.chr("]");
-    });
-  };
-  LittleParser.prototype.verticalBar = function () {
-    var _this = this;
-    return _this.cacheparser("verticalBar", function () {
-      return _this.chr("|");
-    });
-  };
-  LittleParser.prototype.colon = function () {
-    var _this = this;
-    return _this.cacheparser("colon", function () {
-      return _this.chr(":");
-    });
-  };
-  LittleParser.prototype.semicolon = function () {
-    var _this = this;
-    return _this.cacheparser("semicolon", function () {
-      return _this.chr(";");
-    });
-  };
-  LittleParser.prototype.assignmentArrow = function () {
-    var _this = this;
-    return _this.cacheparser("assignmentArrow", function () {
-      return _this.try_([function () {
-        return _this.string(":=");
-      }, function () {
-        return _this.string("<-");
-      }]);
-    });
-  };
-  LittleParser.prototype.apostrophe = function () {
-    var _this = this;
-    return _this.cacheparser("apostrophe", function () {
-      return _this.chr("'");
-    });
-  };
-  LittleParser.prototype.arrayStart = function () {
-    var _this = this;
-    return _this.cacheparser("arrayStart", function () {
-      _this.string("#(");
-      return _this.skipSpace();
-    });
-  };
-  LittleParser.prototype.closeParen = function () {
-    var _this = this;
-    return _this.cacheparser("closeParen", function () {
-      return _this.chr(")");
-    });
-  };
-  LittleParser.prototype.hashStart = function () {
-    var _this = this;
-    return _this.cacheparser("hashStart", function () {
-      return _this.string("#{");
-    });
-  };
-  LittleParser.prototype.hashEnd = function () {
-    var _this = this;
-    return _this.cacheparser("hashEnd", function () {
-      return _this.chr("}");
-    });
-  };
-  LittleParser.prototype.exclamation = function () {
-    var _this = this;
-    return _this.cacheparser("exclamation", function () {
-      return _this.chr("!");
-    });
-  };
-  LittleParser.prototype.variable = function () {
-    var _this = this;
-    return _this.cacheparser("variable", function () {
-      return _this.regex(new RegExp("^[a-zA-Z_$][a-zA-Z0-9_$]*"));
-    });
-  };
-  LittleParser.prototype.extendedVariable = function () {
-    var _this = this;
-    return _this.cacheparser("extendedVariable", function () {
-      var v;
-      v = _this.regex(new RegExp("^[a-zA-Z_$][a-zA-Z0-9_$]*"));
-      return (v === "self") ? ((function () {
-        return "_this";
-      }))() : (function () {
-        _this.instanceVariableP(v) ? (function () {
-          return v = ("_this." + v);
-        })() : void 0;
-        return v;
-      })();
-    });
-  };
-  LittleParser.prototype.keywordSelector = function () {
-    var _this = this;
-    return _this.cacheparser("keywordSelector", function () {
-      return _this.sequence([_this.variable, _this.colon]);
-    });
-  };
-  LittleParser.prototype.unarySelector = function () {
-    var _this = this;
-    return _this.cacheparser("unarySelector", function () {
-      var sel;
-      sel = _this.sequence([_this.variable]);
-      _this.notFollowedBy(_this.colon);
-      return sel;
-    });
-  };
-  LittleParser.prototype.explicitReturn = function () {
-    var _this = this;
-    return _this.cacheparser("explicitReturn", function () {
-      return _this.chr("^");
-    });
-  };
-  LittleParser.prototype.commentQuote = function () {
-    var _this = this;
-    return _this.cacheparser("commentQuote", function () {
-      return _this.chr("\"");
-    });
-  };
-  LittleParser.prototype.skipSpace = function () {
-    var _this = this;
-    return _this.cacheparser("skipSpace", function () {
-      _this.optional(_this.space);
-      return _this.many(function () {
-        _this.betweenandaccept(_this.commentQuote, _this.commentQuote, _this.anyChar);
-        return _this.optional(_this.space);
-      });
-    });
-  };
-  LittleParser.prototype.literal = function () {
-    var _this = this;
-    return _this.cacheparser("literal", function () {
-      return _this.try_([_this.numberLiteral, _this.stringLiteral, _this.symbolLiteral, _this.arrayLiteral, _this.hashLiteral, _this.block]);
-    });
-  };
-  LittleParser.prototype.numberLiteral = function () {
-    var _this = this;
-    return _this.cacheparser("numberLiteral", function () {
-      return _this.regex(new RegExp("^-?[0-9]+(\\.?[0-9]+)?"));
-    });
-  };
-  LittleParser.prototype.stringLiteral = function () {
-    var _this = this;
-    return _this.cacheparser("stringLiteral", function () {
-      return (("\"" + _this.betweenandaccept(_this.apostrophe, _this.apostrophe, _this.anyChar)) + "\"");
-    });
-  };
-  LittleParser.prototype.symbolLiteral = function () {
-    var _this = this;
-    return _this.cacheparser("symbolLiteral", function () {
-      _this.chr("#");
-      return (("\"" + _this.variable()) + "\"");
-    });
-  };
-  LittleParser.prototype.arrayLiteral = function () {
-    var _this = this;
-    var args;
-    return _this.cacheparser("arrayLiteral", function () {
-      args = [];
-      _this.arrayStart();
-      _this.many(function () {
-        args.push(_this.expression());
-        _this.skipSpace();
-        _this.optional(function () {
-          return _this.chr(",");
-        });
-        return _this.skipSpace();
-      });
-      _this.closeParen();
-      return (("[" + args.join(", ")) + "]");
-    });
-  };
-  LittleParser.prototype.hashLiteral = function () {
-    var _this = this;
-    return _this.cacheparser("hashLiteral", function () {
-      var ret;
-      ret = "";
-      _this.hashStart();
-      (ret += "{");
-      (ret += _this.many(function () {
-        var key, val;
-        _this.skipSpace();
-        key = _this.try_([_this.stringLiteral, _this.numberLiteral, _this.symbolLiteral]);
-        _this.skipSpace();
-        _this.colon();
-        _this.skipSpace();
-        val = _this.expression();
-        _this.skipSpace();
-        _this.optional(function () {
-          return _this.chr(",");
-        });
-        return (((key + ": ") + val) + ",");
-      }).slice((0), - 1));
-      _this.skipSpace();
-      _this.hashEnd();
-      (ret += "}");
-      return ret;
-    });
-  };
-  LittleParser.prototype.templateapply = function (template, hashmap) {
-    var _this = this;
-    var dest_str;
-    dest_str = template;
-    hashmap.do_(function (it, key) {
-      ((it === null) || (it === undefined)) ? (function () {
-        return it = "";
-      })() : void 0;
-      return dest_str = dest_str.replace(new RegExp((("%" + key) + "%"), "g"), it);
-    });
-    return dest_str;
-  };
-  exports.LittleParser = LittleParser;
-  return LittleParser;
-}).call(this);
-});
-
-require.define("/src/blockparser.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
-  'use strict';
-  var Packrat, BlockParser;
-  Packrat = require('./packrat').Packrat;
-  BlockParser = (function (_super) {
-    var _Constructor;
-    _Constructor = function ( /* &rest arguments */ ) {
-      if (this.init) this.init.apply(this, arguments);
-    };
-    _Constructor.prototype = new _super();
-    return _Constructor;
-  })(Packrat);
-  BlockParser.prototype.block = function () {
-    var _this = this;
-    var dst_tmpl;
-    dst_tmpl = "function (%parameters%) { %body% }";
-    return _this.cacheparser("block", function () {
-      var parameters, body;
-      _this.blockStart();
-      parameters = _this.blockHead();
-      body = _this.optional(_this.statement);
-      _this.blockEnd();
-      return _this.templateapply(dst_tmpl, {
-        "parameters": parameters,
-        "body": body
-      });
-    });
-  };
-  BlockParser.prototype.blockParameters = function () {
-    var _this = this;
-    return _this.cacheparser("blockParameters", function () {
-      var vars;
-      vars = "";
-      _this.skipSpace();
-      _this.many(function () {
-        _this.colon();
-        (vars += (_this.variable() + ", "));
-        return _this.skipSpace();
-      });
-      return vars.slice((0), - 2);
-    });
-  };
-  BlockParser.prototype.blockHead = function () {
-    var _this = this;
-    return _this.cacheparser("blockHead", function () {
-      return _this.optional(function () {
-        var params;
-        _this.skipSpace();
-        params = _this.blockParameters();
-        (params.length > (0)) ? (function () {
-          return _this.verticalBar();
-        })() : void 0;
-        _this.skipSpace();
-        return params;
-      });
-    });
-  };
-  exports.BlockParser = BlockParser;
-  return BlockParser;
-}).call(this);
-});
-
-require.define("/src/expression.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
-  'use strict';
-  var Packrat, optimization, Expression;
-  Packrat = require('./packrat').Packrat;
-  optimization = require('./optimization');
-  Expression = (function (_super) {
-    var _Constructor;
-    _Constructor = function ( /* &rest arguments */ ) {
-      if (this.init) this.init.apply(this, arguments);
-    };
-    _Constructor.prototype = new _super();
-    return _Constructor;
-  })(Packrat);
-  Expression.prototype.expression = function () {
-    var _this = this;
-    var tmpl;
-    tmpl = "%assignments%%cascade%";
-    return _this.cacheparser("expression", function () {
-      var assignments, cascade;
-      assignments = _this.optional(_this.assignments);
-      cascade = _this.cascade();
-      return _this.templateapply(tmpl, {
-        "assignments": assignments,
-        "cascade": cascade
-      });
-    });
-  };
-  Expression.prototype.assignments = function () {
-    var _this = this;
-    return _this.cacheparser("assignments", function () {
-      return _this.many(function () {
-        var variable;
-        variable = _this.extendedVariable();
-        _this.skipSpace();
-        _this.assignmentArrow();
-        _this.skipSpace();
-        return (variable + " = ");
-      });
-    });
-  };
-  Expression.prototype.cascade = function () {
-    var _this = this;
-    var tmpl;
-    tmpl = "(function () { var _receiver = %simpleExpression%; %body% return _receiver;  })()";
-    return _this.cacheparser("cascade", function () {
-      var se;
-      se = _this.simpleExpression();
-      return _this.try_([function () {
-        _this.skipSpace();
-        _this.notFollowedBy(_this.semicolon);
-        return se;
-      }, function () {
-        var conti;
-        conti = _this.many(function () {
-          var mes;
-          _this.skipSpace();
-          _this.semicolon();
-          _this.skipSpace();
-          mes = _this.continuation();
-          //optimize if optimization is available
-          if (optimization.optimizationAvailable(mes.methodName)) {
-            return optimization.optimize("_receiver", mes.methodName, mes.args) + ';';
-          }
-          return (("_receiver" + mes["js"]) + ";");
-        });
-        return _this.templateapply(tmpl, {
-          "simpleExpression": se,
-          "body": conti
-        });
-      }]);
-    });
-  };
-  Expression.prototype.simpleExpression = function (allowedParsers) {
-    var _this = this;
-    return _this.cacheparser("simpleExpression", function () {
-      var receiver, injection;
-      receiver = injection = _this.primaryReceiver();
-      _this.many(function () {
-        var mes, ret;
-        mes = _this.continuation(allowedParsers);
-        return optimization.optimizationAvailable(mes.methodName) ? ((function () {
-          return injection = optimization.optimize(injection, mes.methodName, mes.args);
-        }))() : (function () {
-          return mes.wrapMe ? ((function () {
-            return injection = ((("(" + injection) + mes.js) + ")");
-          }))() : (function () {
-            return (injection += mes.js);
-          })();
-        })();
-      });
-      return injection;
-    });
-  };
-  Expression.prototype.continuation = function (allowedParsers) {
-    var _this = this;
-    return _this.cacheparser("continuation", function () {
-      (allowedParsers === undefined) ? (function () {
-        return allowedParsers = [_this.keywordMessage, _this.binaryMessage, _this.unaryMessage];
-      })() : void 0;
-      return _this.try_(allowedParsers);
-    });
-  };
-  Expression.prototype.keywordMessage = function () {
-    var _this = this;
-    return _this.cacheparser("keywordMessage", function () {
-      var methodName, args;
-      methodName = "";
-      args = [];
-      _this.many1(function () {
-        _this.skipSpace();
-        (methodName += _this.keywordSelector().replace(":", ""));
-        _this.skipSpace();
-        args.push(_this.simpleExpression([_this.binaryMessage, _this.unaryMessage]));
-        return _this.skipSpace();
-      });
-      return {
-        "js": (((("." + methodName) + "(") + args.join(", ")) + ")"),
-        "wrapMe": false,
-        "methodName": methodName,
-        "args": args
-      };
-    });
-  };
-  Expression.prototype.binaryMessage = function () {
-    var _this = this;
-    return _this.cacheparser("binaryMessage", function () {
-      var operator, argument;
-      _this.skipSpace();
-      operator = _this.operator();
-      _this.skipSpace();
-      argument = _this.simpleExpression([_this.unaryMessage]);
-      return {
-        "js": (((" " + operator) + " ") + argument),
-        "wrapMe": true,
-        "methodName": operator,
-        "args": [argument]
-      };
-    });
-  };
-  Expression.prototype.unaryMessage = function () {
-    var _this = this;
-    return _this.cacheparser("unaryMessage", function () {
-      var unarySelector;
-      _this.skipSpace();
-      unarySelector = _this.unarySelector();
-      return {
-        "js": (("." + unarySelector) + "()"),
-        "wrapMe": false,
-        "methodName": unarySelector,
-        "args": []
-      };
-    });
-  };
-  Expression.prototype.primary = function () {
-    var _this = this;
-    return _this.cacheparser("primary", function () {
-      return _this.try_([_this.extendedVariable, _this.literal, _this.block, _this.primitive, function () {
-        return _this.betweenandaccept((function () {
-          _this.chr("(");
-          return _this.skipSpace();
-        }), (function () {
-          _this.skipSpace();
-          return _this.chr(")");
-        }), _this.cascade);
-      }]);
-    });
-  };
-  Expression.prototype.primaryReceiver = function () {
-    var _this = this;
-    return _this.cacheparser("primaryReceiver", function () {
-      return _this.try_([function () {
-        var num;
-        num = _this.numberLiteral();
-        _this.followedBy(function () {
-          return _this.try_([_this.keywordMessage, _this.unaryMessage]);
-        });
-        return (("(" + num) + ")");
-      }, function () {
-        _this.followedBy(function () {
-          _this.block();
-          _this.skipSpace();
-          return _this.try_([_this.keywordMessage, _this.unaryMessage]);
-        });
-        return (("(" + _this.block()) + ")");
-      },
-      _this.primary]);
-    });
-  };
-  Expression.prototype.primitive = function () {
-    var _this = this;
-    return _this.cacheparser("primitive", function () {
-      _this.skipSpace();
-      return _this.betweenandaccept((function () {
-        _this.chr("<");
-        _this.notFollowedBy(function () {
-          return _this.chr("-");
-        });
-        return "<";
-      }), (function () {
-        return _this.chr(">");
-      }), _this.anyChar);
-    });
-  };
-  Expression.prototype.operator = function () {
-    var _this = this;
-    var p;
-    p = function (str) {
-      return function () {
-        return _this.string(str);
-      };
-    };
-    return _this.cacheparser("operator", function () {
-      var op;
-      _this.skipSpace();
-      return op = _this.try_([p("+="), p("-="), p("*="), p("/="), p("+"), p("-"), p("*"), p("/"), p("%"), p("==="), p("!=="), p("<="), p(">="), p("<"), p(">"), p("^"), p("&&"), p("||")]);
-    });
-  };
-  exports.Expression = Expression;
-  return Expression;
-}).call(this);
-});
-
-require.define("/src/optimization.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
-  'use strict';
+require.define("/src/js/production/optimization.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
+  "use strict";
   var LP, template, optimTmpl, optimize, canUseDotNotation, optimizationAvailable;
   LP = require('./littleparser').LittleParser;
   template = function (template, hashmap) {
@@ -1637,23 +1961,28 @@ require.define("/src/optimization.js",function(require,module,exports,__dirname,
     "ifFalse": "%receiver% ? void 0 : (%arg1%)()",
     "ifTrueifFalse": "%receiver% ? (%arg1%)() : (%arg2%)()",
     "ifFalseifTrue": "%receiver% ? (%arg2%)() : (%arg1%)()",
-    "and": "%receiver% && %arg1%()",
-    "or": "%receiver% || %arg1%()",
-    "eqv": "%receiver% === %arg1%()",
-    "xor": "(%receiver% && !%arg1%()) || (!%receiver% && %arg1%())",
-    "not": "! %receiver%",
+    "tryCatch": "(function () { var _ret; try { _ret = %receiver%(); } catch (err) { _ret = %arg1%(err); } return _ret; })()",
+    "tryCatchFinally": "(function () { var _ret; try { _ret = %receiver%(); } catch (err) { _ret = %arg1%(err); } finally { _ret = %arg2%(); } return _ret; })()",
     "new": "new %receiver%(%args%)"
   };
   canUseDotNotation = function (str) {
     var v, identifier;
     v = new LP(str);
     (function () {
-      return identifier = v.betweenandaccept((function () {
-        return v.chr("\"");
-      }), (function () {
-        return v.chr("\"");
-      }), v.variable);
-    }).tryCatch(function () {});
+      var _ret;
+      try {
+        _ret = (function () {
+          return identifier = v.betweenandaccept((function () {
+            return v.chr("\"");
+          }), (function () {
+            return v.chr("\"");
+          }), v.variable);
+        })();
+      } catch (err) {
+        _ret = function () {}(err);
+      }
+      return _ret;
+    })();
     return (v.getIndex() === v.getInputLength()) ? ((function () {
       return identifier;
     }))() : (function () {
@@ -1690,208 +2019,6 @@ require.define("/src/optimization.js",function(require,module,exports,__dirname,
   };
   exports.optimize = optimize;
   return exports.optimizationAvailable = optimizationAvailable;
-}).call(this);
-});
-
-require.define("/src/statement.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
-  'use strict';
-  var Packrat, Statement;
-  Packrat = require('./packrat').Packrat;
-  Statement = (function (_super) {
-    var _Constructor;
-    _Constructor = function ( /* &rest arguments */ ) {
-      if (this.init) this.init.apply(this, arguments);
-    };
-    _Constructor.prototype = new _super();
-    return _Constructor;
-  })(Packrat);
-  Statement.prototype.statement = function () {
-    var _this = this;
-    return _this.cacheparser("statement", function () {
-      var ret, vd;
-      ret = "";
-      _this.skipSpace();
-      vd = _this.optional(_this.variableDeclaration);
-      (vd !== null) ? (function () {
-        return (ret += vd);
-      })() : void 0;
-      _this.skipSpace();
-      (ret += _this.many(function () {
-        var a;
-        a = _this.statementable();
-        _this.skipSpace();
-        _this.chr(".");
-        _this.skipSpace();
-        _this.followedBy(_this.statementable);
-        return (a + "; ");
-      }));
-      ret = (((ret + "return ") + _this.statementable()) + ";");
-      _this.skipSpace();
-      _this.optional(function () {
-        return _this.chr(".");
-      });
-      return ret;
-    });
-  };
-  Statement.prototype.statementable = function () {
-    var _this = this;
-    return _this.cacheparser("statementable", function () {
-      return _this.try_([_this.classHeader, _this.instanceMethod, _this.expression]);
-    });
-  };
-  Statement.prototype.variableDeclaration = function () {
-    var _this = this;
-    return _this.cacheparser("variableDeclaration", function () {
-      var ret;
-      ret = "var ";
-      _this.skipSpace();
-      _this.verticalBar();
-      (ret += _this.many1(function () {
-        _this.skipSpace();
-        return (_this.variable() + ", ");
-      }).replace(/,\s$/, "; "));
-      _this.skipSpace();
-      _this.verticalBar();
-      return ret;
-    });
-  };
-  exports.Statement = Statement;
-  return Statement;
-}).call(this);
-});
-
-require.define("/src/class.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
-  'use strict';
-  var Packrat, Class;
-  Packrat = require('./packrat').Packrat;
-  Class = (function (_super) {
-    var _Constructor;
-    _Constructor = function ( /* &rest arguments */ ) {
-      if (this.init) this.init.apply(this, arguments);
-    };
-    _Constructor.prototype = new _super();
-    return _Constructor;
-  })(Packrat);
-  Class.prototype.classHeader = function () {
-    var _this = this;
-    var dst_tmpl;
-    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%};\n%className%.prototype = new %superClass%();";
-    return _this.cacheparser("classHeader", function () {
-      var className, superClass, variables, v_init;
-      _this.optional(function () {
-        return _this.chr("+");
-      });
-      superClass = _this.variable();
-      _this.skipSpace();
-      _this.string("subclass:");
-      _this.skipSpace();
-      className = _this.variablableStringContent();
-      _this.skipSpace();
-      _this.string("variables:");
-      _this.skipSpace();
-      variables = _this.instanceVariableArray();
-      _this.instanceVariables[className] = [];
-      v_init = variables.injectinto("", function (a, b) {
-        _this.instanceVariables[className].push(a);
-        return (((b + "this.") + a) + " = null; ");
-      });
-      return _this.templateapply(dst_tmpl, {
-        "className": className,
-        "superClass": superClass,
-        "variableInitialization": v_init
-      });
-    });
-  };
-  Class.prototype.instanceVariableArray = function () {
-    var _this = this;
-    return _this.cacheparser("instanceVariableArray", function () {
-      var variables;
-      variables = [];
-      _this.arrayStart();
-      _this.many(function () {
-        var v;
-        _this.skipSpace();
-        v = _this.variablableStringContent();
-        variables.push(v);
-        _this.skipSpace();
-        _this.optional(function () { return _this.chr(','); });
-        _this.skipSpace();
-        return v;
-      });
-      _this.closeParen();
-      return variables;
-    });
-  };
-  Class.prototype.variablableStringContent = function () {
-    var _this = this;
-    return _this.cacheparser("variablableStringContent", function () {
-      return _this.try_([function () {
-        _this.chr("#");
-        return _this.variable();
-      }, function () {
-        return _this.betweenandaccept(_this.apostrophe, _this.apostrophe, _this.variable);
-      }]);
-    });
-  };
-  Class.prototype.instanceMethod = function () {
-    var _this = this;
-    var method_tmpl;
-    method_tmpl = "%className%.prototype.%methodName% = function (%args%) { var _this = this; %methodBody% }";
-    return _this.cacheparser("instanceMethod", function () {
-      var className, methodHead, methodBody;
-      _this.exclamation();
-      _this.skipSpace();
-      className = _this.variable();
-      _this.skipSpace();
-      methodHead = _this.methodHead();
-      _this.skipSpace();
-      _this.setCurrentClass(className);
-      methodBody = _this.statement();
-      _this.setCurrentClass(null);
-      _this.skipSpace();
-      _this.exclamation();
-      return _this.templateapply(method_tmpl, {
-        "className": className,
-        "methodName": methodHead.name,
-        "args": methodHead.args,
-        "methodBody": methodBody
-      });
-    });
-  };
-  Class.prototype.methodHead = function () {
-    var _this = this;
-    return _this.cacheparser("methodHead", function () {
-      var methodName, args;
-      methodName = "";
-      args = [];
-      _this.try_([function () {
-        return _this.many1(function () {
-          (methodName += _this.keywordSelector().slice((0), - 1));
-          _this.skipSpace();
-          args.push(_this.variable());
-          return _this.skipSpace();
-        });
-      }, function () {
-        return methodName = _this.unarySelector();
-      }]);
-      return {
-        "name": methodName,
-        "args": args.join(", ")
-      };
-    });
-  };
-  Class.prototype.setCurrentClass = function (className) {
-    var _this = this;
-    _this.currentClass = className;
-    return className;
-  };
-  Class.prototype.instanceVariableP = function (variableName) {
-    var _this = this;
-    var v;
-    return (((_this.currentClass !== null) && (_this.instanceVariables[_this.currentClass] !== undefined)) && (_this.instanceVariables[_this.currentClass].indexOf(variableName) > -1));
-  };
-  exports.Class = Class;
-  return Class;
 }).call(this);
 });
 
@@ -3219,83 +3346,88 @@ if (typeof exports !== "undefined") {
 }
 });
 
-require.define("/src/littlesmallscript.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
-  'use strict';
-  var Packrat, LittleParser, BlockParser, Expression, Statement, Class, LittleSmallscript, mp;
-  Packrat = require('./packrat').Packrat;
-  LittleParser = require('./littleparser').LittleParser;
-  BlockParser = require('./blockparser').BlockParser;
-  Expression = require('./expression').Expression;
+require.define("/src/js/production/littlesmallscript.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
+  "use strict";
+  var Statement;
   Statement = require('./statement').Statement;
-  Class = require('./class').Class;
-  LittleSmallscript = (function (_super) {
-    var _Constructor;
-    _Constructor = function ( /* &rest arguments */ ) {
-      if (this.init) this.init.apply(this, arguments);
-    };
-    _Constructor.prototype = new _super();
-    return _Constructor;
-  })(Packrat);
-  LittleParser.prototype.do_(function (item, key) {
-    return LittleSmallscript.prototype[key] = item;
-  });
-  BlockParser.prototype.do_(function (item, key) {
-    return LittleSmallscript.prototype[key] = item;
-  });
-  Expression.prototype.do_(function (item, key) {
-    return LittleSmallscript.prototype[key] = item;
-  });
-  Statement.prototype.do_(function (item, key) {
-    return LittleSmallscript.prototype[key] = item;
-  });
-  Class.prototype.do_(function (item, key) {
-    return LittleSmallscript.prototype[key] = item;
-  });
-  LittleSmallscript.prototype.init = function (input, options) {
+  var LittleSmallscript;
+  LittleSmallscript = function () {
+    this.input = null;
+    this.options = null;
+    this.beautifyOption = null;
+    this.cache = null;
+    if (this.init) {
+      this.init.apply(this, arguments);
+    }
+  };
+  LittleSmallscript.prototype = new Statement();;
+  LittleSmallscript.prototype.initWithInputandOptions = function (text, opt) {
     var _this = this;
-    _this.input = input;
-    _this.index = 0;
+    _this.input = text;
+    _this.options = opt;
     _this.cache = {};
-    _this.options = options;
-    _this.instanceVariables = {};
-    return _this.currentClass = null;
-  };
-  LittleSmallscript.prototype.onError = function (err) {
-    var _this = this;
-    var line, rest, token;
-    (function () {
-      return line = (_this.input.substring((0), _this.maxIndex).match(/\n/g).size() + 1);
-    }).tryCatch(function () {
-      return line = 0;
-    });
-    rest = _this.input.substring(_this.maxIndex);
-    token = rest.substring((0), rest.search(/[\.\s\t\n]|$/));
-    console.log((((("Parse error on line " + line) + ". Unexpected ") + token) + "."));
-    return console.log("====================================================");
-  };
-  LittleSmallscript.prototype.toJS = function () {
-    var _this = this;
-    var wrapTmpl, js, beautifyOption;
-    wrapTmpl = "(function () { \"use strict\"; %statement% }).call(this);";
-    (function () {
-      return js = _this.templateapply(wrapTmpl, {
-        "statement": _this.statement()
-      });
-    }).tryCatch(function () {
-      return _this.onError();
-    });
-    (_this.index < _this.input.length) ? (function () {
-      return _this.onError({});
-    })() : void 0;
-    beautifyOption = {
+    _this.beautifyOption = {
       "indent_size": 2,
       "indent_char": " ",
       "jslint_happy": true
     };
-    return (_this.options && _this.options.prettyprint) ? ((function () {
-      return require('../lib/beautify.js').js_beautify(js, beautifyOption);
-    }))() : (function () {
-      return js;
+    return _this;
+  };
+  LittleSmallscript.prototype.onError = function (err) {
+    var _this = this;
+    var line, rest, token;
+    line = (function () {
+      var _ret;
+      try {
+        _ret = (function () {
+          return (_this.input.substring((0), _this.getMaxIndex()).match(/\n/g).size() + 1);
+        })();
+      } catch (err) {
+        _ret = function () {
+          return 0;
+        }(err);
+      }
+      return _ret;
+    })();
+    rest = _this.input.substring(_this.getMaxIndex());
+    token = rest.substring((0), rest.search(/[\.\s\t\n]|$/));
+    console.log((((("Parse error on line " + line) + ". Unexpected ") + token) + "."));
+    console.log("====================================================");
+    return console.log(_this.getStackTrace());
+  };
+  LittleSmallscript.prototype.toJS = function () {
+    var _this = this;
+    var wrapTmpl, js, beautifyOption, err;
+    err = false;
+    wrapTmpl = "(function () { \"use strict\"; %statement% }).call(this);";
+    (function () {
+      var _ret;
+      try {
+        _ret = (function () {
+          return js = _this.templateapply(wrapTmpl, {
+            "statement": _this.statement()
+          });
+        })();
+      } catch (err) {
+        _ret = function () {
+          err = true;
+          return _this.onError();
+        }(err);
+      }
+      return _ret;
+    })();
+    err ? void 0 : (function () {
+      return (_this.getIndex() < _this.input.size()) ? (function () {
+        err = true;
+        return _this.onError(null);
+      })() : void 0;
+    })();
+    return err ? void 0 : (function () {
+      return (_this.options && _this.options.prettyprint) ? ((function () {
+        return require('../../../lib/beautify.js').js_beautify(js, _this.beautifyOption);
+      }))() : (function () {
+        return js;
+      })();
     })();
   };
   exports.LittleSmallscript = LittleSmallscript;
@@ -3303,5 +3435,5 @@ require.define("/src/littlesmallscript.js",function(require,module,exports,__dir
   return LittleSmallscript;
 }).call(this);
 });
-require("/src/littlesmallscript.js");
+require("/src/js/production/littlesmallscript.js");
 })();

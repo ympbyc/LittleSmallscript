@@ -22,9 +22,9 @@ expression | tmpl |
     | assignments cascade |
     assignments := self optional: [self assignments].
     cascade := self cascade.
-    [self template: tmpl apply: #{
+    self template: tmpl apply: #{
       #assignments:assignments #cascade:cascade
-    }] tryCatch: [:e|console log: e]
+    }
   ]
 !.
 !Expression
