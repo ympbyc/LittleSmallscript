@@ -31,22 +31,10 @@
         return _this.assignments();
       });
       cascade = _this.cascade();
-      return (function () {
-        var _ret;
-        try {
-          _ret = (function () {
-            return _this.templateapply(tmpl, {
-              "assignments": assignments,
-              "cascade": cascade
-            });
-          })();
-        } catch (err) {
-          _ret = function (e) {
-            return console.log(e);
-          }(err);
-        }
-        return _ret;
-      })();
+      return _this.templateapply(tmpl, {
+        "assignments": assignments,
+        "cascade": cascade
+      });
     });
   };
   Expression.prototype.assignments = function () {
