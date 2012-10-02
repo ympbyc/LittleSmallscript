@@ -50,7 +50,7 @@ $(function () {
     $errorWrp.hide();
     var js;
     try {
-      js = new LittleSmallscript(txt, {prettyprint: true, optimization: true}).toJS();
+      js = new LittleSmallscript().initWithInputandOptions(txt, {prettyprint: true, optimization: true}).toJS();
     } catch (err) {
       $errorWrp.show();
       $error.text((err.message||err.type||"Error").slice(0,30));
