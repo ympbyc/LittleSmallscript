@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var Block;
-  Block = require('./block').Block;
+  Block = require("./block");
   var Class;
   Class = function () {
     this.instanceVariables = null;
@@ -19,7 +19,7 @@
   Class.prototype.classHeader = function () {
     var _this = this;
     var dst_tmpl;
-    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };\n%className%.prototype = new %superClass%();";
+    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };\n%className%.prototype = new %superClass%()";
     return _this.cacheaParser("classHeader", function () {
       var className, superClass, variables, v_init;
       _this.optional(function () {
@@ -142,6 +142,6 @@
     var v;
     return (((_this.currentClass !== null) && (_this.instanceVariables[_this.currentClass] !== undefined)) && (_this.instanceVariables[_this.currentClass].indexOf(variableName) > -1));
   };
-  exports.Class = Class;
+  module.exports = Class;
   return Class;
 }).call(this);

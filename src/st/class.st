@@ -1,6 +1,6 @@
 "class definition syntax"
 | Block |
-Block := <require('./block')> at: #Block
+Block := require value:'./block'
 .
 Block
   subclass: #Class
@@ -20,7 +20,7 @@ classHeader | dst_tmpl |
   dst_tmpl := 
 'var %className%;
 %className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };
-%className%.prototype = new %superClass%();'.
+%className%.prototype = new %superClass%()'.
   self cache: #classHeader aParser: [| className superClass variables v_init |
     self optional: [self chr: '+']. "LSt compatibility"
     superClass := self variable.
@@ -134,6 +134,6 @@ instanceVariableP: variableName |v|
   && ((instanceVariables at: currentClass) !== undefined)
   && (((instanceVariables at: currentClass) indexOf: variableName) > -1)
 !.
-exports at:#Class put:Class
+module at:#exports put:Class
 .
 Class

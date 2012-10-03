@@ -394,7 +394,7 @@ process.binding = function (name) {
 require.define("/src/js/production/statement.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
   "use strict";
   var Class;
-  Class = require('./class').Class;
+  Class = require("./class");
   var Statement;
   Statement = function () {
     if (this.init) {
@@ -419,14 +419,28 @@ require.define("/src/js/production/statement.js",function(require,module,exports
         var a;
         a = _this.statementable();
         _this.skipSpace();
-        _this.chr(".");
+        _this.optional(function () {
+          return _this.chr(".");
+        });
         _this.skipSpace();
         _this.followedBy(function () {
           return _this.statementable();
         });
         return (a + "; ");
       }));
-      ret = (((ret + "return ") + _this.expression()) + ";");
+      (ret += (function () {
+        var _ret;
+        try {
+          _ret = (function () {
+            return (("return " + _this.expression()) + ";");
+          })();
+        } catch (err) {
+          _ret = function () {
+            return "return null;";
+          }(err);
+        }
+        return _ret;
+      })());
       _this.skipSpace();
       _this.optional(function () {
         return _this.chr(".");
@@ -462,7 +476,7 @@ require.define("/src/js/production/statement.js",function(require,module,exports
       return ret;
     });
   };
-  exports.Statement = Statement;
+  module.exports = Statement;
   return Statement;
 }).call(this);
 });
@@ -470,7 +484,7 @@ require.define("/src/js/production/statement.js",function(require,module,exports
 require.define("/src/js/production/class.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
   "use strict";
   var Block;
-  Block = require('./block').Block;
+  Block = require("./block");
   var Class;
   Class = function () {
     this.instanceVariables = null;
@@ -488,7 +502,7 @@ require.define("/src/js/production/class.js",function(require,module,exports,__d
   Class.prototype.classHeader = function () {
     var _this = this;
     var dst_tmpl;
-    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };\n%className%.prototype = new %superClass%();";
+    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };\n%className%.prototype = new %superClass%()";
     return _this.cacheaParser("classHeader", function () {
       var className, superClass, variables, v_init;
       _this.optional(function () {
@@ -611,7 +625,7 @@ require.define("/src/js/production/class.js",function(require,module,exports,__d
     var v;
     return (((_this.currentClass !== null) && (_this.instanceVariables[_this.currentClass] !== undefined)) && (_this.instanceVariables[_this.currentClass].indexOf(variableName) > -1));
   };
-  exports.Class = Class;
+  module.exports = Class;
   return Class;
 }).call(this);
 });
@@ -619,7 +633,7 @@ require.define("/src/js/production/class.js",function(require,module,exports,__d
 require.define("/src/js/production/block.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
   "use strict";
   var Expression;
-  Expression = require('./expression').Expression;
+  Expression = require("./expression");
   var Block;
   Block = function () {
     if (this.init) {
@@ -674,7 +688,7 @@ require.define("/src/js/production/block.js",function(require,module,exports,__d
       });
     });
   };
-  exports.Block = Block;
+  module.exports = Block;
   return Block;
 }).call(this);
 });
@@ -682,8 +696,8 @@ require.define("/src/js/production/block.js",function(require,module,exports,__d
 require.define("/src/js/production/expression.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
   "use strict";
   var LittleParser, optimization;
-  LittleParser = require('./littleparser').LittleParser;
-  optimization = require('./optimization');
+  LittleParser = require("./littleparser");
+  optimization = require("./optimization");
   var Expression;
   Expression = function () {
     this.bundledMethods = null;
@@ -712,22 +726,10 @@ require.define("/src/js/production/expression.js",function(require,module,export
         return _this.assignments();
       });
       cascade = _this.cascade();
-      return (function () {
-        var _ret;
-        try {
-          _ret = (function () {
-            return _this.templateapply(tmpl, {
-              "assignments": assignments,
-              "cascade": cascade
-            });
-          })();
-        } catch (err) {
-          _ret = function (e) {
-            return console.log(e);
-          }(err);
-        }
-        return _ret;
-      })();
+      return _this.templateapply(tmpl, {
+        "assignments": assignments,
+        "cascade": cascade
+      });
     });
   };
   Expression.prototype.assignments = function () {
@@ -955,7 +957,7 @@ require.define("/src/js/production/expression.js",function(require,module,export
       return op = _this.try_([p("+="), p("-="), p("*="), p("/="), p("+"), p("-"), p("*"), p("/"), p("%"), p("==="), p("!=="), p("<="), p(">="), p("<"), p(">"), p("^"), p("&&"), p("||")]);
     });
   };
-  exports.Expression = Expression;
+  module.exports = Expression;
   return Expression;
 }).call(this);
 });
@@ -963,7 +965,7 @@ require.define("/src/js/production/expression.js",function(require,module,export
 require.define("/src/js/production/littleparser.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
   "use strict";
   var Packrat;
-  Packrat = require('./packrat').Packrat;
+  Packrat = require("./packrat");
   var LittleParser;
   LittleParser = function () {
     if (this.init) {
@@ -1177,6 +1179,7 @@ require.define("/src/js/production/littleparser.js",function(require,module,expo
     return _this.cacheaParser("arrayLiteral", function () {
       args = [];
       _this.arrayStart();
+      _this.skipSpace();
       _this.many(function () {
         args.push(_this.expression());
         _this.skipSpace();
@@ -1234,14 +1237,14 @@ require.define("/src/js/production/littleparser.js",function(require,module,expo
     });
     return dest_str;
   };
-  exports.LittleParser = LittleParser;
+  module.exports = LittleParser;
   return LittleParser;
 }).call(this);
 });
 
 require.define("/src/js/production/packrat.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
   "use strict";
-  require('../../prelude');
+  require("../../prelude");
   Number.prototype.timesString = function (str) {
     var _this = this;
     var ret;
@@ -1579,7 +1582,7 @@ require.define("/src/js/production/packrat.js",function(require,module,exports,_
     console.log(s);
     return s;
   };
-  exports.Packrat = Packrat;
+  module.exports = Packrat;
   return Packrat;
 }).call(this);
 });
@@ -1934,7 +1937,7 @@ require.define("/src/prelude.js",function(require,module,exports,__dirname,__fil
 require.define("/src/js/production/optimization.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
   "use strict";
   var LP, template, optimTmpl, optimize, canUseDotNotation, optimizationAvailable;
-  LP = require('./littleparser').LittleParser;
+  LP = require("./littleparser");
   template = function (template, hashmap) {
     var dest_str;
     dest_str = template;
@@ -3349,7 +3352,7 @@ if (typeof exports !== "undefined") {
 require.define("/src/js/production/littlesmallscript.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
   "use strict";
   var Statement;
-  Statement = require('./statement').Statement;
+  Statement = require("./statement");
   var LittleSmallscript;
   LittleSmallscript = function () {
     this.input = null;
@@ -3424,13 +3427,13 @@ require.define("/src/js/production/littlesmallscript.js",function(require,module
     })();
     return err ? void 0 : (function () {
       return (_this.options && _this.options.prettyprint) ? ((function () {
-        return require('../../../lib/beautify.js').js_beautify(js, _this.beautifyOption);
+        return require("../../../lib/beautify.js").js_beautify(js, _this.beautifyOption);
       }))() : (function () {
         return js;
       })();
     })();
   };
-  exports.LittleSmallscript = LittleSmallscript;
+  module.exports = LittleSmallscript;
   window.LittleSmallscript = LittleSmallscript;
   return LittleSmallscript;
 }).call(this);

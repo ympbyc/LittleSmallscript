@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var Expression;
-  Expression = require('./expression').Expression;
+  Expression = require("./expression");
   var Block;
   Block = function () {
     if (this.init) {
@@ -56,6 +56,6 @@
       });
     });
   };
-  exports.Block = Block;
+  module.exports = Block;
   return Block;
 }).call(this);

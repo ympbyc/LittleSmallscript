@@ -1,6 +1,11 @@
 "
+  examples/AutoTyper.st
+
   AutoTyper automates your live coding.
-  AutoTyper author: 'Minori Yamashita' Email: 'ympbyc@gmail.com'
+  AutoTyper
+    author: 'Minori Yamashita'
+    Email: 'ympbyc@gmail.com'
+    requires: 'jQuery'
 "
 Object subclass: #AutoTyper variables: #(#input #index #interval #console)
 .

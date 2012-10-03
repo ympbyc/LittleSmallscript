@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var Statement;
-  Statement = require('./statement').Statement;
+  Statement = require("./statement");
   var LittleSmallscript;
   LittleSmallscript = function () {
     this.input = null;
@@ -76,12 +76,12 @@
     })();
     return err ? void 0 : (function () {
       return (_this.options && _this.options.prettyprint) ? ((function () {
-        return require('../../../lib/beautify.js').js_beautify(js, _this.beautifyOption);
+        return require("../../../lib/beautify.js").js_beautify(js, _this.beautifyOption);
       }))() : (function () {
         return js;
       })();
     })();
   };
-  exports.LittleSmallscript = LittleSmallscript;
+  module.exports = LittleSmallscript;
   return LittleSmallscript;
 }).call(this);

@@ -1,7 +1,7 @@
 | LittleParser optimization |
-LittleParser := <require('./littleparser')> at: #LittleParser
+LittleParser := require value:'./littleparser'
 .
-optimization := <require('./optimization')>
+optimization := require value:'./optimization'
 .
 LittleParser subclass:#Expression 
             variables:#(#bundledMethods)
@@ -224,6 +224,6 @@ operator | p |
     )
   ]
 !.
-exports at: #Expression put: Expression
+module at: #exports put: Expression
 .
 Expression

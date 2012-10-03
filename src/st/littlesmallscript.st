@@ -1,5 +1,5 @@
 | Statement |
-Statement := <require('./statement')> at: #Statement
+Statement := require value:'./statement'
 .
 Statement
   subclass:#LittleSmallscript
@@ -30,7 +30,7 @@ onError:err | line rest token |
   token := rest sub:0 string:(rest search:</[\.\s\t\n]|$/>).
   console log: 'Parse error on line '+line+'. Unexpected '+token+'.'.
   console log: '===================================================='.
-  console log: (self getStackTrace)
+  console log: self getStackTrace
 !.
 !LittleSmallscript
 toJS | wrapTmpl js beautifyOption err |
@@ -44,10 +44,10 @@ toJS | wrapTmpl js beautifyOption err |
   ].
   err ifFalse:[
     options && (options at:#prettyprint) ifTrue: [
-      <require('../../../lib/beautify.js')> js_: js beautify: beautifyOption
+      (require value:'../../../lib/beautify.js') js_: js beautify: beautifyOption
     ] ifFalse: [js]
   ]
 !.
-exports at:#LittleSmallscript put:LittleSmallscript
+module at:#exports put:LittleSmallscript
 .
 LittleSmallscript

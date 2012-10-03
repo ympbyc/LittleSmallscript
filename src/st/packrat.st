@@ -1,4 +1,4 @@
-<require('../../prelude')>
+require value:'../../prelude'
 .
 !Number
 timesString: str | ret |
@@ -221,6 +221,6 @@ p: s
   console log: s.
   s
 !.
-exports at: #Packrat put: Packrat
+module at: #exports put: Packrat
 .
 Packrat

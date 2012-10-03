@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var Class;
-  Class = require('./class').Class;
+  Class = require("./class");
   var Statement;
   Statement = function () {
     if (this.init) {
@@ -26,14 +26,28 @@
         var a;
         a = _this.statementable();
         _this.skipSpace();
-        _this.chr(".");
+        _this.optional(function () {
+          return _this.chr(".");
+        });
         _this.skipSpace();
         _this.followedBy(function () {
           return _this.statementable();
         });
         return (a + "; ");
       }));
-      ret = (((ret + "return ") + _this.expression()) + ";");
+      (ret += (function () {
+        var _ret;
+        try {
+          _ret = (function () {
+            return (("return " + _this.expression()) + ";");
+          })();
+        } catch (err) {
+          _ret = function () {
+            return "return null;";
+          }(err);
+        }
+        return _ret;
+      })());
       _this.skipSpace();
       _this.optional(function () {
         return _this.chr(".");
@@ -69,6 +83,6 @@
       return ret;
     });
   };
-  exports.Statement = Statement;
+  module.exports = Statement;
   return Statement;
 }).call(this);
