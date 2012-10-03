@@ -2,7 +2,7 @@
   parse and compile lexical block
 "
 | Expression |
-Expression := <require('./expression')> at: #Expression
+Expression := require value:'./expression'
 .
 Expression 
   subclass:#Block 
@@ -44,6 +44,6 @@ blockHead
     ]
   ]
 !.
-exports at: #Block put: Block
+module at: #exports put: Block
 .
 Block

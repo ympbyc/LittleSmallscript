@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  require('../../prelude');
+  require("../../prelude");
   Number.prototype.timesString = function (str) {
     var _this = this;
     var ret;
@@ -338,6 +338,6 @@
     console.log(s);
     return s;
   };
-  exports.Packrat = Packrat;
+  module.exports = Packrat;
   return Packrat;
 }).call(this);

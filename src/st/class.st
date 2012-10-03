@@ -1,6 +1,6 @@
 "class definition syntax"
 | Block |
-Block := <require('./block')> at: #Block
+Block := require value:'./block'
 .
 Block
   subclass: #Class
@@ -134,6 +134,6 @@ instanceVariableP: variableName |v|
   && ((instanceVariables at: currentClass) !== undefined)
   && (((instanceVariables at: currentClass) indexOf: variableName) > -1)
 !.
-exports at:#Class put:Class
+module at:#exports put:Class
 .
 Class

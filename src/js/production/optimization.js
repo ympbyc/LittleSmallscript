@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var LP, template, optimTmpl, optimize, canUseDotNotation, optimizationAvailable;
-  LP = require('./littleparser').LittleParser;
+  LP = require("./littleparser");
   template = function (template, hashmap) {
     var dest_str;
     dest_str = template;

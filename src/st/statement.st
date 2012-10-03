@@ -1,5 +1,5 @@
 | Class |
-Class := <require('./class')> at: #Class
+Class := require value:'./class'
 .
 Class subclass: #Statement variables: #()
 .
@@ -15,13 +15,13 @@ statement
     ret += (self many: [| a |
       a := self statementable.
       self skipSpace.
-      self chr: '.'.
+      self optional: [self chr: '.'].
       self skipSpace.
       self followedBy: [self statementable].
 
       a + '; '
     ]).
-    ret := ret + 'return ' + self expression + ';'.
+    ret += (['return ' + self expression + ';'] tryCatch: ['return null;']).
     self skipSpace.
     self optional: [ self chr: '.' ]. "allow tail period"
 
@@ -53,6 +53,6 @@ variableDeclaration
     ret
   ]
 !.
-exports at:#Statement put: Statement
+module at:#exports put: Statement
 .
 Statement

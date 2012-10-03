@@ -1,8 +1,8 @@
 (function () {
   "use strict";
   var LittleParser, optimization;
-  LittleParser = require('./littleparser').LittleParser;
-  optimization = require('./optimization');
+  LittleParser = require("./littleparser");
+  optimization = require("./optimization");
   var Expression;
   Expression = function () {
     this.bundledMethods = null;
@@ -262,6 +262,6 @@
       return op = _this.try_([p("+="), p("-="), p("*="), p("/="), p("+"), p("-"), p("*"), p("/"), p("%"), p("==="), p("!=="), p("<="), p(">="), p("<"), p(">"), p("^"), p("&&"), p("||")]);
     });
   };
-  exports.Expression = Expression;
+  module.exports = Expression;
   return Expression;
 }).call(this);

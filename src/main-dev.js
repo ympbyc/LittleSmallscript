@@ -5,7 +5,7 @@
 
   var LittleSmallscript, fs, optimist, argv, readline, rl, help;
   
-  LittleSmallscript = require("./js/development/littlesmallscript").LittleSmallscript;
+  LittleSmallscript = require("./js/development/littlesmallscript");
   
   fs = require('fs');
 

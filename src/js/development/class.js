@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var Block;
-  Block = require('./block').Block;
+  Block = require("./block");
   var Class;
   Class = function () {
     this.instanceVariables = null;
@@ -142,6 +142,6 @@
     var v;
     return (((_this.currentClass !== null) && (_this.instanceVariables[_this.currentClass] !== undefined)) && (_this.instanceVariables[_this.currentClass].indexOf(variableName) > -1));
   };
-  exports.Class = Class;
+  module.exports = Class;
   return Class;
 }).call(this);
