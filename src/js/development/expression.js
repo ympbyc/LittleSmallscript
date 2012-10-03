@@ -1,8 +1,8 @@
 (function () {
   "use strict";
   var LittleParser, optimization;
-  LittleParser = require('./littleparser').LittleParser;
-  optimization = require('./optimization');
+  LittleParser = require("./littleparser");
+  optimization = require("./optimization");
   var Expression;
   Expression = function () {
     this.bundledMethods = null;
@@ -31,22 +31,10 @@
         return _this.assignments();
       });
       cascade = _this.cascade();
-      return (function () {
-        var _ret;
-        try {
-          _ret = (function () {
-            return _this.templateapply(tmpl, {
-              "assignments": assignments,
-              "cascade": cascade
-            });
-          })();
-        } catch (err) {
-          _ret = function (e) {
-            return console.log(e);
-          }(err);
-        }
-        return _ret;
-      })();
+      return _this.templateapply(tmpl, {
+        "assignments": assignments,
+        "cascade": cascade
+      });
     });
   };
   Expression.prototype.assignments = function () {
@@ -274,6 +262,6 @@
       return op = _this.try_([p("+="), p("-="), p("*="), p("/="), p("+"), p("-"), p("*"), p("/"), p("%"), p("==="), p("!=="), p("<="), p(">="), p("<"), p(">"), p("^"), p("&&"), p("||")]);
     });
   };
-  exports.Expression = Expression;
+  module.exports = Expression;
   return Expression;
 }).call(this);

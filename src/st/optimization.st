@@ -1,5 +1,5 @@
 | LP template optimTmpl optimize canUseDotNotation optimizationAvailable |
-LP := <require('./littleparser')> at: #LittleParser
+LP := require value:'./littleparser'
 .
 template := [:template :hashmap | | dest_str |
   dest_str := template.

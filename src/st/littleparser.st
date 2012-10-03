@@ -2,7 +2,7 @@
   Small parsers that are used to implement the greater parsers
 "
 | Packrat |
-Packrat := <require('./packrat')> at: #Packrat
+Packrat := require value:'./packrat'
 .
 Packrat 
   subclass:#LittleParser
@@ -165,6 +165,7 @@ arrayLiteral |args|
   self cache:#arrayLiteral aParser:[
     args := #().
     self arrayStart.
+    self skipSpace.
     self many: [
       args push: self expression.
       self skipSpace.
@@ -207,6 +208,6 @@ template: template apply: hashmap | dest_str |
   ].
   dest_str
 !.
-exports at: #LittleParser put: LittleParser
+module at: #exports put: LittleParser
 .
 LittleParser

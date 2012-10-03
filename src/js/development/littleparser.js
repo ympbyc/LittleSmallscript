@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var Packrat;
-  Packrat = require('./packrat').Packrat;
+  Packrat = require("./packrat");
   var LittleParser;
   LittleParser = function () {
     if (this.init) {
@@ -215,6 +215,7 @@
     return _this.cacheaParser("arrayLiteral", function () {
       args = [];
       _this.arrayStart();
+      _this.skipSpace();
       _this.many(function () {
         args.push(_this.expression());
         _this.skipSpace();
@@ -272,6 +273,6 @@
     });
     return dest_str;
   };
-  exports.LittleParser = LittleParser;
+  module.exports = LittleParser;
   return LittleParser;
 }).call(this);

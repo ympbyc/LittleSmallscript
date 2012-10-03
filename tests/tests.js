@@ -2,7 +2,7 @@
   'use strict';
 
   var LittleSmallscript, errors, test, log, lss, p;
-  LittleSmallscript = require("../src/js/production/littlesmallscript").LittleSmallscript;
+  LittleSmallscript = require("../src/js/production/littlesmallscript");
 
   errors = [];
   test = function (result, expected, mes) {
@@ -208,7 +208,7 @@
         a.skipSpace();
         return a.block() + "; ";
       });
-    })(), "function () {  }; function () { return 1; }; function (foo) { return foo; }; function (foo) { var bar; foo; return bar; }; ", "block01");
+    })(), "function () { return null; }; function () { return 1; }; function (foo) { return foo; }; function (foo) { var bar; foo; return bar; }; ", "block01");
     
     //blockParameters
     a = lss(" :foo  :bar :baz");
@@ -246,8 +246,8 @@
     //primaryReceiver
     test(lss("1").primaryReceiver(), "1", "primaryReceiver01");
     test(lss("1 to: 5").primaryReceiver(), "(1)", "primaryReceiver02");
-    test(lss("[]").primaryReceiver(), "function () {  }", "primaryReceiver03");
-    test(lss("[] tryCatch: []").primaryReceiver(), "(function () {  })", "primaryReceiver04");
+    test(lss("[]").primaryReceiver(), "function () { return null; }", "primaryReceiver03");
+    test(lss("[] tryCatch: []").primaryReceiver(), "(function () { return null; })", "primaryReceiver04");
     //primitive
     test(lss("<alert(1)>").primaryReceiver(), "alert(1)", "primitive01");
 
@@ -284,7 +284,7 @@
     //classHeader
     test(
       lss('Animal subclass: #Snake variables: #(#name #color)').classHeader(),
-      'var Snake;\nSnake = function () { this.name = null; this.color = null; if (this.init) { this.init.apply(this, arguments); } };\nSnake.prototype = new Animal();',
+      'var Snake;\nSnake = function () { this.name = null; this.color = null; if (this.init) { this.init.apply(this, arguments); } };\nSnake.prototype = new Animal()',
       'classHeader01'
     );
 
