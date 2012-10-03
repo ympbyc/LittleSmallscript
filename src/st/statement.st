@@ -15,7 +15,7 @@ statement
     ret += (self many: [| a |
       a := self statementable.
       self skipSpace.
-      self optional: [self chr: '.'].
+      self chr: '.'.
       self skipSpace.
       self followedBy: [self statementable].
 
