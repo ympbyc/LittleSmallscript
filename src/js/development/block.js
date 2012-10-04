@@ -8,7 +8,7 @@
       this.init.apply(this, arguments);
     }
   };
-  Block.prototype = new Expression();;
+  Block.prototype = new Expression();
   Block.prototype.block = function () {
     var _this = this;
     var dst_tmpl;

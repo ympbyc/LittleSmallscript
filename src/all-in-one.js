@@ -401,7 +401,7 @@ require.define("/src/js/production/statement.js",function(require,module,exports
       this.init.apply(this, arguments);
     }
   };
-  Statement.prototype = new Class();;
+  Statement.prototype = new Class();
   Statement.prototype.statement = function () {
     var _this = this;
     return _this.cacheaParser("statement", function () {
@@ -419,9 +419,7 @@ require.define("/src/js/production/statement.js",function(require,module,exports
         var a;
         a = _this.statementable();
         _this.skipSpace();
-        _this.optional(function () {
-          return _this.chr(".");
-        });
+        _this.chr(".");
         _this.skipSpace();
         _this.followedBy(function () {
           return _this.statementable();
@@ -436,7 +434,21 @@ require.define("/src/js/production/statement.js",function(require,module,exports
           })();
         } catch (err) {
           _ret = function () {
-            return "return null;";
+            var st;
+            st = (function () {
+              var _ret;
+              try {
+                _ret = (function () {
+                  return (_this.statementable() + ";");
+                })();
+              } catch (err) {
+                _ret = function () {
+                  return "";
+                }(err);
+              }
+              return _ret;
+            })();
+            return (st + "return null;");
           }(err);
         }
         return _ret;
@@ -493,7 +505,7 @@ require.define("/src/js/production/class.js",function(require,module,exports,__d
       this.init.apply(this, arguments);
     }
   };
-  Class.prototype = new Block();;
+  Class.prototype = new Block();
   Class.prototype.init = function () {
     var _this = this;
     _this.instanceVariables = {};
@@ -640,7 +652,7 @@ require.define("/src/js/production/block.js",function(require,module,exports,__d
       this.init.apply(this, arguments);
     }
   };
-  Block.prototype = new Expression();;
+  Block.prototype = new Expression();
   Block.prototype.block = function () {
     var _this = this;
     var dst_tmpl;
@@ -705,7 +717,7 @@ require.define("/src/js/production/expression.js",function(require,module,export
       this.init.apply(this, arguments);
     }
   };
-  Expression.prototype = new LittleParser();;
+  Expression.prototype = new LittleParser();
   Expression.prototype.init = function () {
     var _this = this;
     return _this.bundledMethods = [];
@@ -972,7 +984,7 @@ require.define("/src/js/production/littleparser.js",function(require,module,expo
       this.init.apply(this, arguments);
     }
   };
-  LittleParser.prototype = new Packrat();;
+  LittleParser.prototype = new Packrat();
   LittleParser.prototype.space = function () {
     var _this = this;
     return _this.cacheaParser("space", function () {
@@ -1266,7 +1278,7 @@ require.define("/src/js/production/packrat.js",function(require,module,exports,_
       this.init.apply(this, arguments);
     }
   };
-  Packrat.prototype = new Object();;
+  Packrat.prototype = new Object();
   Packrat.prototype.init = function (text) {
     var _this = this;
     _this.input = text;
@@ -3363,7 +3375,7 @@ require.define("/src/js/production/littlesmallscript.js",function(require,module
       this.init.apply(this, arguments);
     }
   };
-  LittleSmallscript.prototype = new Statement();;
+  LittleSmallscript.prototype = new Statement();
   LittleSmallscript.prototype.initWithInputandOptions = function (text, opt) {
     var _this = this;
     _this.input = text;
