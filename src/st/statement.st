@@ -21,7 +21,12 @@ statement
 
       a + '; '
     ]).
-    ret += (['return ' + self expression + ';'] tryCatch: ['return null;']).
+    ret += ([
+      'return ' + self expression + ';'
+    ] tryCatch: [| st |
+      st := [self statementable + ';'] tryCatch: [''].
+      st + 'return null;'
+    ]).
     self skipSpace.
     self optional: [ self chr: '.' ]. "allow tail period"
 

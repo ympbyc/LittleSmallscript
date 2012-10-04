@@ -12,7 +12,7 @@
       this.init.apply(this, arguments);
     }
   };
-  LittleSmallscript.prototype = new Statement();;
+  LittleSmallscript.prototype = new Statement();
   LittleSmallscript.prototype.initWithInputandOptions = function (text, opt) {
     var _this = this;
     _this.input = text;

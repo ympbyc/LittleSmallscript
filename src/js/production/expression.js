@@ -10,7 +10,7 @@
       this.init.apply(this, arguments);
     }
   };
-  Expression.prototype = new LittleParser();;
+  Expression.prototype = new LittleParser();
   Expression.prototype.init = function () {
     var _this = this;
     return _this.bundledMethods = [];
