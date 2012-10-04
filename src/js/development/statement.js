@@ -8,7 +8,7 @@
       this.init.apply(this, arguments);
     }
   };
-  Statement.prototype = new Class();;
+  Statement.prototype = new Class();
   Statement.prototype.statement = function () {
     var _this = this;
     return _this.cacheaParser("statement", function () {
@@ -26,9 +26,7 @@
         var a;
         a = _this.statementable();
         _this.skipSpace();
-        _this.optional(function () {
-          return _this.chr(".");
-        });
+        _this.chr(".");
         _this.skipSpace();
         _this.followedBy(function () {
           return _this.statementable();

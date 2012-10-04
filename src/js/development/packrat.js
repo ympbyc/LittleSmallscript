@@ -22,7 +22,7 @@
       this.init.apply(this, arguments);
     }
   };
-  Packrat.prototype = new Object();;
+  Packrat.prototype = new Object();
   Packrat.prototype.init = function (text) {
     var _this = this;
     _this.input = text;
@@ -54,7 +54,9 @@
     fn = (fn !== undefined) ? ((function () {
       return fn;
     }))() : (function () {
-      return function () {};
+      return function () {
+        return null;
+      };
     })();
     c = {};
     (_this.logNest += 1);
@@ -207,7 +209,9 @@
           return f = false;
         })();
       } catch (err) {
-        _ret = function () {}(err);
+        _ret = function () {
+          return null;
+        }(err);
       }
       return _ret;
     })();
@@ -231,7 +235,9 @@
           return f = true;
         })();
       } catch (err) {
-        _ret = function () {}(err);
+        _ret = function () {
+          return null;
+        }(err);
       }
       return _ret;
     })();

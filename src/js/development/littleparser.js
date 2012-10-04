@@ -8,7 +8,7 @@
       this.init.apply(this, arguments);
     }
   };
-  LittleParser.prototype = new Packrat();;
+  LittleParser.prototype = new Packrat();
   LittleParser.prototype.space = function () {
     var _this = this;
     return _this.cacheaParser("space", function () {
