@@ -10,7 +10,7 @@
       this.init.apply(this, arguments);
     }
   };
-  Class.prototype = new Block();;
+  Class.prototype = new Block();
   Class.prototype.init = function () {
     var _this = this;
     _this.instanceVariables = {};

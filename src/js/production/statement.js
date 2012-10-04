@@ -8,7 +8,7 @@
       this.init.apply(this, arguments);
     }
   };
-  Statement.prototype = new Class();;
+  Statement.prototype = new Class();
   Statement.prototype.statement = function () {
     var _this = this;
     return _this.cacheaParser("statement", function () {
@@ -26,9 +26,7 @@
         var a;
         a = _this.statementable();
         _this.skipSpace();
-        _this.optional(function () {
-          return _this.chr(".");
-        });
+        _this.chr(".");
         _this.skipSpace();
         _this.followedBy(function () {
           return _this.statementable();
@@ -43,7 +41,21 @@
           })();
         } catch (err) {
           _ret = function () {
-            return "return null;";
+            var st;
+            st = (function () {
+              var _ret;
+              try {
+                _ret = (function () {
+                  return (_this.statementable() + ";");
+                })();
+              } catch (err) {
+                _ret = function () {
+                  return "";
+                }(err);
+              }
+              return _ret;
+            })();
+            return (st + "return null;");
           }(err);
         }
         return _ret;

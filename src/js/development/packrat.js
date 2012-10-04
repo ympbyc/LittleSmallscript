@@ -22,7 +22,7 @@
       this.init.apply(this, arguments);
     }
   };
-  Packrat.prototype = new Object();;
+  Packrat.prototype = new Object();
   Packrat.prototype.init = function (text) {
     var _this = this;
     _this.input = text;
