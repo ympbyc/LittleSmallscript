@@ -44,31 +44,32 @@ ToDo:
 * !!!<strong>DOCUMENTS<strong>!!!
 * ^ syntax
 
-Current working example:
-------------------------
+Example:
+--------
+https://github.com/ympbyc/LittleSmallscript/tree/master/examples
+
 The language is changing every second so do example codes. Here's what works at least for now.
 
 ```smalltalk
 Object subclass:#Animal variables:#(#name)
 .
 !Animal
+setName: aName
+  name := aName.
+!.
+!Animal
 move: metre
   window alert: name + ' moved ' + metre + 'm.'
 !.
-Animal subclass:#Snake variables:#(#name)
+Animal subclass:#Snake variables:#()
 .
-!Snake
-init: aName
-  name := aName.
-  self
-!.
 !Snake
 crawl
   window alert: 'Slithering...'.
   self move: 5
 !.
 Snake new
-; init: 'Sammy the Python'
+; setName: 'Sammy the Python'
 ; crawl
 ```
 
