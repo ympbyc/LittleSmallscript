@@ -581,22 +581,22 @@ counter = 0;
 Object subclass:#Animal variables:#(#name)
 .
 !Animal
+setName: aName
+  name := aName.
+!.
+!Animal
 move: metre
   window alert: name + ' moved ' + metre + 'm.'
 !.
-Animal subclass:#Snake variables:#(#name)
+Animal subclass:#Snake variables:#()
 .
-!Snake
-init: aName
-  name := aName.
-  self
-!.
 !Snake
 crawl
   window alert: 'Slithering...'.
   self move: 5
 !.
-Snake new: 'Sammy the Python'
+Snake new
+; setName: 'Sammy the Python'
 ; crawl
             </pre>
           </div>
@@ -610,30 +610,29 @@ Animal = function () {
   }
 };
 Animal.prototype = new Object();
+Animal.prototype.setName = function (aName) {
+  var _this = this;
+  return _this.name = aName;
+};
 Animal.prototype.move = function (metre) {
   var _this = this;
   return window.alert((((_this.name + " moved ") + metre) + "m."));
 };
 var Snake;
 Snake = function () {
-  this.name = null;
   if (this.init) {
     this.init.apply(this, arguments);
   }
 };
 Snake.prototype = new Animal();
-Snake.prototype.init = function (aName) {
-  var _this = this;
-  _this.name = aName;
-  return _this;
-};
 Snake.prototype.crawl = function () {
   var _this = this;
   window.alert("Slithering...");
   return _this.move(5);
 };
 return (function () {
-  var _receiver = new Snake("Sammy the Python");
+  var _receiver = new Snake();
+  _receiver.setName("Sammy the Python");
   _receiver.crawl();
   return _receiver;
 })();
