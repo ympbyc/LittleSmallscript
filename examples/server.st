@@ -5,7 +5,7 @@
   Compile this file and give it to node
 "
 | http Server |
-http := <require('http')>
+http := require value: 'http'
 .
 Server := http at:#Server
 .
