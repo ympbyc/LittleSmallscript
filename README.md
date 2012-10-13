@@ -76,7 +76,12 @@ Snake new
 Versions:
 ----------
 
-23pm 30 Sep 2012
+16::42 13 Oct 2012
+
+v1.0.1
+The last statement in a block can end with a tailing period.
+
+23:00 30 Sep 2012
 
 v1.0.0  
 The first major version!  
@@ -85,7 +90,7 @@ v1 is not backward compatible with v0.
 Syntax for accessing instance variables has changed.  
 Class definition syntax has been added.  
 
-23pm 20 Sep 2012
+23:00 20 Sep 2012
 
 v0.0.4  
 Fixed many bugs.    
