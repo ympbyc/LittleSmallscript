@@ -1310,7 +1310,9 @@ require.define("/src/js/production/packrat.js",function(require,module,exports,_
     fn = (fn !== undefined) ? ((function () {
       return fn;
     }))() : (function () {
-      return function () {};
+      return function () {
+        return null;
+      };
     })();
     c = {};
     (_this.logNest += 1);
@@ -1463,7 +1465,9 @@ require.define("/src/js/production/packrat.js",function(require,module,exports,_
           return f = false;
         })();
       } catch (err) {
-        _ret = function () {}(err);
+        _ret = function () {
+          return null;
+        }(err);
       }
       return _ret;
     })();
@@ -1487,7 +1491,9 @@ require.define("/src/js/production/packrat.js",function(require,module,exports,_
           return f = true;
         })();
       } catch (err) {
-        _ret = function () {}(err);
+        _ret = function () {
+          return null;
+        }(err);
       }
       return _ret;
     })();
@@ -1994,7 +2000,9 @@ require.define("/src/js/production/optimization.js",function(require,module,expo
           }), v.variable);
         })();
       } catch (err) {
-        _ret = function () {}(err);
+        _ret = function () {
+          return null;
+        }(err);
       }
       return _ret;
     })();
