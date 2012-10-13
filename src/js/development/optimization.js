@@ -46,7 +46,9 @@
           }), v.variable);
         })();
       } catch (err) {
-        _ret = function () {}(err);
+        _ret = function () {
+          return null;
+        }(err);
       }
       return _ret;
     })();
