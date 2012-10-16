@@ -6,11 +6,15 @@
   Class = function () {
     this.instanceVariables = null;
     this.currentClass = null;
+    this.__super = new Block();
     if (this.init) {
       this.init.apply(this, arguments);
     }
   };
   Class.prototype = new Block();
+  Class.prototype.superarguments = Class.prototype.super = function (m, args) {
+    return this.__super[m].apply(this, args || []);
+  };
   Class.prototype.init = function () {
     var _this = this;
     _this.instanceVariables = {};

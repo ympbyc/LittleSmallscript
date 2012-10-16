@@ -4,11 +4,15 @@
   Class = require("./class");
   var Statement;
   Statement = function () {
+    this.__super = new Class();
     if (this.init) {
       this.init.apply(this, arguments);
     }
   };
   Statement.prototype = new Class();
+  Statement.prototype.superarguments = Statement.prototype.super = function (m, args) {
+    return this.__super[m].apply(this, args || []);
+  };
   Statement.prototype.statement = function () {
     var _this = this;
     return _this.cacheaParser("statement", function () {

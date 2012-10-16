@@ -8,11 +8,15 @@
     this.options = null;
     this.beautifyOption = null;
     this.cache = null;
+    this.__super = new Statement();
     if (this.init) {
       this.init.apply(this, arguments);
     }
   };
   LittleSmallscript.prototype = new Statement();
+  LittleSmallscript.prototype.superarguments = LittleSmallscript.prototype.super = function (m, args) {
+    return this.__super[m].apply(this, args || []);
+  };
   LittleSmallscript.prototype.initWithInputandOptions = function (text, opt) {
     var _this = this;
     _this.input = text;
@@ -44,8 +48,7 @@
     rest = _this.input.substring(_this.getMaxIndex());
     token = rest.substring((0), rest.search(/[\.\s\t\n]|$/));
     console.log((((("Parse error on line " + line) + ". Unexpected ") + token) + "."));
-    console.log("====================================================");
-    return console.log(_this.getStackTrace());
+    return console.log("====================================================");
   };
   LittleSmallscript.prototype.toJS = function () {
     var _this = this;

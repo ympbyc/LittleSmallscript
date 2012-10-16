@@ -4,11 +4,15 @@
   Expression = require("./expression");
   var Block;
   Block = function () {
+    this.__super = new Expression();
     if (this.init) {
       this.init.apply(this, arguments);
     }
   };
   Block.prototype = new Expression();
+  Block.prototype.superarguments = Block.prototype.super = function (m, args) {
+    return this.__super[m].apply(this, args || []);
+  };
   Block.prototype.block = function () {
     var _this = this;
     var dst_tmpl;
