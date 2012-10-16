@@ -18,11 +18,15 @@
     this.maxIndex = null;
     this.logNest = null;
     this.stackTrace = null;
+    this.__super = new Object();
     if (this.init) {
       this.init.apply(this, arguments);
     }
   };
   Packrat.prototype = new Object();
+  Packrat.prototype.superarguments = Packrat.prototype.super = function (m, args) {
+    return this.__super[m].apply(this, args || []);
+  };
   Packrat.prototype.init = function (text) {
     var _this = this;
     _this.input = text;

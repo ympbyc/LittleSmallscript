@@ -19,8 +19,9 @@ init
 classHeader | dst_tmpl |
   dst_tmpl := 
 'var %className%;
-%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };
-%className%.prototype = new %superClass%()'.
+%className% = function () { %variableInitialization%this.__super = new %superClass%(); if (this.init) { this.init.apply(this, arguments); } };
+%className%.prototype = new %superClass%();
+%className%.prototype.superarguments = %className%.prototype.super = function (m,args) { return this.__super[m].apply(this, args||[]); }'.
   self cache: #classHeader aParser: [| className superClass variables v_init |
     self optional: [self chr: '+']. "LSt compatibility"
     superClass := self variable.

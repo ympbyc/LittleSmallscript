@@ -30,7 +30,7 @@ onError:err | line rest token |
   token := rest sub:0 string:(rest search:</[\.\s\t\n]|$/>).
   console log: 'Parse error on line '+line+'. Unexpected '+token+'.'.
   console log: '===================================================='.
-  console log: self getStackTrace
+  "console log: self getStackTrace"
 !.
 !LittleSmallscript
 toJS | wrapTmpl js beautifyOption err |
