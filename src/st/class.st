@@ -14,20 +14,20 @@ init
   instanceVariables := #{}.
   currentClass := null
 !.
-"Animal subclass: #Snake variables: #(#name #colour #awake)"
+"Snake := Animal subclass variables: #(#name #colour)"
 !Class
 classHeader | dst_tmpl |
   dst_tmpl := 
-'var %className%;
-%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };
+'%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };
 %className%.prototype = new %superClass%()'.
   self cache: #classHeader aParser: [| className superClass variables v_init |
-    self optional: [self chr: '+']. "LSt compatibility"
+    className := self variable.
+    self skipSpace.
+    self assignmentArrow.
+    self skipSpace.
     superClass := self variable.
     self skipSpace.
-    self string: 'subclass:'.
-    self skipSpace.
-    className := self variablableStringContent.
+    self string: 'subclass'.
     self skipSpace.
     self string: 'variables:'.
     self skipSpace.

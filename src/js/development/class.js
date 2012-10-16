@@ -19,17 +19,16 @@
   Class.prototype.classHeader = function () {
     var _this = this;
     var dst_tmpl;
-    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };\n%className%.prototype = new %superClass%()";
+    dst_tmpl = "%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };\n%className%.prototype = new %superClass%()";
     return _this.cacheaParser("classHeader", function () {
       var className, superClass, variables, v_init;
-      _this.optional(function () {
-        return _this.chr("+");
-      });
+      className = _this.variable();
+      _this.skipSpace();
+      _this.assignmentArrow();
+      _this.skipSpace();
       superClass = _this.variable();
       _this.skipSpace();
-      _this.string("subclass:");
-      _this.skipSpace();
-      className = _this.variablableStringContent();
+      _this.string("subclass");
       _this.skipSpace();
       _this.string("variables:");
       _this.skipSpace();
