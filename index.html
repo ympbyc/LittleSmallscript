@@ -142,7 +142,7 @@ list := #(1 2 3 4 5).
 
 "Objects:"
 math := #{
-  #root: Math at: sqrt
+  #root: Math at: #sqrt
   #square: square 
   #cube: [:x | (square value: x) * x]
 }.
@@ -166,7 +166,7 @@ square = function (x) {
 };
 list = [1, 2, 3, 4, 5];
 math = {
-  "root": Math[sqrt],
+  "root": Math.sqrt,
   "square": square,
   "cube": function (x) {
     return (square(x) * x);
@@ -517,8 +517,8 @@ foo = x ? (function () { return 1; })() : (function () { return 2; })();
 
         <h3>Iteration Over Objects and Arrays</h3>
         <p>
-          Various iteration methods are provided via the prelude module (/src/littlesmallmethods.js (not tested fully)).
-          The most basic ones are "do" and "collect" (they are identical to Array.forEach and Array.map in JS)
+          Various iteration methods are provided via the prelude module (/src/prelude.js).
+          However the recommended practice is not to use this library and instead use the JS native methods like forEach and map.
         </p>
         <div class="compare-codes">
           <div class="compare-left">
@@ -526,11 +526,11 @@ foo = x ? (function () { return 1; })() : (function () { return 2; })();
 | yearsOld |
 
 "Eat Lunch"
-#(#toast #cheese #wine) do: [:food | eat value: food].
+#(#toast #cheese #wine) forEach: [:food | eat value: food].
 
 "Objects"
 yearsOld := #{#max:10 #ida:9 #tim:11}.
-ages := yearsOld collect: [:age :child | 
+ages := yearsOld map: [:age :child | 
   child + ' is ' + age
 ]
             </pre>
@@ -539,19 +539,19 @@ ages := yearsOld collect: [:age :child |
             <pre class="prettyprint lang-js">
 var yearsOld;
 
-["toast", "cheese", "wine"].do_(function (food) {
+["toast", "cheese", "wine"].forEach(function (food) {
   eat(food);
 });
 
 yearsOld = {"max":10, "ida":9, "tim":11};
-ages = yearsOld.collect(function (age, child) {
+ages = yearsOld.map(function (age, child) {
   return ((child + " is ") + age);
 });
             </pre>
           </div>
         </div><!-- /compare-codes -->
         <br class="clear">
-        <p>While loop is created with whileTrue - instance method of Function.</p>
+        <p>While loop is created with whileTrue - an instance method of Function defined in prelude.js.</p>
         <div class="compare-codes">
           <div class="compare-left">
             <pre class="prettyprint">
@@ -585,26 +585,28 @@ counter = 0;
         <div class="compare-codes">
           <div class="compare-left">
             <pre class="prettyprint">
-Object subclass:#Animal variables:#(#name)
-.
++Object subclass:#Animal variables:#(#name).
+
 !Animal
 setName: aName
-  name := aName.
+  name := aName
 !.
 !Animal
 move: metre
   window alert: name + ' moved ' + metre + 'm.'
 !.
-Animal subclass:#Snake variables:#()
-.
+
++Animal subclass:#Snake variables:#().
+
 !Snake
-crawl
+move
   window alert: 'Slithering...'.
-  self move: 5
+  Snake super:#move arguments:#(5)
 !.
+
 Snake new
 ; setName: 'Sammy the Python'
-; crawl
+; move
             </pre>
           </div>
           <div class="compare-right">
@@ -616,6 +618,7 @@ Animal = function () {
     this.init.apply(this, arguments);
   }
 };
+Animal.__super = Object.prototype;
 Animal.prototype = new Object();
 Animal.prototype.setName = function (aName) {
   var _this = this;
@@ -631,16 +634,17 @@ Snake = function () {
     this.init.apply(this, arguments);
   }
 };
+Snake.__super = Animal.prototype;
 Snake.prototype = new Animal();
-Snake.prototype.crawl = function () {
+Snake.prototype.move = function () {
   var _this = this;
   window.alert("Slithering...");
-  return _this.move(5);
+  return Snake.__super.move.apply(_this, [5]);
 };
-return (function () {
+(function () {
   var _receiver = new Snake();
   _receiver.setName("Sammy the Python");
-  _receiver.crawl();
+  _receiver.move();
   return _receiver;
 })();
             </pre>
@@ -710,6 +714,17 @@ hi = function () {
       <div id="changelog">
         <h2>Change Log</h2>
         
+
+        <span class="idle"><a href="https://github.com/ympbyc/LittleSmallscript/tree/self-hosting"><strong>v1.0.2</strong></a></span><span> - Oct 17, 2012</span>
+        <p>
+          Super Methods can be called using the following syntax
+          <pre>
+            SuperClass super:#superMethod.
+            "or"
+            SuperClass super:#superMethod arguments:#(1 2 3)
+          </pre>
+        </p>
+
         <span class="idle"><a href="https://github.com/ympbyc/LittleSmallscript/tree/self-hosting"><strong>v1.0.0</strong></a></span><span> - Sep 30, 2012</span>
         <p>
           The first major version!<br />
