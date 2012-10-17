@@ -6,15 +6,12 @@
   Class = function () {
     this.instanceVariables = null;
     this.currentClass = null;
-    this.__super = new Block();
     if (this.init) {
       this.init.apply(this, arguments);
     }
   };
-  Class.prototype = new Block();
-  Class.prototype.superarguments = Class.prototype.super = function (m, args) {
-    return this.__super[m].apply(this, args || []);
-  };
+  Class.__super = Block.prototype;
+  Class.prototype = new Block();;
   Class.prototype.init = function () {
     var _this = this;
     _this.instanceVariables = {};
@@ -23,7 +20,7 @@
   Class.prototype.classHeader = function () {
     var _this = this;
     var dst_tmpl;
-    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };\n%className%.__super = new %superClass%();\n%className%.prototype = new %superClass%();\n%className%.prototype.superarguments = %className%.prototype.super = function (m,args) { return %className%.__super[m].apply(this, args||[]); }";
+    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };\n%className%.__super = %superClass%.prototype;\n%className%.prototype = new %superClass%()";
     return _this.cacheaParser("classHeader", function () {
       var className, superClass, variables, v_init;
       _this.optional(function () {
