@@ -9,7 +9,7 @@
     }
   };
   Statement.__super = Class.prototype;
-  Statement.prototype = new Class();;
+  Statement.prototype = new Class();
   Statement.prototype.statement = function () {
     var _this = this;
     return _this.cacheaParser("statement", function () {

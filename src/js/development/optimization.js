@@ -30,7 +30,9 @@
     "ifFalseifTrue": "%receiver% ? (%arg2%)() : (%arg1%)()",
     "tryCatch": "(function () { var _ret; try { _ret = %receiver%(); } catch (err) { _ret = %arg1%(err); } return _ret; })()",
     "tryCatchFinally": "(function () { var _ret; try { _ret = %receiver%(); } catch (err) { _ret = %arg1%(err); } finally { _ret = %arg2%(); } return _ret; })()",
-    "new": "new %receiver%(%args%)"
+    "new": "new %receiver%(%args%)",
+    "super": "%receiver%.__super.%arg1%.call(_this)",
+    "superarguments": "%receiver%.__super.%arg1%.apply(_this, %arg2%)"
   };
   canUseDotNotation = function (str) {
     var v, identifier;
@@ -74,6 +76,9 @@
         args[(0)] = identifier;
         return methodName = "dotput";
       })() : void 0;
+    })() : void 0;
+    ((methodName === "super") || (methodName === "superarguments")) ? (function () {
+      return args[(0)] = canUseDotNotation(args[0]);
     })() : void 0;
     return template(optimTmpl[methodName], {
       "receiver": receiver,

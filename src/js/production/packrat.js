@@ -23,7 +23,7 @@
     }
   };
   Packrat.__super = Object.prototype;
-  Packrat.prototype = new Object();;
+  Packrat.prototype = new Object();
   Packrat.prototype.init = function (text) {
     var _this = this;
     _this.input = text;

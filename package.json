@@ -1,7 +1,7 @@
 {
   "name": "littlesmallscript",
   "preferGlobal": "true",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "author": "Minori Yamashita <ympbyc@gmail.com>",
   "description": "A simple Smalltalk to js translator.",
   "bin" : { 

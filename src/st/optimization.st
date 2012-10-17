@@ -30,6 +30,8 @@ optimTmpl := #{
   'tryCatchFinally' : 
     '(function () { var _ret; try { _ret = %receiver%(); } catch (err) { _ret = %arg1%(err); } finally { _ret = %arg2%(); } return _ret; })()',
   'new' : 'new %receiver%(%args%)',
+  'super' : '%receiver%.__super.%arg1%.call(_this)',
+  'superarguments' : '%receiver%.__super.%arg1%.apply(_this, %arg2%)',
 }
 .
 canUseDotNotation := [:str| | v identifier |
@@ -55,6 +57,9 @@ optimize := [:receiver :methodName :args |
       args at: 0 put: identifier.
       methodName := 'dotput'
     ]
+  ].
+  (methodName === 'super') || (methodName === 'superarguments') ifTrue: [
+    args at:0 put: (canUseDotNotation value: (args at: 0))
   ].
   "end"
 
