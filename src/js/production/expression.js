@@ -6,15 +6,12 @@
   var Expression;
   Expression = function () {
     this.bundledMethods = null;
-    this.__super = new LittleParser();
     if (this.init) {
       this.init.apply(this, arguments);
     }
   };
-  Expression.prototype = new LittleParser();
-  Expression.prototype.superarguments = Expression.prototype.super = function (m, args) {
-    return this.__super[m].apply(this, args || []);
-  };
+  Expression.__super = LittleParser.prototype;
+  Expression.prototype = new LittleParser();;
   Expression.prototype.init = function () {
     var _this = this;
     return _this.bundledMethods = [];

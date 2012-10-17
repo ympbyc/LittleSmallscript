@@ -8,15 +8,12 @@
     this.options = null;
     this.beautifyOption = null;
     this.cache = null;
-    this.__super = new Statement();
     if (this.init) {
       this.init.apply(this, arguments);
     }
   };
-  LittleSmallscript.prototype = new Statement();
-  LittleSmallscript.prototype.superarguments = LittleSmallscript.prototype.super = function (m, args) {
-    return this.__super[m].apply(this, args || []);
-  };
+  LittleSmallscript.__super = Statement.prototype;
+  LittleSmallscript.prototype = new Statement();;
   LittleSmallscript.prototype.initWithInputandOptions = function (text, opt) {
     var _this = this;
     _this.input = text;

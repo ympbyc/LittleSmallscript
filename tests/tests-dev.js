@@ -284,7 +284,7 @@
     //classHeader
     test(
       lss('Animal subclass: #Snake variables: #(#name #color)').classHeader(),
-      'var Snake;\nSnake = function () { this.name = null; this.color = null; if (this.init) { this.init.apply(this, arguments); } };\nSnake.__super = new Animal();\nSnake.prototype = new Animal();\nSnake.prototype.superarguments = Snake.prototype.super = function (m,args) { return Snake.__super[m].apply(this, args||[]); }',
+      'var Snake;\nSnake = function () { this.name = null; this.color = null; if (this.init) { this.init.apply(this, arguments); } };\nSnake.__super = Animal.prototype;\nSnake.prototype = new Animal()',
       'classHeader01'
     );
 
