@@ -529,8 +529,9 @@ foo = x ? (function () { return 1; })() : (function () { return 2; })();
 #(#toast #cheese #wine) forEach: [:food | eat value: food].
 
 "Objects"
+require value: 'src/prelude'.
 yearsOld := #{#max:10 #ida:9 #tim:11}.
-ages := yearsOld map: [:age :child | 
+ages := yearsOld collect: [:age :child | 
   child + ' is ' + age
 ]
             </pre>
@@ -543,6 +544,7 @@ var yearsOld;
   eat(food);
 });
 
+require('src/prelude');
 yearsOld = {"max":10, "ida":9, "tim":11};
 ages = yearsOld.map(function (age, child) {
   return ((child + " is ") + age);
