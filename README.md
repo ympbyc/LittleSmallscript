@@ -78,8 +78,8 @@ Versions:
 
 18:40 17 Oct 2012
 
-v1.0.2
-A temporary syntax fro calling super methods is introduced. See the example above.
+v1.0.2  
+A temporary syntax for calling super methods is introduced. See the example above.
 
 23:00 30 Sep 2012
 
