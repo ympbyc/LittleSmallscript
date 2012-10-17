@@ -31,7 +31,7 @@ Direction:
 * The goal is to write Javascript in Smalltalk's syntax.
 * No class browser and stuff.
 * Some expressions are converted to javascripts syntax, for efficiency and readability.
-  * "(1 === 1) ifTrue: ['yay']" -> "(1 === 1).ifTrue(function () {return 'yay';})" -> "(1 === 1) ? (function { 'yay'; })() : void 0;"
+  * "(1 === 1) ifTrue: ['yay']" -> "(1 === 1).ifTrue(function () {return 'yay';})" -> "(1 === 1) ? (function () { 'yay'; })() : void 0;"
   * #(1 2 3) at: 0 -> [1,2,3].at(0) -> [1,2,3][0]
 * Other message expressions are translated into method calling expression.
   * "obj unary" becomes "obj.unary()". "array inject:1 into:[]" becomes "array.injectinto(1, function () {})".
@@ -39,9 +39,7 @@ Direction:
 
 ToDo:
 -----
-* Error messages enhancement
 * Bundle standard methods into compiled js (issue#3)
-* !!!<strong>DOCUMENTS<strong>!!!
 * ^ syntax
 
 Example:
@@ -51,35 +49,37 @@ https://github.com/ympbyc/LittleSmallscript/tree/master/examples
 The language is changing every second so do example codes. Here's what works at least for now.
 
 ```smalltalk
-Object subclass:#Animal variables:#(#name)
-.
++Object subclass:#Animal variables:#(#name).
+
 !Animal
 setName: aName
-  name := aName.
+  name := aName
 !.
 !Animal
 move: metre
   window alert: name + ' moved ' + metre + 'm.'
 !.
-Animal subclass:#Snake variables:#()
-.
+
++Animal subclass:#Snake variables:#().
+
 !Snake
-crawl
+move
   window alert: 'Slithering...'.
-  self move: 5
+  Snake super:#move arguments:#(5)
 !.
+
 Snake new
 ; setName: 'Sammy the Python'
-; crawl
+; move
 ```
 
 Versions:
 ----------
 
-16::42 13 Oct 2012
+18:40 17 Oct 2012
 
-v1.0.1
-The last statement in a block can end with a tailing period.
+v1.0.2
+A temporary syntax fro calling super methods is introduced. See the example above.
 
 23:00 30 Sep 2012
 

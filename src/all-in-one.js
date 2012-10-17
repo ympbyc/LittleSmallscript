@@ -401,6 +401,7 @@ require.define("/src/js/production/statement.js",function(require,module,exports
       this.init.apply(this, arguments);
     }
   };
+  Statement.__super = Class.prototype;
   Statement.prototype = new Class();
   Statement.prototype.statement = function () {
     var _this = this;
@@ -505,6 +506,7 @@ require.define("/src/js/production/class.js",function(require,module,exports,__d
       this.init.apply(this, arguments);
     }
   };
+  Class.__super = Block.prototype;
   Class.prototype = new Block();
   Class.prototype.init = function () {
     var _this = this;
@@ -514,7 +516,7 @@ require.define("/src/js/production/class.js",function(require,module,exports,__d
   Class.prototype.classHeader = function () {
     var _this = this;
     var dst_tmpl;
-    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };\n%className%.prototype = new %superClass%()";
+    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };\n%className%.__super = %superClass%.prototype;\n%className%.prototype = new %superClass%()";
     return _this.cacheaParser("classHeader", function () {
       var className, superClass, variables, v_init;
       _this.optional(function () {
@@ -652,6 +654,7 @@ require.define("/src/js/production/block.js",function(require,module,exports,__d
       this.init.apply(this, arguments);
     }
   };
+  Block.__super = Expression.prototype;
   Block.prototype = new Expression();
   Block.prototype.block = function () {
     var _this = this;
@@ -717,6 +720,7 @@ require.define("/src/js/production/expression.js",function(require,module,export
       this.init.apply(this, arguments);
     }
   };
+  Expression.__super = LittleParser.prototype;
   Expression.prototype = new LittleParser();
   Expression.prototype.init = function () {
     var _this = this;
@@ -984,6 +988,7 @@ require.define("/src/js/production/littleparser.js",function(require,module,expo
       this.init.apply(this, arguments);
     }
   };
+  LittleParser.__super = Packrat.prototype;
   LittleParser.prototype = new Packrat();
   LittleParser.prototype.space = function () {
     var _this = this;
@@ -1278,6 +1283,7 @@ require.define("/src/js/production/packrat.js",function(require,module,exports,_
       this.init.apply(this, arguments);
     }
   };
+  Packrat.__super = Object.prototype;
   Packrat.prototype = new Object();
   Packrat.prototype.init = function (text) {
     var _this = this;
@@ -1984,7 +1990,9 @@ require.define("/src/js/production/optimization.js",function(require,module,expo
     "ifFalseifTrue": "%receiver% ? (%arg2%)() : (%arg1%)()",
     "tryCatch": "(function () { var _ret; try { _ret = %receiver%(); } catch (err) { _ret = %arg1%(err); } return _ret; })()",
     "tryCatchFinally": "(function () { var _ret; try { _ret = %receiver%(); } catch (err) { _ret = %arg1%(err); } finally { _ret = %arg2%(); } return _ret; })()",
-    "new": "new %receiver%(%args%)"
+    "new": "new %receiver%(%args%)",
+    "super": "%receiver%.__super.%arg1%.call(_this)",
+    "superarguments": "%receiver%.__super.%arg1%.apply(_this, %arg2%)"
   };
   canUseDotNotation = function (str) {
     var v, identifier;
@@ -2028,6 +2036,9 @@ require.define("/src/js/production/optimization.js",function(require,module,expo
         args[(0)] = identifier;
         return methodName = "dotput";
       })() : void 0;
+    })() : void 0;
+    ((methodName === "super") || (methodName === "superarguments")) ? (function () {
+      return args[(0)] = canUseDotNotation(args[0]);
     })() : void 0;
     return template(optimTmpl[methodName], {
       "receiver": receiver,
@@ -3383,6 +3394,7 @@ require.define("/src/js/production/littlesmallscript.js",function(require,module
       this.init.apply(this, arguments);
     }
   };
+  LittleSmallscript.__super = Statement.prototype;
   LittleSmallscript.prototype = new Statement();
   LittleSmallscript.prototype.initWithInputandOptions = function (text, opt) {
     var _this = this;
@@ -3415,8 +3427,7 @@ require.define("/src/js/production/littlesmallscript.js",function(require,module
     rest = _this.input.substring(_this.getMaxIndex());
     token = rest.substring((0), rest.search(/[\.\s\t\n]|$/));
     console.log((((("Parse error on line " + line) + ". Unexpected ") + token) + "."));
-    console.log("====================================================");
-    return console.log(_this.getStackTrace());
+    return console.log("====================================================");
   };
   LittleSmallscript.prototype.toJS = function () {
     var _this = this;
