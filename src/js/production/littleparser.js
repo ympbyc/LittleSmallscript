@@ -9,7 +9,7 @@
     }
   };
   LittleParser.__super = Packrat.prototype;
-  LittleParser.prototype = new Packrat();;
+  LittleParser.prototype = new Packrat();
   LittleParser.prototype.space = function () {
     var _this = this;
     return _this.cacheaParser("space", function () {
