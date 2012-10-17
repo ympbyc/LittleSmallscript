@@ -3,7 +3,9 @@
 (function () {
   'use strict';
 
-  var LittleSmallscript, fs, optimist, argv, readline, rl, help;
+  var LittleSmallscript, fs, optimist, argv, readline, rl, help, VERSION;
+
+  VERSION = 1.0.2;
   
   LittleSmallscript = require("./js/production/littlesmallscript");
   
@@ -21,6 +23,8 @@
       .alias('p', 'print')
       .describe('p', 'print out the compiled JavaScript')
       .describe('packed', 'output without prettyprint')
+      .alias('v', 'version')
+      .describe('v', 'print the version')
       .argv;
 
   function interactiveShell () {
@@ -55,6 +59,8 @@ Usage: littlesmallscript [options] path/to/script.st\n\n \
 ";
 
   if (argv.h) return console.log(help);
+
+  if (argv.v) return console.log(VERSION);
 
   if (argv.i) return interactiveShell();
   
