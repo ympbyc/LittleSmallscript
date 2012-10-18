@@ -5,7 +5,7 @@
 
   var LittleSmallscript, fs, optimist, argv, readline, rl, help, VERSION;
 
-  VERSION = '1.0.2';
+  VERSION = 'littlesmallscript 1.0.2';
   
   LittleSmallscript = require("./js/production/littlesmallscript");
   
@@ -25,6 +25,8 @@
       .describe('packed', 'output without prettyprint')
       .alias('v', 'version')
       .describe('v', 'print the version')
+      .alias('w', 'watch')
+      .describe('watch files in current directory for changes and automaticaly compile them.')
       .argv;
 
   function interactiveShell () {
@@ -49,13 +51,32 @@
     });
   }
 
+  function compile (fileName) {
+    if (! fileName) return console.log(help);
+    return fs.readFile(fileName, 'utf8', function (err, lssString) {
+      if (err) throw err;
+      try {
+        var js = new LittleSmallscript().initWithInputandOptions(lssString, {prettyprint: true}).toJS();
+        if (argv.p) return console.log(js);
+        fs.writeFile(fileName.replace(/\.([^\.])+$/, '.js'), js, function (err) {
+          if (err) throw err;
+        });
+      } catch (err) {
+        console.log(err.message||err.type||JSON.stringify(err));
+        throw err;
+      }
+    });
+  }
+
   help = 
 "\n \
 Usage: littlesmallscript [options] path/to/script.st\n\n \
 -c, --compile      compile to JavaScript and save as .js files\n \
--i, --interactive  run an interactive LittleSmallscript REPL\n \
 -h, --help         display this help message\n \
+-i, --interactive  run an interactive LittleSmallscript REPL\n \
 -p, --print        print out the compiled JavaScript\n \
+-v, --version      print out the version\n \
+-w, --watch        watch *.st files in current directory for changes and automaticaly compile them\n \
 ";
 
   if (argv.h) return console.log(help);
@@ -63,24 +84,19 @@ Usage: littlesmallscript [options] path/to/script.st\n\n \
   if (argv.v) return console.log(VERSION);
 
   if (argv.i) return interactiveShell();
-  
-  return (function () {
-    var fileName = argv.c || argv.p;
-    if (! fileName) return console.log(help);
-    return fs.readFile(fileName, 'utf8', function (err, lssString) {
-      if (err) throw err;
-      try {
-        var js = new LittleSmallscript().initWithInputandOptions(lssString, {prettyprint: true}).toJS();
-        if (argv.p) return console.log(js);
-        fs.writeFile(argv.c.replace(/\.([^\.])+$/, '.js'), js, function (err) {
-          if (err) throw err;
-        });
-      } catch (err) {
-        console.log(err.message||err.type||JSON.stringify(err));
-        if (err.partialjs) console.log('###partial js###\n'+err.partialjs+'\n#########');
-        throw err;
-      }
+
+  if (argv.w) return fs.readdir('.', function (err, files) {
+    //--watch
+    files.forEach(function (fileName) {
+      if (fileName.slice(fileName.length - 3) !== '.st') return;
+      fs.watchFile(fileName, {interval:5000}, function (curr, prev) {
+        if (curr.mtime !== prev.mtime) {
+          return compile(fileName);
+        }
+      });
     });
-  })();
+  });
+  
+  return compile(argv.c || argv.p);
 
 }).call(this);
