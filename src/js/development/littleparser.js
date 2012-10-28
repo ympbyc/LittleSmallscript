@@ -147,6 +147,23 @@
       return _this.chr("\"");
     });
   };
+  LittleParser.prototype.comment = function () {
+    var _this = this;
+    return _this.cacheaParser("comment", function () {
+      var comment;
+      comment = _this.betweenandaccept((function () {
+        return _this.commentQuote();
+      }), (function () {
+        return _this.commentQuote();
+      }), function () {
+        return _this.anyChar();
+      });
+      _this.optional(function () {
+        return _this.space();
+      });
+      return comment;
+    });
+  };
   LittleParser.prototype.skipSpace = function () {
     var _this = this;
     return _this.cacheaParser("skipSpace", function () {
@@ -154,16 +171,7 @@
         return _this.space();
       });
       return _this.many(function () {
-        _this.betweenandaccept((function () {
-          return _this.commentQuote();
-        }), (function () {
-          return _this.commentQuote();
-        }), function () {
-          return _this.anyChar();
-        });
-        return _this.optional(function () {
-          return _this.space();
-        });
+        return _this.comment();
       });
     });
   };

@@ -116,13 +116,18 @@ commentQuote
   ]
 !.
 !LittleParser
+comment
+  self cache:#comment aParser:[| comment |
+    comment := self between: [self commentQuote] and: [self commentQuote] accept: [self anyChar].
+    self optional: [self space].
+    comment
+  ]
+!.
+!LittleParser
 skipSpace
   self cache:#skipSpace aParser:[
     self optional: [self space].
-    self many: [
-      self between: [self commentQuote] and: [self commentQuote] accept: [self anyChar].
-      self optional: [self space]
-    ]
+    self many: [self comment]
   ]
 !.
 !LittleParser
