@@ -91,6 +91,7 @@ Usage: littlesmallscript [options] path/to/script.st\n\n \
       if (fileName.slice(fileName.length - 3) !== '.st') return;
       fs.watchFile(fileName, {interval:5000}, function (curr, prev) {
         if (curr.mtime !== prev.mtime) {
+          console.log("compiling "+fileName+"...\n");
           return compile(fileName);
         }
       });
