@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var Block;
-  Block = require("./block");
+  Block = require('./block');
   var Class;
   Class = function () {
     this.instanceVariables = null;
@@ -20,36 +20,36 @@
   Class.prototype.classHeader = function () {
     var _this = this;
     var dst_tmpl;
-    dst_tmpl = "var %className%;\n%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };\n%className%.__super = %superClass%.prototype;\n%className%.prototype = new %superClass%()";
-    return _this.cacheaParser("classHeader", function () {
+    dst_tmpl = 'var %className%;\n%className% = function () { %variableInitialization%if (this.init) { this.init.apply(this, arguments); } };\n%className%.__super = %superClass%.prototype;\n%className%.prototype = new %superClass%()';
+    return _this.cacheaParser('classHeader', function () {
       var className, superClass, variables, v_init;
       _this.optional(function () {
-        return _this.chr("+");
+        return _this.chr('+');
       });
       superClass = _this.variable();
       _this.skipSpace();
-      _this.string("subclass:");
+      _this.string('subclass:');
       _this.skipSpace();
       className = _this.variablableStringContent();
       _this.skipSpace();
-      _this.string("variables:");
+      _this.string('variables:');
       _this.skipSpace();
       variables = _this.instanceVariableArray();
       _this.instanceVariables[className] = [];
-      v_init = variables.injectinto("", function (a, b) {
+      v_init = variables.injectinto('', function (a, b) {
         _this.instanceVariables[className].push(a);
-        return (((b + "this.") + a) + " = null; ");
+        return (((b + 'this.') + a) + ' = null; ');
       });
       return _this.templateapply(dst_tmpl, {
-        "className": className,
-        "superClass": superClass,
-        "variableInitialization": v_init
+        'className': className,
+        'superClass': superClass,
+        'variableInitialization': v_init
       });
     });
   };
   Class.prototype.instanceVariableArray = function () {
     var _this = this;
-    return _this.cacheaParser("instanceVariableArray", function () {
+    return _this.cacheaParser('instanceVariableArray', function () {
       var variables;
       variables = [];
       _this.arrayStart();
@@ -60,7 +60,7 @@
         variables.push(v);
         _this.skipSpace();
         _this.optional(function () {
-          return _this.chr(",");
+          return _this.chr(',');
         });
         _this.skipSpace();
         return v;
@@ -71,9 +71,9 @@
   };
   Class.prototype.variablableStringContent = function () {
     var _this = this;
-    return _this.cacheaParser("variablableStringContent", function () {
+    return _this.cacheaParser('variablableStringContent', function () {
       return _this.try_([function () {
-        _this.chr("#");
+        _this.chr('#');
         return _this.variable();
       }, function () {
         return _this.betweenandaccept((function () {
@@ -89,8 +89,8 @@
   Class.prototype.instanceMethod = function () {
     var _this = this;
     var method_tmpl;
-    method_tmpl = "%className%.prototype.%methodName% = function (%args%) { var _this = this; %methodBody% }";
-    return _this.cacheaParser("instanceMethod", function () {
+    method_tmpl = '%className%.prototype.%methodName% = function (%args%) { var _this = this; %methodBody% }';
+    return _this.cacheaParser('instanceMethod', function () {
       var className, methodHead, methodBody;
       _this.exclamation();
       _this.skipSpace();
@@ -104,18 +104,18 @@
       _this.skipSpace();
       _this.exclamation();
       return _this.templateapply(method_tmpl, {
-        "className": className,
-        "methodName": methodHead.name,
-        "args": methodHead.args,
-        "methodBody": methodBody
+        'className': className,
+        'methodName': methodHead.name,
+        'args': methodHead.args,
+        'methodBody': methodBody
       });
     });
   };
   Class.prototype.methodHead = function () {
     var _this = this;
-    return _this.cacheaParser("methodHead", function () {
+    return _this.cacheaParser('methodHead', function () {
       var methodName, args;
-      methodName = "";
+      methodName = '';
       args = [];
       _this.try_([function () {
         return _this.many1(function () {
@@ -128,8 +128,8 @@
         return methodName = _this.unarySelector();
       }]);
       return {
-        "name": methodName,
-        "args": args.join(", ")
+        'name': methodName,
+        'args': args.join(', ')
       };
     });
   };

@@ -1,4 +1,4 @@
-require value:'../../prelude'
+require value:'../../../bin/prelude'
 .
 !Number
 timesString: str | ret |

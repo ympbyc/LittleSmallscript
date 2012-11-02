@@ -1,11 +1,11 @@
 {
   "name": "littlesmallscript",
   "preferGlobal": "true",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Minori Yamashita <ympbyc@gmail.com>",
   "description": "A simple Smalltalk to js translator.",
   "bin" : { 
-    "littlesmallscript" : "./src/main.js" 
+    "littlesmallscript" : "./bin/main.js" 
   },
   "repository": {
     "type": "git",

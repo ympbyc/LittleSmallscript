@@ -1,25 +1,25 @@
 echo packrat &&
-node ../main.js -c packrat.st &&
+node ../../bin/main.js -c packrat.st &&
 
 echo littleparser &&
-node ../main.js -c littleparser.st &&
+node ../../bin/main.js -c littleparser.st &&
 
 echo expression &&
-node ../main.js -c expression.st &&
+node ../../bin/main.js -c expression.st &&
 
 echo blockparser &&
-node ../main.js -c block.st &&
+node ../../bin/main.js -c block.st &&
 
 echo class &&
-node ../main.js -c class.st &&
+node ../../bin/main.js -c class.st &&
 
 echo statement &&
-node ../main.js -c statement.st &&
+node ../../bin/main.js -c statement.st &&
 
 echo optimization &&
-node ../main.js -c optimization.st &&
+node ../../bin/main.js -c optimization.st &&
 
 echo littlesmallscript &&
-node ../main.js -c littlesmallscript.st
+node ../../bin/main.js -c littlesmallscript.st
 
 mv *.js ../js/development/

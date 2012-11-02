@@ -5,9 +5,9 @@
 
   var LittleSmallscript, fs, optimist, argv, readline, rl, help, VERSION;
 
-  VERSION = 'littlesmallscript 1.0.2';
+  VERSION = 'littlesmallscript 1.0.3';
   
-  LittleSmallscript = require("./js/production/littlesmallscript");
+  LittleSmallscript = require("../src/js/production/littlesmallscript");
   
   fs = require('fs');
 
@@ -91,6 +91,7 @@ Usage: littlesmallscript [options] path/to/script.st\n\n \
       if (fileName.slice(fileName.length - 3) !== '.st') return;
       fs.watchFile(fileName, {interval:5000}, function (curr, prev) {
         if (curr.mtime !== prev.mtime) {
+          console.log("compiling "+fileName+"...\n");
           return compile(fileName);
         }
       });

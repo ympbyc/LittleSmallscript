@@ -1127,6 +1127,23 @@ require.define("/src/js/production/littleparser.js",function(require,module,expo
       return _this.chr("\"");
     });
   };
+  LittleParser.prototype.comment = function () {
+    var _this = this;
+    return _this.cacheaParser("comment", function () {
+      var comment;
+      comment = _this.betweenandaccept((function () {
+        return _this.commentQuote();
+      }), (function () {
+        return _this.commentQuote();
+      }), function () {
+        return _this.anyChar();
+      });
+      _this.optional(function () {
+        return _this.space();
+      });
+      return comment;
+    });
+  };
   LittleParser.prototype.skipSpace = function () {
     var _this = this;
     return _this.cacheaParser("skipSpace", function () {
@@ -1134,16 +1151,7 @@ require.define("/src/js/production/littleparser.js",function(require,module,expo
         return _this.space();
       });
       return _this.many(function () {
-        _this.betweenandaccept((function () {
-          return _this.commentQuote();
-        }), (function () {
-          return _this.commentQuote();
-        }), function () {
-          return _this.anyChar();
-        });
-        return _this.optional(function () {
-          return _this.space();
-        });
+        return _this.comment();
       });
     });
   };
@@ -1174,20 +1182,26 @@ require.define("/src/js/production/littleparser.js",function(require,module,expo
   LittleParser.prototype.stringLiteral = function () {
     var _this = this;
     return _this.cacheaParser("stringLiteral", function () {
-      return (("\"" + _this.betweenandaccept((function () {
+      return (("'" + _this.betweenandaccept((function () {
         return _this.apostrophe();
       }), (function () {
         return _this.apostrophe();
       }), function () {
-        return _this.anyChar();
-      }).replace(/\n/g, "\\n")) + "\"");
+        var c;
+        c = _this.anyChar();
+        return (c === "\\") ? ((function () {
+          return (c + _this.anyChar());
+        }))() : (function () {
+          return c;
+        })();
+      }).replace(/\n/g, "\\n")) + "'");
     });
   };
   LittleParser.prototype.symbolLiteral = function () {
     var _this = this;
     return _this.cacheaParser("symbolLiteral", function () {
       _this.chr("#");
-      return (("\"" + _this.variable()) + "\"");
+      return (("'" + _this.variable()) + "'");
     });
   };
   LittleParser.prototype.arrayLiteral = function () {
@@ -1261,7 +1275,7 @@ require.define("/src/js/production/littleparser.js",function(require,module,expo
 
 require.define("/src/js/production/packrat.js",function(require,module,exports,__dirname,__filename,process,global){(function () {
   "use strict";
-  require("../../prelude");
+  require("../../../bin/prelude");
   Number.prototype.timesString = function (str) {
     var _this = this;
     var ret;
@@ -1611,7 +1625,7 @@ require.define("/src/js/production/packrat.js",function(require,module,exports,_
 }).call(this);
 });
 
-require.define("/src/prelude.js",function(require,module,exports,__dirname,__filename,process,global){/*
+require.define("/bin/prelude.js",function(require,module,exports,__dirname,__filename,process,global){/*
  * Copyright (c) 2012 Minori Yamashita <ympbyc@gmail.com>
  * See LICENCE.txt
  */
@@ -2002,9 +2016,9 @@ require.define("/src/js/production/optimization.js",function(require,module,expo
       try {
         _ret = (function () {
           return identifier = v.betweenandaccept((function () {
-            return v.chr("\"");
+            return v.chr("'");
           }), (function () {
-            return v.chr("\"");
+            return v.chr("'");
           }), v.variable);
         })();
       } catch (err) {

@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var Expression;
-  Expression = require("./expression");
+  Expression = require('./expression');
   var Block;
   Block = function () {
     if (this.init) {
@@ -13,8 +13,8 @@
   Block.prototype.block = function () {
     var _this = this;
     var dst_tmpl;
-    dst_tmpl = "function (%parameters%) { %body% }";
-    return _this.cacheaParser("block", function () {
+    dst_tmpl = 'function (%parameters%) { %body% }';
+    return _this.cacheaParser('block', function () {
       var parameters, body;
       _this.blockStart();
       parameters = _this.blockHead();
@@ -23,20 +23,20 @@
       });
       _this.blockEnd();
       return _this.templateapply(dst_tmpl, {
-        "parameters": parameters,
-        "body": body
+        'parameters': parameters,
+        'body': body
       });
     });
   };
   Block.prototype.blockParameters = function () {
     var _this = this;
-    return _this.cacheaParser("blockParameters", function () {
+    return _this.cacheaParser('blockParameters', function () {
       var vars;
-      vars = "";
+      vars = '';
       _this.skipSpace();
       _this.many(function () {
         _this.colon();
-        (vars += (_this.variable() + ", "));
+        (vars += (_this.variable() + ', '));
         return _this.skipSpace();
       });
       return vars.slice((0), - 2);
@@ -44,7 +44,7 @@
   };
   Block.prototype.blockHead = function () {
     var _this = this;
-    return _this.cacheaParser("blockHead", function () {
+    return _this.cacheaParser('blockHead', function () {
       return _this.optional(function () {
         var params;
         _this.skipSpace();

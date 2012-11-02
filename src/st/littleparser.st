@@ -116,13 +116,18 @@ commentQuote
   ]
 !.
 !LittleParser
+comment
+  self cache:#comment aParser:[| comment |
+    comment := self between: [self commentQuote] and: [self commentQuote] accept: [self anyChar].
+    self optional: [self space].
+    comment
+  ]
+!.
+!LittleParser
 skipSpace
   self cache:#skipSpace aParser:[
     self optional: [self space].
-    self many: [
-      self between: [self commentQuote] and: [self commentQuote] accept: [self anyChar].
-      self optional: [self space]
-    ]
+    self many: [self comment]
   ]
 !.
 !LittleParser
@@ -147,17 +152,21 @@ numberLiteral
 !LittleParser
 stringLiteral
   self cache: #stringLiteral aParser: [
-    '\"' + ((self 
+    '\'' + ((self 
           between: [self apostrophe]
           and: [self apostrophe] 
-          accept: [self anyChar]) rep:</\n/g> lace:'\\n') + '\"'
+          accept: [|c|
+            c := self anyChar.
+            c === '\\' ifTrue:[c + self anyChar]
+                       ifFalse:[c]
+          ]) rep:</\n/g> lace:'\\n') + '\''
   ]
 !.
 !LittleParser
 symbolLiteral
   self cache: #symbolLiteral aParser:[
     self chr: '#'.
-    '\"' + self variable + '\"'
+    '\'' + self variable + '\''
   ]
 !.
 !LittleParser
