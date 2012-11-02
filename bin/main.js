@@ -5,9 +5,9 @@
 
   var LittleSmallscript, fs, optimist, argv, readline, rl, help, VERSION;
 
-  VERSION = 'littlesmallscript 1.0.2';
+  VERSION = 'littlesmallscript 1.0.3';
   
-  LittleSmallscript = require("./js/production/littlesmallscript");
+  LittleSmallscript = require("../src/js/production/littlesmallscript");
   
   fs = require('fs');
 

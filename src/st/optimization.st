@@ -37,7 +37,7 @@ optimTmpl := #{
 canUseDotNotation := [:str| | v identifier |
   v := LP new: str.
   [
-    identifier := v between: [v chr: '\"'] and: [v chr: '\"'] accept: (v at:#variable)
+    identifier := v between: [v chr: <"'">] and: [v chr: <"'">] accept: (v at:#variable)
   ] tryCatch: [].
   v getIndex === v getInputLength ifTrue: [identifier] ifFalse: [null]
 ]

@@ -51,19 +51,16 @@ The language is changing every second so do example codes. Here's what works at 
 ```smalltalk
 +Object subclass:#Animal variables:#(#name).
 
-!Animal
-setName: aName
+!Animal setName: aName
   name := aName
 !.
-!Animal
-move: metre
+!Animal move: metre
   window alert: name + ' moved ' + metre + 'm.'
 !.
 
 +Animal subclass:#Snake variables:#().
 
-!Snake
-move
+!Snake move
   window alert: 'Slithering...'.
   Snake super:#move arguments:#(5)
 !.

@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var Packrat;
-  Packrat = require("./packrat");
+  Packrat = require('./packrat');
   var LittleParser;
   LittleParser = function () {
     if (this.init) {
@@ -12,103 +12,103 @@
   LittleParser.prototype = new Packrat();
   LittleParser.prototype.space = function () {
     var _this = this;
-    return _this.cacheaParser("space", function () {
-      return _this.regex(new RegExp("^[\\s\\n\\t]+"));
+    return _this.cacheaParser('space', function () {
+      return _this.regex(new RegExp('^[\\s\\n\\t]+'));
     });
   };
   LittleParser.prototype.blockStart = function () {
     var _this = this;
-    return _this.cacheaParser("blockStart", function () {
-      return _this.chr("[");
+    return _this.cacheaParser('blockStart', function () {
+      return _this.chr('[');
     });
   };
   LittleParser.prototype.blockEnd = function () {
     var _this = this;
-    return _this.cacheaParser("blockEnd", function () {
-      return _this.chr("]");
+    return _this.cacheaParser('blockEnd', function () {
+      return _this.chr(']');
     });
   };
   LittleParser.prototype.verticalBar = function () {
     var _this = this;
-    return _this.cacheaParser("verticalBar", function () {
-      return _this.chr("|");
+    return _this.cacheaParser('verticalBar', function () {
+      return _this.chr('|');
     });
   };
   LittleParser.prototype.colon = function () {
     var _this = this;
-    return _this.cacheaParser("colon", function () {
-      return _this.chr(":");
+    return _this.cacheaParser('colon', function () {
+      return _this.chr(':');
     });
   };
   LittleParser.prototype.semicolon = function () {
     var _this = this;
-    return _this.cacheaParser("semicolon", function () {
-      return _this.chr(";");
+    return _this.cacheaParser('semicolon', function () {
+      return _this.chr(';');
     });
   };
   LittleParser.prototype.assignmentArrow = function () {
     var _this = this;
-    return _this.cacheaParser("assignmentArrow", function () {
+    return _this.cacheaParser('assignmentArrow', function () {
       return _this.try_([function () {
-        return _this.string(":=");
+        return _this.string(':=');
       }, function () {
-        return _this.string("<-");
+        return _this.string('<-');
       }]);
     });
   };
   LittleParser.prototype.apostrophe = function () {
     var _this = this;
-    return _this.cacheaParser("apostrophe", function () {
+    return _this.cacheaParser('apostrophe', function () {
       return _this.chr("'");
     });
   };
   LittleParser.prototype.arrayStart = function () {
     var _this = this;
-    return _this.cacheaParser("arrayStart", function () {
-      _this.string("#(");
+    return _this.cacheaParser('arrayStart', function () {
+      _this.string('#(');
       return _this.skipSpace();
     });
   };
   LittleParser.prototype.closeParen = function () {
     var _this = this;
-    return _this.cacheaParser("closeParen", function () {
-      return _this.chr(")");
+    return _this.cacheaParser('closeParen', function () {
+      return _this.chr(')');
     });
   };
   LittleParser.prototype.hashStart = function () {
     var _this = this;
-    return _this.cacheaParser("hashStart", function () {
-      return _this.string("#{");
+    return _this.cacheaParser('hashStart', function () {
+      return _this.string('#{');
     });
   };
   LittleParser.prototype.hashEnd = function () {
     var _this = this;
-    return _this.cacheaParser("hashEnd", function () {
-      return _this.chr("}");
+    return _this.cacheaParser('hashEnd', function () {
+      return _this.chr('}');
     });
   };
   LittleParser.prototype.exclamation = function () {
     var _this = this;
-    return _this.cacheaParser("exclamation", function () {
-      return _this.chr("!");
+    return _this.cacheaParser('exclamation', function () {
+      return _this.chr('!');
     });
   };
   LittleParser.prototype.variable = function () {
     var _this = this;
-    return _this.cacheaParser("variable", function () {
-      return _this.regex(new RegExp("^[a-zA-Z_$][a-zA-Z0-9_$]*"));
+    return _this.cacheaParser('variable', function () {
+      return _this.regex(new RegExp('^[a-zA-Z_$][a-zA-Z0-9_$]*'));
     });
   };
   LittleParser.prototype.extendedVariable = function () {
     var _this = this;
-    return _this.cacheaParser("extendedVariable", function () {
+    return _this.cacheaParser('extendedVariable', function () {
       var v;
-      v = _this.regex(new RegExp("^[a-zA-Z_$][a-zA-Z0-9_$]*"));
-      return (v === "self") ? ((function () {
-        return "_this";
+      v = _this.regex(new RegExp('^[a-zA-Z_$][a-zA-Z0-9_$]*'));
+      return (v === 'self') ? ((function () {
+        return '_this';
       }))() : (function () {
         _this.instanceVariableP(v) ? (function () {
-          return v = ("_this." + v);
+          return v = ('_this.' + v);
         })() : void 0;
         return v;
       })();
@@ -116,7 +116,7 @@
   };
   LittleParser.prototype.keywordSelector = function () {
     var _this = this;
-    return _this.cacheaParser("keywordSelector", function () {
+    return _this.cacheaParser('keywordSelector', function () {
       return _this.sequence([function () {
         return _this.variable();
       }, function () {
@@ -126,7 +126,7 @@
   };
   LittleParser.prototype.unarySelector = function () {
     var _this = this;
-    return _this.cacheaParser("unarySelector", function () {
+    return _this.cacheaParser('unarySelector', function () {
       var sel;
       sel = _this.variable();
       _this.notFollowedBy(function () {
@@ -137,19 +137,19 @@
   };
   LittleParser.prototype.explicitReturn = function () {
     var _this = this;
-    return _this.cacheaParser("explicitReturn", function () {
-      return _this.chr("^");
+    return _this.cacheaParser('explicitReturn', function () {
+      return _this.chr('^');
     });
   };
   LittleParser.prototype.commentQuote = function () {
     var _this = this;
-    return _this.cacheaParser("commentQuote", function () {
-      return _this.chr("\"");
+    return _this.cacheaParser('commentQuote', function () {
+      return _this.chr('\"');
     });
   };
   LittleParser.prototype.comment = function () {
     var _this = this;
-    return _this.cacheaParser("comment", function () {
+    return _this.cacheaParser('comment', function () {
       var comment;
       comment = _this.betweenandaccept((function () {
         return _this.commentQuote();
@@ -166,7 +166,7 @@
   };
   LittleParser.prototype.skipSpace = function () {
     var _this = this;
-    return _this.cacheaParser("skipSpace", function () {
+    return _this.cacheaParser('skipSpace', function () {
       _this.optional(function () {
         return _this.space();
       });
@@ -177,7 +177,7 @@
   };
   LittleParser.prototype.literal = function () {
     var _this = this;
-    return _this.cacheaParser("literal", function () {
+    return _this.cacheaParser('literal', function () {
       return _this.try_([function () {
         return _this.numberLiteral();
       }, function () {
@@ -195,33 +195,39 @@
   };
   LittleParser.prototype.numberLiteral = function () {
     var _this = this;
-    return _this.cacheaParser("numberLiteral", function () {
-      return _this.regex(new RegExp("^-?[0-9]+(\\.?[0-9]+)?"));
+    return _this.cacheaParser('numberLiteral', function () {
+      return _this.regex(new RegExp('^-?[0-9]+(\\.?[0-9]+)?'));
     });
   };
   LittleParser.prototype.stringLiteral = function () {
     var _this = this;
-    return _this.cacheaParser("stringLiteral", function () {
-      return (("\"" + _this.betweenandaccept((function () {
+    return _this.cacheaParser('stringLiteral', function () {
+      return (('\'' + _this.betweenandaccept((function () {
         return _this.apostrophe();
       }), (function () {
         return _this.apostrophe();
       }), function () {
-        return _this.anyChar();
-      }).replace(/\n/g, "\\n")) + "\"");
+        var c;
+        c = _this.anyChar();
+        return (c === '\\') ? ((function () {
+          return (c + _this.anyChar());
+        }))() : (function () {
+          return c;
+        })();
+      }).replace(/\n/g, '\\n')) + '\'');
     });
   };
   LittleParser.prototype.symbolLiteral = function () {
     var _this = this;
-    return _this.cacheaParser("symbolLiteral", function () {
-      _this.chr("#");
-      return (("\"" + _this.variable()) + "\"");
+    return _this.cacheaParser('symbolLiteral', function () {
+      _this.chr('#');
+      return (('\'' + _this.variable()) + '\'');
     });
   };
   LittleParser.prototype.arrayLiteral = function () {
     var _this = this;
     var args;
-    return _this.cacheaParser("arrayLiteral", function () {
+    return _this.cacheaParser('arrayLiteral', function () {
       args = [];
       _this.arrayStart();
       _this.skipSpace();
@@ -229,21 +235,21 @@
         args.push(_this.expression());
         _this.skipSpace();
         _this.optional(function () {
-          return _this.chr(",");
+          return _this.chr(',');
         });
         return _this.skipSpace();
       });
       _this.closeParen();
-      return (("[" + args.join(", ")) + "]");
+      return (('[' + args.join(', ')) + ']');
     });
   };
   LittleParser.prototype.hashLiteral = function () {
     var _this = this;
-    return _this.cacheaParser("hashLiteral", function () {
+    return _this.cacheaParser('hashLiteral', function () {
       var ret;
-      ret = "";
+      ret = '';
       _this.hashStart();
-      (ret += "{");
+      (ret += '{');
       (ret += _this.many(function () {
         var key, val;
         _this.skipSpace();
@@ -260,13 +266,13 @@
         val = _this.expression();
         _this.skipSpace();
         _this.optional(function () {
-          return _this.chr(",");
+          return _this.chr(',');
         });
-        return (((key + ": ") + val) + ",");
+        return (((key + ': ') + val) + ',');
       }).slice((0), - 1));
       _this.skipSpace();
       _this.hashEnd();
-      (ret += "}");
+      (ret += '}');
       return ret;
     });
   };
@@ -276,9 +282,9 @@
     dest_str = template;
     hashmap.do_(function (it, key) {
       ((it === null) || (it === undefined)) ? (function () {
-        return it = "";
+        return it = '';
       })() : void 0;
-      return dest_str = dest_str.replace(new RegExp((("%" + key) + "%"), "g"), it);
+      return dest_str = dest_str.replace(new RegExp((('%' + key) + '%'), 'g'), it);
     });
     return dest_str;
   };

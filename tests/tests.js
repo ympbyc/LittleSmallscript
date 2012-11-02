@@ -154,7 +154,7 @@
     a = lss("-12.15'foo'#symbol123#(1 2 #(3))#{#a: 1,#b: #{#a: #()}}");
     test((function () {
       return a.literal() + a.literal() + a.literal() + a.literal() + a.literal();
-    })(), '-12.15"foo""symbol123"[1, 2, [3]]{"a": 1,"b": {"a": []}}', "literal01");
+    })(), "-12.15'foo''symbol123'[1, 2, [3]]{'a': 1,'b': {'a': []}}", "literal01");
     
     a = lss("-12.15'foo'#symbol123#(1 2 #(3))#{#a: 1,#b: #{#a: #()}}");
     test((function () {
@@ -163,13 +163,20 @@
           a.symbolLiteral() +
           a.arrayLiteral() +
           a.hashLiteral();
-    })(), '-12.15"foo""symbol123"[1, 2, [3]]{"a": 1,"b": {"a": []}}', "literal02");
+    })(), "-12.15'foo''symbol123'[1, 2, [3]]{'a': 1,'b': {'a': []}}", "literal02");
 
     //newlines inside strings
     test(
       lss("'1\n2\n3'").stringLiteral(),
-      '"1\\n2\\n3"',
+      "'1\\n2\\n3'",
       'newlines in strings'
+    );
+
+    //backslash escaping
+    test(
+      lss("'Foo\\'s name:\\nMike'").stringLiteral(),
+      "'Foo\\'s name:\\nMike'",
+      "backslash escaping"
     );
 
     //variable

@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var Class;
-  Class = require("./class");
+  Class = require('./class');
   var Statement;
   Statement = function () {
     if (this.init) {
@@ -12,9 +12,9 @@
   Statement.prototype = new Class();
   Statement.prototype.statement = function () {
     var _this = this;
-    return _this.cacheaParser("statement", function () {
+    return _this.cacheaParser('statement', function () {
       var ret, vd;
-      ret = "";
+      ret = '';
       _this.skipSpace();
       vd = _this.optional(function () {
         return _this.variableDeclaration();
@@ -27,18 +27,18 @@
         var a;
         a = _this.statementable();
         _this.skipSpace();
-        _this.chr(".");
+        _this.chr('.');
         _this.skipSpace();
         _this.followedBy(function () {
           return _this.statementable();
         });
-        return (a + "; ");
+        return (a + '; ');
       }));
       (ret += (function () {
         var _ret;
         try {
           _ret = (function () {
-            return (("return " + _this.expression()) + ";");
+            return (('return ' + _this.expression()) + ';');
           })();
         } catch (err) {
           _ret = function () {
@@ -47,30 +47,30 @@
               var _ret;
               try {
                 _ret = (function () {
-                  return (_this.statementable() + ";");
+                  return (_this.statementable() + ';');
                 })();
               } catch (err) {
                 _ret = function () {
-                  return "";
+                  return '';
                 }(err);
               }
               return _ret;
             })();
-            return (st + "return null;");
+            return (st + 'return null;');
           }(err);
         }
         return _ret;
       })());
       _this.skipSpace();
       _this.optional(function () {
-        return _this.chr(".");
+        return _this.chr('.');
       });
       return ret;
     });
   };
   Statement.prototype.statementable = function () {
     var _this = this;
-    return _this.cacheaParser("statementable", function () {
+    return _this.cacheaParser('statementable', function () {
       return _this.try_([function () {
         return _this.classHeader();
       }, function () {
@@ -82,15 +82,15 @@
   };
   Statement.prototype.variableDeclaration = function () {
     var _this = this;
-    return _this.cacheaParser("variableDeclaration", function () {
+    return _this.cacheaParser('variableDeclaration', function () {
       var ret;
-      ret = "var ";
+      ret = 'var ';
       _this.skipSpace();
       _this.verticalBar();
       (ret += _this.many1(function () {
         _this.skipSpace();
-        return (_this.variable() + ", ");
-      }).replace(/,\s$/, "; "));
+        return (_this.variable() + ', ');
+      }).replace(/,\s$/, '; '));
       _this.skipSpace();
       _this.verticalBar();
       return ret;

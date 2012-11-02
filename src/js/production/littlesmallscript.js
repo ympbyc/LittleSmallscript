@@ -1,7 +1,7 @@
 (function () {
   "use strict";
   var Statement;
-  Statement = require("./statement");
+  Statement = require('./statement');
   var LittleSmallscript;
   LittleSmallscript = function () {
     this.input = null;
@@ -20,9 +20,9 @@
     _this.options = opt;
     _this.cache = {};
     _this.beautifyOption = {
-      "indent_size": 2,
-      "indent_char": " ",
-      "jslint_happy": true
+      'indent_size': 2,
+      'indent_char': ' ',
+      'jslint_happy': true
     };
     return _this;
   };
@@ -44,20 +44,20 @@
     })();
     rest = _this.input.substring(_this.getMaxIndex());
     token = rest.substring((0), rest.search(/[\.\s\t\n]|$/));
-    console.log((((("Parse error on line " + line) + ". Unexpected ") + token) + "."));
-    return console.log("====================================================");
+    console.log((((('Parse error on line ' + line) + '. Unexpected ') + token) + '.'));
+    return console.log('====================================================');
   };
   LittleSmallscript.prototype.toJS = function () {
     var _this = this;
     var wrapTmpl, js, beautifyOption, err;
     err = false;
-    wrapTmpl = "(function () { \"use strict\"; %statement% }).call(this);";
+    wrapTmpl = '(function () { \"use strict\"; %statement% }).call(this);';
     (function () {
       var _ret;
       try {
         _ret = (function () {
           return js = _this.templateapply(wrapTmpl, {
-            "statement": _this.statement()
+            'statement': _this.statement()
           });
         })();
       } catch (err) {
@@ -76,7 +76,7 @@
     })();
     return err ? void 0 : (function () {
       return (_this.options && _this.options.prettyprint) ? ((function () {
-        return require("../../../lib/beautify.js").js_beautify(js, _this.beautifyOption);
+        return require('../../../lib/beautify.js').js_beautify(js, _this.beautifyOption);
       }))() : (function () {
         return js;
       })();

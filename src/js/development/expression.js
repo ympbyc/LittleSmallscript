@@ -1,8 +1,8 @@
 (function () {
   "use strict";
   var LittleParser, optimization;
-  LittleParser = require("./littleparser");
-  optimization = require("./optimization");
+  LittleParser = require('./littleparser');
+  optimization = require('./optimization');
   var Expression;
   Expression = function () {
     this.bundledMethods = null;
@@ -25,37 +25,37 @@
   Expression.prototype.expression = function () {
     var _this = this;
     var tmpl;
-    tmpl = "%assignments%%cascade%";
-    return _this.cacheaParser("expression", function () {
+    tmpl = '%assignments%%cascade%';
+    return _this.cacheaParser('expression', function () {
       var assignments, cascade;
       assignments = _this.optional(function () {
         return _this.assignments();
       });
       cascade = _this.cascade();
       return _this.templateapply(tmpl, {
-        "assignments": assignments,
-        "cascade": cascade
+        'assignments': assignments,
+        'cascade': cascade
       });
     });
   };
   Expression.prototype.assignments = function () {
     var _this = this;
-    return _this.cacheaParser("assignments", function () {
+    return _this.cacheaParser('assignments', function () {
       return _this.many(function () {
         var variable;
         variable = _this.extendedVariable();
         _this.skipSpace();
         _this.assignmentArrow();
         _this.skipSpace();
-        return (variable + " = ");
+        return (variable + ' = ');
       });
     });
   };
   Expression.prototype.cascade = function () {
     var _this = this;
     var tmpl;
-    tmpl = "(function () { var _receiver = %simpleExpression%; %body% return _receiver;  })()";
-    return _this.cacheaParser("cascade", function () {
+    tmpl = '(function () { var _receiver = %simpleExpression%; %body% return _receiver;  })()';
+    return _this.cacheaParser('cascade', function () {
       var se;
       se = _this.simpleExpression();
       return _this.try_([function () {
@@ -73,21 +73,21 @@
           _this.skipSpace();
           mes = _this.continuation();
           return optimization.optimizationAvailable(mes.methodName) ? ((function () {
-            return (optimization.optimize("_receiver", mes.methodName, mes.args) + ";");
+            return (optimization.optimize('_receiver', mes.methodName, mes.args) + ';');
           }))() : (function () {
-            return (("_receiver" + mes.js) + ";");
+            return (('_receiver' + mes.js) + ';');
           })();
         });
         return _this.templateapply(tmpl, {
-          "simpleExpression": se,
-          "body": conti
+          'simpleExpression': se,
+          'body': conti
         });
       }]);
     });
   };
   Expression.prototype.simpleExpression = function (allowedParsers) {
     var _this = this;
-    return _this.cacheaParser("simpleExpression", function () {
+    return _this.cacheaParser('simpleExpression', function () {
       var receiver, injection;
       receiver = injection = _this.primaryReceiver();
       _this.many(function () {
@@ -97,7 +97,7 @@
           return injection = optimization.optimize(injection, mes.methodName, mes.args);
         }))() : (function () {
           return mes.wrapMe ? ((function () {
-            return injection = ((("(" + injection) + mes.js) + ")");
+            return injection = ((('(' + injection) + mes.js) + ')');
           }))() : (function () {
             return (injection += mes.js);
           })();
@@ -108,7 +108,7 @@
   };
   Expression.prototype.continuation = function (allowedParsers) {
     var _this = this;
-    return _this.cacheaParser("continuation", function () {
+    return _this.cacheaParser('continuation', function () {
       (allowedParsers === undefined) ? (function () {
         return allowedParsers = [function () {
           return _this.keywordMessage();
@@ -123,13 +123,13 @@
   };
   Expression.prototype.keywordMessage = function () {
     var _this = this;
-    return _this.cacheaParser("keywordMessage", function () {
+    return _this.cacheaParser('keywordMessage', function () {
       var methodName, args;
-      methodName = "";
+      methodName = '';
       args = [];
       _this.many1(function () {
         _this.skipSpace();
-        (methodName += _this.keywordSelector().replace(":", ""));
+        (methodName += _this.keywordSelector().replace(':', ''));
         _this.skipSpace();
         args.push(_this.simpleExpression([function () {
           return _this.binaryMessage();
@@ -139,16 +139,16 @@
         return _this.skipSpace();
       });
       return {
-        "js": (((("." + methodName) + "(") + args.join(", ")) + ")"),
-        "wrapMe": false,
-        "methodName": methodName,
-        "args": args
+        'js': (((('.' + methodName) + '(') + args.join(', ')) + ')'),
+        'wrapMe': false,
+        'methodName': methodName,
+        'args': args
       };
     });
   };
   Expression.prototype.binaryMessage = function () {
     var _this = this;
-    return _this.cacheaParser("binaryMessage", function () {
+    return _this.cacheaParser('binaryMessage', function () {
       var operator, argument;
       _this.skipSpace();
       operator = _this.operator();
@@ -157,30 +157,30 @@
         return _this.unaryMessage();
       }]);
       return {
-        "js": (((" " + operator) + " ") + argument),
-        "wrapMe": true,
-        "methodName": operator,
-        "args": [argument]
+        'js': (((' ' + operator) + ' ') + argument),
+        'wrapMe': true,
+        'methodName': operator,
+        'args': [argument]
       };
     });
   };
   Expression.prototype.unaryMessage = function () {
     var _this = this;
-    return _this.cacheaParser("unaryMessage", function () {
+    return _this.cacheaParser('unaryMessage', function () {
       var unarySelector;
       _this.skipSpace();
       unarySelector = _this.unarySelector();
       return {
-        "js": (("." + unarySelector) + "()"),
-        "wrapMe": false,
-        "methodName": unarySelector,
-        "args": []
+        'js': (('.' + unarySelector) + '()'),
+        'wrapMe': false,
+        'methodName': unarySelector,
+        'args': []
       };
     });
   };
   Expression.prototype.primary = function () {
     var _this = this;
-    return _this.cacheaParser("primary", function () {
+    return _this.cacheaParser('primary', function () {
       return _this.try_([function () {
         return _this.extendedVariable();
       }, function () {
@@ -191,11 +191,11 @@
         return _this.primitive();
       }, function () {
         return _this.betweenandaccept((function () {
-          _this.chr("(");
+          _this.chr('(');
           return _this.skipSpace();
         }), (function () {
           _this.skipSpace();
-          return _this.chr(")");
+          return _this.chr(')');
         }), function () {
           return _this.cascade();
         });
@@ -204,7 +204,7 @@
   };
   Expression.prototype.primaryReceiver = function () {
     var _this = this;
-    return _this.cacheaParser("primaryReceiver", function () {
+    return _this.cacheaParser('primaryReceiver', function () {
       return _this.try_([function () {
         var num;
         num = _this.numberLiteral();
@@ -215,7 +215,7 @@
             return _this.unaryMessage();
           }]);
         });
-        return (("(" + num) + ")");
+        return (('(' + num) + ')');
       }, function () {
         _this.followedBy(function () {
           _this.block();
@@ -226,7 +226,7 @@
             return _this.unaryMessage();
           }]);
         });
-        return (("(" + _this.block()) + ")");
+        return (('(' + _this.block()) + ')');
       }, function () {
         return _this.primary();
       }]);
@@ -234,16 +234,16 @@
   };
   Expression.prototype.primitive = function () {
     var _this = this;
-    return _this.cacheaParser("primitive", function () {
+    return _this.cacheaParser('primitive', function () {
       _this.skipSpace();
       return _this.betweenandaccept((function () {
-        _this.chr("<");
+        _this.chr('<');
         _this.notFollowedBy(function () {
-          return _this.chr("-");
+          return _this.chr('-');
         });
-        return "<";
+        return '<';
       }), (function () {
-        return _this.chr(">");
+        return _this.chr('>');
       }), function () {
         return _this.anyChar();
       });
@@ -257,10 +257,10 @@
         return _this.string(str);
       };
     };
-    return _this.cacheaParser("operator", function () {
+    return _this.cacheaParser('operator', function () {
       var op;
       _this.skipSpace();
-      return op = _this.try_([p("+="), p("-="), p("*="), p("/="), p("+"), p("-"), p("*"), p("/"), p("%"), p("==="), p("!=="), p("<="), p(">="), p("<"), p(">"), p("^"), p("&&"), p("||")]);
+      return op = _this.try_([p('+='), p('-='), p('*='), p('/='), p('+'), p('-'), p('*'), p('/'), p('%'), p('==='), p('!=='), p('<='), p('>='), p('<'), p('>'), p('^'), p('&&'), p('||')]);
     });
   };
   module.exports = Expression;
