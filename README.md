@@ -73,13 +73,16 @@ Snake new
 Versions:
 ----------
 
-18:40 17 Oct 2012
+12:35 2 Nov 2012  
+v1.0.3  
+String literals compile into single-quoted JS string. They were double quotes in previous versions.  
+String literals support backslash escaping.
 
-v1.0.2
+18:40 17 Oct 2012  
+v1.0.2  
 A temporary syntax fro calling super methods is introduced. See the example above.
 
-23:00 30 Sep 2012
-
+23:00 30 Sep 2012  
 v1.0.0  
 The first major version!  
 Every parser is now written in LittleSmallscript itself.  
@@ -87,21 +90,18 @@ v1 is not backward compatible with v0.
 Syntax for accessing instance variables has changed.  
 Class definition syntax has been added.  
 
-23:00 20 Sep 2012
-
+23:00 20 Sep 2012  
 v0.0.4  
 Fixed many bugs.    
 Binary messages now take bare operators instead of primitives.  
 method:at: and method:dot: fixes the scope of 'self'.
 
-1am 20 Sep 2012
-
+1am 20 Sep 2012  
 v0.0.3  
 Ready to ship! Known bugs are to be fixed.  
 Added optimization.
 
 12pm 12 Sep 2012  
-
 v0.0.2  
 Statement parser is coplete.  
 Consequently, temporary variable declaration is now supported. | foo bar | compiles to var foo, bar;.  
@@ -111,7 +111,6 @@ Much of Little Smalltalk's built-in methods are provided via the library: prelud
 Prettyprint using beautify.js.  
 
 5am 10 Sep 2012  
-
 v0.0.1  
 Implemented a PEG parser in javascript.  
 Can now parse and generate expressions and literals.  
