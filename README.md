@@ -1,6 +1,6 @@
 Little Smallscript
 ==================
-Little Smalltalk to Javascript translator.
+A dialect of Smalltalk that compiles into JavaScript.
 
 Author:
 -------
@@ -36,11 +36,6 @@ Direction:
 * Other message expressions are translated into method calling expression.
   * "obj unary" becomes "obj.unary()". "array inject:1 into:[]" becomes "array.injectinto(1, function () {})".
   * binary messages take js operators as selectors: x % 2 === 0
-
-ToDo:
------
-* Bundle standard methods into compiled js (issue#3)
-* ^ syntax
 
 Example:
 --------
