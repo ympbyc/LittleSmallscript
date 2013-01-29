@@ -5,10 +5,10 @@
 
   var LittleSmallscript, fs, optimist, argv, readline, rl, help, VERSION;
 
-  VERSION = 'littlesmallscript 1.0.3';
-  
+  VERSION = 'littlesmallscript 1.0.4';
+
   LittleSmallscript = require("../src/js/production/littlesmallscript");
-  
+
   fs = require('fs');
 
   optimist = require('optimist');
@@ -34,10 +34,10 @@
 
     readline = require('readline'),
     rl = readline.createInterface(process.stdin, process.stdout);
-    
+
     rl.setPrompt("LittleSmallscript> ");
     rl.prompt();
-    
+
     rl.on("line", function(input) {
       try {
         var js = new LittleSmallscript().initWithInputandOptions(input, {prettyprint:true}).toJS();
@@ -68,7 +68,7 @@
     });
   }
 
-  help = 
+  help =
 "\n \
 Usage: littlesmallscript [options] path/to/script.st\n\n \
 -c, --compile      compile to JavaScript and save as .js files\n \
@@ -97,7 +97,25 @@ Usage: littlesmallscript [options] path/to/script.st\n\n \
       });
     });
   });
-  
-  return compile(argv.c || argv.p);
+
+  if (argv.c || argv.p) return compile(argv.c || argv.p);
+
+  //If no command-line option is given, go UNIXy!
+  (function () {
+    var inputText = '';
+
+    process.stdin.resume();
+    process.stdin.setEncoding('utf8');
+
+    process.stdin.on('data', function (chunk) {
+      inputText += chunk;
+    });
+
+    process.stdin.on('end', function () {
+      console.log(
+          new LittleSmallscript().initWithInputandOptions(inputText, {prettyprint: true}).toJS());
+      inputText = '';
+    });
+  }());
 
 }).call(this);
