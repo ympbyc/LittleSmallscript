@@ -589,22 +589,17 @@ counter = 0;
             <pre class="prettyprint">
 +Object subclass:#Animal variables:#(#name).
 
-!Animal
-setName: aName
-  name := aName
-!.
-!Animal
-move: metre
-  window alert: name + ' moved ' + metre + 'm.'
-!.
+!Animal setName: aName
+  name := aName !.
+
+!Animal move: metre
+  window alert: name + ' moved ' + metre + 'm.' !.
 
 +Animal subclass:#Snake variables:#().
 
-!Snake
-move
+!Snake move
   window alert: 'Slithering...'.
-  Snake super:#move arguments:#(5)
-!.
+  Snake super:#move arguments:#(5) !.
 
 Snake new
 ; setName: 'Sammy the Python'
@@ -716,6 +711,11 @@ hi = function () {
       <div id="changelog">
         <h2>Change Log</h2>
         
+        <span class="idle"><strong>v1.0.4</strong></span><span> - Jan 29, 2013</span>
+        <p>
+          Inputs can now be piped-in to littlesmallscript. e.g: <pre class="prettyprint">echo '(1 to: 5) map: [ :n | n * n]' | littlesmallscript</pre>.
+        </p>
+
         <span class="idle"><strong><a href="https://github.com/ympbyc/LittleSmallscript/zipball/v1.0.3">v1.0.3</a></strong></span><span> - Nov 2, 2012</span>
         <p>
           String literal supports backslash escaping.
