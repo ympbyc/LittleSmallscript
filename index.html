@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  
+
   <head>
     <meta charset="utf-8">
     <title>LittleSmallscript</title>
@@ -28,7 +28,7 @@
     <link href="assets/css/prettify.css" rel="stylesheet">
     <link href="assets/css/sub.css" rel="stylesheet">
 </head>
-  
+
   <body>
     <div class="navbar navbar-fixed-top nav-bar">
       <div class="navbar-inner">
@@ -125,7 +125,7 @@ The golden rule of LittleSmallscript is: <em>"It's just JavaScript"</em>. The co
 | number opposite square list math cubes |
 
 "Assignment:"
-number   := 42. 
+number   := 42.
 opposite := true.
 "or"
 number   &lt;- 42.
@@ -143,7 +143,7 @@ list := #(1 2 3 4 5).
 "Objects:"
 math := #{
   #root: Math at: #sqrt
-  #square: square 
+  #square: square
   #cube: [:x | (square value: x) * x]
 }.
 
@@ -180,7 +180,7 @@ cubes = list.collect(function (num) {
         </div><!-- /compare-codes -->
         <br class="clear">
       </div>
-      
+
       <div id="installation">
         <h2>Installation</h2>
         <p>Type the following sequence of commands in your terminal.</p>
@@ -192,7 +192,7 @@ cd LittleSmallscript/
 npm install -g
         </pre>
       </div>
-      
+
       <div id="usage">
         <h2>Usage</h2>
         <p>When you 'npm install -g', a command line tool named 'littlesmallscript' gets installed.
@@ -211,7 +211,7 @@ littlesmallscript -i
 littlesmallscript --interactive
         </pre>
       </div>
-      
+
       <div id="language-reference">
         <h2>Language Reference</h2>
         <p>blah blah blah</p>
@@ -350,7 +350,7 @@ square := [:x | x * x].
 cube := [:x | (square value: x) * x].
 
 [:x| | foo |
-  foo := x. 
+  foo := x.
   foo
 ] value: 2
             </pre>
@@ -376,10 +376,10 @@ cube = function (x) {
           </div>
         </div><!-- /compare-codes -->
         <br class="clear">
-        
+
         <h3>Literals</h3>
         <p>
-          The LittleSmallscriptscript literal for Arrays look similar to that of Smalltalk. 
+          The LittleSmallscriptscript literal for Arrays look similar to that of Smalltalk.
           However they accept and evaluate any expression thrown into them. (in Smalltalk, only limited variety of elements are accepted)
         </p>
         <p>
@@ -473,7 +473,7 @@ kids = {
             <pre class="prettyprint">
 | foo bar |
 foo := bar := 1.
-[| foo | 
+[| foo |
   foo := 2.
   foo
 ] value. "=> 2"
@@ -531,7 +531,7 @@ foo = x ? (function () { return 1; })() : (function () { return 2; })();
 "Objects"
 require value: 'src/prelude'.
 yearsOld := #{#max:10 #ida:9 #tim:11}.
-ages := yearsOld collect: [:age :child | 
+ages := yearsOld collect: [:age :child |
   child + ' is ' + age
 ]
             </pre>
@@ -578,7 +578,7 @@ counter = 0;
           </div>
         </div><!-- /compare-codes -->
         <br class="clear">
-        
+
         <h3>Classes and Inheritance</h3>
         <p>
           LittleSmallscript has a class definition syntax that is an imitation of Little Smalltalk v5's.<br />
@@ -648,7 +648,7 @@ Snake.prototype.move = function () {
           </div>
         </div><!-- /compare-codes -->
         <br class="clear">
-        
+
         <h3>Embedded Javascript</h3>
         <p>
           Hopefully, you'll never need to use it, but if you ever need to intersperse snippets of JavaScript within your LittleSmallscript, you can use  &lt; and &gt; to pass it straight through.
@@ -679,7 +679,7 @@ hi = function () {
 [
   allHellBreaksLoose.
   catsAndDogsLivingTogether
-] tryCatch: [:error | 
+] tryCatch: [:error |
   window alert: error
 ]
             </pre>
@@ -707,10 +707,10 @@ hi = function () {
 
       </div><!-- /reference -->
       <br class="clear">
-      
+
       <div id="changelog">
         <h2>Change Log</h2>
-        
+
         <span class="idle"><strong>v1.0.4</strong></span><span> - Jan 29, 2013</span>
         <p>
           Inputs can now be piped-in to littlesmallscript. e.g: <pre class="prettyprint">echo '(1 to: 5) map: [ :n | n * n]' | littlesmallscript</pre>.
@@ -754,10 +754,10 @@ ClassName super:#superMethodName arguments:#(1 2 3)
         </p>
       </div>
       <br class="clear">
-    
+
     </div>
     <br class="clear">
-    
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js">
     </script>
     <script src="assets/js/bootstrap.js">
@@ -765,7 +765,7 @@ ClassName super:#superMethodName arguments:#(1 2 3)
     <script src="assets/js/prettify.js">
     </script>
 
-    <script src="https://raw.github.com/ympbyc/LittleSmallscript/master/bin/all-in-one.js"></script>
+    <script src="https://rawgithub.com/ympbyc/LittleSmallscript/master/bin/all-in-one.js"></script>
     <script src="assets/js/lssweb.js">
     </script>
   </body>
