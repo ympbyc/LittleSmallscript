@@ -22,9 +22,19 @@ $ npm install -g
 USAGE:
 ------
 
+Compile and run on node:
+
 ```shell
-$ littlesmallscript --help
+$ cat examples/server.st | littlesmallscript | node
 ```
+
+Saving the compiled file:
+
+```shell
+$ cat examples/server.st | littlesmallscript > ~/server.js
+```
+
+etc
 
 Direction:
 ----------
