@@ -19,6 +19,12 @@ $ cd LittleSmallscript
 $ npm install -g
 ```
 
+or simply
+
+```shell
+$ npm install -g littlesmallscript
+```
+
 USAGE:
 ------
 
